@@ -1,5 +1,5 @@
 
-class Tilemap {
+export class Tilemap {
     tilemap: Array<Array<ImageBitmap>>;
     width: number;
     height: number;
@@ -12,7 +12,7 @@ class Tilemap {
         this.width = 0;
         this.height = 0;
         this.tilemap = [];
-        console.log("Tilemap created");
+
         image.onload = async (event) => {
             this.width = (image.width - (image.width % this.tileSize));
             this.height = (image.height - (image.height % this.tileSize));
@@ -29,4 +29,21 @@ class Tilemap {
     }
 }
 
-export default Tilemap;
+export class TilemapLoader {
+    constructor(tilemaps: Array<{ src: string, tileSize: number }>, onLoad: () => void) {
+        let remaining: number = tilemaps.length;
+        setTimeout(() => {
+            if(remaining > 0) {
+                throw new Error('Tilemap loading timeout');
+            }
+        }, 3000)
+        tilemaps.forEach((tilemap) => {
+            let tilemapObj: Tilemap = new Tilemap(tilemap.src, tilemap.tileSize, (src: string) => {
+                remaining--;
+                if(remaining == 0) {
+                    onLoad();
+                }
+            });        
+        });
+    }
+}

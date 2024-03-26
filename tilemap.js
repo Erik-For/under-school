@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-class Tilemap {
+export class Tilemap {
     constructor(src, tileSize, callback) {
         let image = new Image();
         image.src = src;
@@ -15,7 +15,6 @@ class Tilemap {
         this.width = 0;
         this.height = 0;
         this.tilemap = [];
-        console.log("Tilemap created");
         image.onload = (event) => __awaiter(this, void 0, void 0, function* () {
             this.width = (image.width - (image.width % this.tileSize));
             this.height = (image.height - (image.height % this.tileSize));
@@ -30,4 +29,21 @@ class Tilemap {
         });
     }
 }
-export default Tilemap;
+export class TilemapLoader {
+    constructor(tilemaps, onLoad) {
+        let remaining = tilemaps.length;
+        setTimeout(() => {
+            if (remaining > 0) {
+                throw new Error('Tilemap loading timeout');
+            }
+        }, 3000);
+        tilemaps.forEach((tilemap) => {
+            let tilemapObj = new Tilemap(tilemap.src, tilemap.tileSize, (src) => {
+                remaining--;
+                if (remaining == 0) {
+                    onLoad();
+                }
+            });
+        });
+    }
+}
