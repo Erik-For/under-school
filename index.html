@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        #game {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .tilemap {
+            display: none;
+        }
+    </style>
+    <script>var exports = {};</script>
+    <script type="module" src="tilemap.js"></script>
+    <script type="module"src="game.js" defer></script>
+</head>
+<body>
+    <canvas id="game"></canvas>
+    <!-- <canvas height="1000" width="1000" class="tilemap" style="display: none;"></canvas>-->
+</body>
+</html>
