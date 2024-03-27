@@ -1,4 +1,4 @@
-# Den heter testing men här kommer slutgiltiga koden ligga ???, 
+# Bästa spelet någonsin gjort förmodligen
 
 [Editor docs](https://github.com/Erik-For/under-school-testing/blob/master/EDITOR.md)
 
