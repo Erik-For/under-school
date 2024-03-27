@@ -21,6 +21,10 @@ export class Scene {
     getTiles() {
         return this.#mapData;
     }
+
+    removeTile(pos: TileCoordinate) {
+        this.#mapData.get(pos.getY().toString())?.delete(pos.getX().toString());
+    }
 }
 
 export class Tile {

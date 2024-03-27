@@ -1,6 +1,6 @@
 export class InputHandler {
     keys: Map<string, boolean>;
-    relaventKeys: Set<string>;
+    #relaventKeys: Set<string>;
     /**
      * keyClick is a map of keycodes to functions that should be called when the key is clicked
     */
@@ -11,12 +11,12 @@ export class InputHandler {
     keyHeld: Map<string, () => any>;
 
     constructor() {
-        this.relaventKeys = new Set();
+        this.#relaventKeys = new Set();
         this.keys = new Map();
         this.keyClick = new Map();
         this.keyHeld = new Map();
         window.addEventListener('keydown', (event) => {
-            if (!this.relaventKeys.has(event.code)) {
+            if (!this.#relaventKeys.has(event.code)) {
                 return;
             }
             this.keys.set(event.code, true);
@@ -26,7 +26,7 @@ export class InputHandler {
 
         });
         window.addEventListener('keyup', (event) => {
-            if (!this.relaventKeys.has(event.code)) {
+            if (!this.#relaventKeys.has(event.code)) {
                 return;
             }
             this.keys.set(event.code, false);
@@ -55,8 +55,8 @@ export class InputHandler {
      * onClick is run once per click
      */
     onClick(key: string, func: () => any) {
-        if(!this.relaventKeys.has(key)){
-            this.relaventKeys.add(key);
+        if(!this.#relaventKeys.has(key)){
+            this.#relaventKeys.add(key);
         }
         this.keyClick.set(key, func);
     }
@@ -66,10 +66,17 @@ export class InputHandler {
      * onHold is run once per frame
      */
     onHold(key: string, func: () => any) {
-        if(!this.relaventKeys.has(key)){
-            this.relaventKeys.add(key);
+        if(!this.#relaventKeys.has(key)){
+            this.#relaventKeys.add(key);
         }
         this.keyHeld.set(key, func);
+    }
+
+    /** 
+     * trackKey trackes the key so isKeyDown is callable with the key
+     */
+    trackKey(key: string) {
+        this.#relaventKeys.add(key)
     }
 }
 

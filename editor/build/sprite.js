@@ -18,31 +18,38 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _SpriteSheet_spritemap;
+var _SpriteSheet_spritemap, _SpriteSheet_src;
 export class SpriteSheet {
-    constructor(src, spriteSize, onLoad) {
+    constructor(src, spriteSize) {
         _SpriteSheet_spritemap.set(this, void 0);
-        let image = new Image();
-        image.src = src;
+        _SpriteSheet_src.set(this, void 0);
+        __classPrivateFieldSet(this, _SpriteSheet_src, src, "f");
         this.spriteSize = spriteSize;
         this.width = 0;
         this.height = 0;
         __classPrivateFieldSet(this, _SpriteSheet_spritemap, [], "f");
-        image.onload = (event) => __awaiter(this, void 0, void 0, function* () {
-            this.width = (image.width - (image.width % this.spriteSize));
-            this.height = (image.height - (image.height % this.spriteSize));
-            const asyncRun = () => __awaiter(this, void 0, void 0, function* () {
-                for (let y = 0; y < this.height / this.spriteSize; y++) {
-                    __classPrivateFieldGet(this, _SpriteSheet_spritemap, "f")[y] = [];
-                    for (let x = 0; x < this.width / this.spriteSize; x++) {
-                        let img = yield createImageBitmap(image, x * spriteSize, y * spriteSize, this.spriteSize, this.spriteSize);
-                        __classPrivateFieldGet(this, _SpriteSheet_spritemap, "f")[y][x] = img;
+    }
+    slice() {
+        const promise = new Promise((reslove, reject) => {
+            let image = new Image();
+            image.src = __classPrivateFieldGet(this, _SpriteSheet_src, "f");
+            image.onload = (event) => __awaiter(this, void 0, void 0, function* () {
+                this.width = (image.width - (image.width % this.spriteSize));
+                this.height = (image.height - (image.height % this.spriteSize));
+                const asyncRun = () => __awaiter(this, void 0, void 0, function* () {
+                    for (let y = 0; y < this.height / this.spriteSize; y++) {
+                        __classPrivateFieldGet(this, _SpriteSheet_spritemap, "f")[y] = [];
+                        for (let x = 0; x < this.width / this.spriteSize; x++) {
+                            let img = yield createImageBitmap(image, x * this.spriteSize, y * this.spriteSize, this.spriteSize, this.spriteSize);
+                            __classPrivateFieldGet(this, _SpriteSheet_spritemap, "f")[y][x] = img;
+                        }
                     }
-                }
+                });
+                yield asyncRun();
+                reslove(__classPrivateFieldGet(this, _SpriteSheet_src, "f"));
             });
-            yield asyncRun();
-            onLoad(src);
         });
+        return promise;
     }
     getSprite(x, y) {
         return __classPrivateFieldGet(this, _SpriteSheet_spritemap, "f")[y][x];
@@ -56,7 +63,7 @@ export class SpriteSheet {
         return __classPrivateFieldGet(this, _SpriteSheet_spritemap, "f");
     }
 }
-_SpriteSheet_spritemap = new WeakMap();
+_SpriteSheet_spritemap = new WeakMap(), _SpriteSheet_src = new WeakMap();
 /**
  * SpriteSheetLoader is a class that loads multiple spritesheets and stores them in a dictionary
  * it calls the @param onLoad callback when all spritesheets are loaded
@@ -69,10 +76,10 @@ export class SpriteSheetLoader {
             if (remaining > 0) {
                 throw new Error('Spritesheet loading timeout');
             }
-        }, 5000);
+        }, 10 * 1000);
         spritesheets.forEach((spritesheet) => {
-            let spritesheetMap = new SpriteSheet(spritesheet.src, spritesheet.spriteSize, (src) => {
-                this.spritesheets.set(src, spritesheetMap);
+            spritesheet.slice().then((src) => {
+                this.spritesheets.set(src, spritesheet);
                 remaining--;
                 if (remaining == 0) {
                     onLoad();

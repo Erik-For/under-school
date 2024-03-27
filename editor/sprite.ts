@@ -1,34 +1,44 @@
 export class SpriteSheet {
     #spritemap: Array<Array<ImageBitmap>>;
+    #src: string;
     width: number;
     height: number;
     spriteSize: number;
 
-    constructor(src: string, spriteSize: number, onLoad: (src: string) => void){
-        let image = new Image();
-        image.src = src;
+    constructor(src: string, spriteSize: number){
+        this.#src = src;
         this.spriteSize = spriteSize;
         this.width = 0;
         this.height = 0;
         this.#spritemap = [];
+    }
 
-        image.onload = async (event) => {
-            this.width = (image.width - (image.width % this.spriteSize));
-            this.height = (image.height - (image.height % this.spriteSize));
+    slice(): Promise<string> {
+        const promise = new Promise<string>((reslove, reject) => {
 
-            const asyncRun = async () => {
-                for(let y = 0; y < this.height/this.spriteSize; y++) {
-                    this.#spritemap[y] = [];
-                    for(let x = 0; x < this.width/this.spriteSize; x++) {
-                        let img: ImageBitmap = await createImageBitmap(image, x*spriteSize, y*spriteSize, this.spriteSize, this.spriteSize);
-                        this.#spritemap[y][x] = img;
+            let image = new Image();
+            image.src = this.#src;
+            image.onload = async (event) => {
+                this.width = (image.width - (image.width % this.spriteSize));
+                this.height = (image.height - (image.height % this.spriteSize));
+    
+                const asyncRun = async () => {
+                    for(let y = 0; y < this.height/this.spriteSize; y++) {
+                        this.#spritemap[y] = [];
+                        for(let x = 0; x < this.width/this.spriteSize; x++) {
+                            let img: ImageBitmap = await createImageBitmap(image, x*this.spriteSize, y*this.spriteSize, this.spriteSize, this.spriteSize);
+                            this.#spritemap[y][x] = img;
+                        }
                     }
                 }
+                await asyncRun();
+                reslove(this.#src);
             }
-            await asyncRun();
-            onLoad(src);
-        }
+        });
+        return promise;
     }
+
+
 
     getSprite(x: number, y: number): ImageBitmap {
         return this.#spritemap[y][x];
@@ -50,22 +60,22 @@ export class SpriteSheet {
 export class SpriteSheetLoader {
     spritesheets: Map<string, SpriteSheet>;
 
-    constructor(spritesheets: Array<{ src: string, spriteSize: number }>, onLoad: () => void) {
+    constructor(spritesheets: Array<SpriteSheet>, onLoad: () => void) {
         let remaining: number = spritesheets.length;
         this.spritesheets = new Map();
         setTimeout(() => {
             if(remaining > 0) {
                 throw new Error('Spritesheet loading timeout');
             }
-        }, 5000)
+        }, 10*1000)
         spritesheets.forEach((spritesheet) => {
-            let spritesheetMap: SpriteSheet = new SpriteSheet(spritesheet.src, spritesheet.spriteSize, (src: string) => {
-                this.spritesheets.set(src, spritesheetMap);
+            spritesheet.slice().then((src) => {
+                this.spritesheets.set(src, spritesheet);
                 remaining--;
                 if(remaining == 0) {
                     onLoad();
                 }
-            });        
+            });
         });
         this.spritesheets
     }

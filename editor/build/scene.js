@@ -29,6 +29,10 @@ export class Scene {
     getTiles() {
         return __classPrivateFieldGet(this, _Scene_mapData, "f");
     }
+    removeTile(pos) {
+        var _a;
+        (_a = __classPrivateFieldGet(this, _Scene_mapData, "f").get(pos.getY().toString())) === null || _a === void 0 ? void 0 : _a.delete(pos.getX().toString());
+    }
 }
 _Scene_mapData = new WeakMap();
 export class Tile {
