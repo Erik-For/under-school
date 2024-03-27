@@ -73,6 +73,8 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
         if (selectedSprite != null) {
             let x = Math.floor(((camera.x - canvas.width / 2) + event.clientX) / (tileSize * renderScale));
             let y = Math.floor(((camera.y - canvas.height / 2) + event.clientY) / (tileSize * renderScale));
+            // when holding shift add a sprite to the top of the tile
+            // if not holding shift create/replace tile
             if (input.isKeyDown("ShiftLeft")) {
                 let tile = scene.getTile(x, y);
                 if (tile != null) {
@@ -88,6 +90,8 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
         event.preventDefault();
         let x = Math.floor(((camera.x - canvas.width / 2) + event.clientX) / (tileSize * renderScale));
         let y = Math.floor(((camera.y - canvas.height / 2) + event.clientY) / (tileSize * renderScale));
+        // when holding shift remove the top sprite from the tile
+        // if not holding shift delete the tile
         if (input.isKeyDown("ShiftLeft")) {
             let tile = scene.getTile(x, y);
             if (tile != null) {
@@ -101,11 +105,11 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
         }
         scene.removeTile(new TileCoordinate(x, y));
     });
+    // Save every 5 seconds so that the user does not loose their work and cry
     setInterval(() => {
-        let dataStorage = sessionStorage.setItem("data", serilizeScene(scene));
+        sessionStorage.setItem("data", serilizeScene(scene));
     }, 5000);
     populateSpritesheetModal(spriteSheetManager);
-    render(camera, scene);
     requestAnimationFrame(function gameLoop() {
         input.update();
         render(camera, scene);
