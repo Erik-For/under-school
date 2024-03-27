@@ -1,15 +1,4 @@
 export class InputHandler {
-    keys: Map<string, boolean>;
-    relaventKeys: Set<string>;
-    /**
-     * keyClick is a map of keycodes to functions that should be called when the key is clicked
-    */
-    keyClick: Map<string, () => any>;
-    /**
-     * keyClick is a map of keycodes to functions that should be called when the update method is called and the key is held
-    */
-    keyHeld: Map<string, () => any>;
-
     constructor() {
         this.relaventKeys = new Set();
         this.keys = new Map();
@@ -21,9 +10,8 @@ export class InputHandler {
             }
             this.keys.set(event.code, true);
             if (this.keyClick.has(event.code)) {
-                this.keyClick.get(event.code)!();
+                this.keyClick.get(event.code)();
             }
-
         });
         window.addEventListener('keyup', (event) => {
             if (!this.relaventKeys.has(event.code)) {
@@ -32,11 +20,9 @@ export class InputHandler {
             this.keys.set(event.code, false);
         });
     }
-
-    isKeyDown(key: string) {
+    isKeyDown(key) {
         return this.keys.get(key) || false;
     }
-
     /**
      * update is a function that should be called once per frame
      * it will call the functions that are set to be called when a key is held
@@ -45,31 +31,28 @@ export class InputHandler {
     update() {
         this.keys.forEach((value, key) => {
             if (value && this.keyHeld.has(key)) {
-                this.keyHeld.get(key)!();
+                this.keyHeld.get(key)();
             }
         });
     }
-    
     /**
      * onClick is a function that takes a key and a function that should be called when the key is clicked
      * onClick is run once per click
      */
-    onClick(key: string, func: () => any) {
-        if(!this.relaventKeys.has(key)){
+    onClick(key, func) {
+        if (!this.relaventKeys.has(key)) {
             this.relaventKeys.add(key);
         }
         this.keyClick.set(key, func);
     }
-
     /**
      * onHold is a function that takes a key and a function that should be called when the key is held
      * onHold is run once per frame
      */
-    onHold(key: string, func: () => any) {
-        if(!this.relaventKeys.has(key)){
+    onHold(key, func) {
+        if (!this.relaventKeys.has(key)) {
             this.relaventKeys.add(key);
         }
         this.keyHeld.set(key, func);
     }
 }
-

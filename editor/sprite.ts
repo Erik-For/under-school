@@ -1,28 +1,27 @@
-
 export class SpriteSheet {
-    tilemap: Array<Array<ImageBitmap>>;
+    #spritemap: Array<Array<ImageBitmap>>;
     width: number;
     height: number;
-    tileSize: number;
+    spriteSize: number;
 
-    constructor(src: string, tileSize: number, onLoad: (src: string) => void){
+    constructor(src: string, spriteSize: number, onLoad: (src: string) => void){
         let image = new Image();
         image.src = src;
-        this.tileSize = tileSize;
+        this.spriteSize = spriteSize;
         this.width = 0;
         this.height = 0;
-        this.tilemap = [];
+        this.#spritemap = [];
 
         image.onload = async (event) => {
-            this.width = (image.width - (image.width % this.tileSize));
-            this.height = (image.height - (image.height % this.tileSize));
+            this.width = (image.width - (image.width % this.spriteSize));
+            this.height = (image.height - (image.height % this.spriteSize));
 
             const asyncRun = async () => {
-                for(let y = 0; y < this.height/this.tileSize; y++) {
-                    this.tilemap[y] = [];
-                    for(let x = 0; x < this.width/this.tileSize; x++) {
-                        let img: ImageBitmap = await createImageBitmap(image, x*tileSize, y*tileSize, this.tileSize, this.tileSize);
-                        this.tilemap[y][x] = img;
+                for(let y = 0; y < this.height/this.spriteSize; y++) {
+                    this.#spritemap[y] = [];
+                    for(let x = 0; x < this.width/this.spriteSize; x++) {
+                        let img: ImageBitmap = await createImageBitmap(image, x*spriteSize, y*spriteSize, this.spriteSize, this.spriteSize);
+                        this.#spritemap[y][x] = img;
                     }
                 }
             }
@@ -31,35 +30,48 @@ export class SpriteSheet {
         }
     }
 
-    getTile(x: number, y: number): ImageBitmap {
-        return this.tilemap[y][x];
+    getSprite(x: number, y: number): ImageBitmap {
+        return this.#spritemap[y][x];
+    }
+
+    /**
+     * @returns a 2D array of ImageBitmaps
+     * the first index is the y coordinate and the second index is the x coordinate
+     * the ImageBitmaps are the sprites in the spritesheet
+    */
+    getSprites(): Array<Array<ImageBitmap>> {
+        return this.#spritemap;
     }
 }
-
+/**
+ * SpriteSheetLoader is a class that loads multiple spritesheets and stores them in a dictionary
+ * it calls the @param onLoad callback when all spritesheets are loaded
+ */
 export class SpriteSheetLoader {
-    tilemaps: Record<string, SpriteSheet> = {};
+    spritesheets: Map<string, SpriteSheet>;
 
-    constructor(tilemaps: Array<{ src: string, tileSize: number }>, onLoad: () => void) {
-        let remaining: number = tilemaps.length;
+    constructor(spritesheets: Array<{ src: string, spriteSize: number }>, onLoad: () => void) {
+        let remaining: number = spritesheets.length;
+        this.spritesheets = new Map();
         setTimeout(() => {
             if(remaining > 0) {
-                throw new Error('Tilemap loading timeout');
+                throw new Error('Spritesheet loading timeout');
             }
-        }, 3000)
-        tilemaps.forEach((tilemap) => {
-            let tilemapObj: SpriteSheet = new SpriteSheet(tilemap.src, tilemap.tileSize, (src: string) => {
-                this.tilemaps[src] = tilemapObj;
+        }, 5000)
+        spritesheets.forEach((spritesheet) => {
+            let spritesheetMap: SpriteSheet = new SpriteSheet(spritesheet.src, spritesheet.spriteSize, (src: string) => {
+                this.spritesheets.set(src, spritesheetMap);
                 remaining--;
                 if(remaining == 0) {
                     onLoad();
                 }
             });        
         });
-        this.tilemaps
+        this.spritesheets
     }
 
-    getTextureTilemap(src: string): SpriteSheet {
-        return this.tilemaps[src];
+    getSpriteSheet(src: string): SpriteSheet {
+        return this.spritesheets.get(src)!;
     }
 }
 
@@ -69,8 +81,8 @@ export class Sprite {
     yOffset: number;
     zindex: number;
 
-    constructor(textureTileMapName: string, x: number, y: number, zindex: number) {
-        this.spriteSheetSrc = textureTileMapName;
+    constructor(spriteSheetSrc: string, x: number, y: number, zindex: number) {
+        this.spriteSheetSrc = spriteSheetSrc;
         this.xOffset = x;
         this.yOffset = y;
         this.zindex = zindex;
@@ -78,18 +90,18 @@ export class Sprite {
 }
 
 /**
-* Renders ONE and only ONE image per tilemap coordinate
+* Renders ONE and only ONE sprite per tile
 */
 export function render(ctx: CanvasRenderingContext2D, spriteSheetLoader: SpriteSheetLoader, sprite: Sprite, x: number, y: number, width: number, height: number) {
-    let tilemap: SpriteSheet = spriteSheetLoader.getTextureTilemap(sprite.spriteSheetSrc);
-    if(!tilemap) {
-        throw new Error('Tilemap not found');
+    let spritesheet: SpriteSheet = spriteSheetLoader.getSpriteSheet(sprite.spriteSheetSrc);
+    if(!spritesheet) {
+        throw new Error('Spritesheet not found');
     }
-    ctx.drawImage(tilemap.getTile(sprite.xOffset, sprite.yOffset), x, y, width, height);
+    ctx.drawImage(spritesheet.getSprite(sprite.xOffset, sprite.yOffset), x, y, width, height);
 }
 
 /**
-* Renders multiple images on the same world coordinates ordered by ascending z-index 
+* Renders multiple sprites on the same tile ordered by ascending z-index 
 */
 export function renderMany(ctx: CanvasRenderingContext2D, spriteSheetLoader: SpriteSheetLoader, sprites: Array<Sprite>, x: number, y: number, width: number, height: number) {
     sprites.sort((a,b) => a.zindex - b.zindex).forEach((sprite) => {
