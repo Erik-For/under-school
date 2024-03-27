@@ -17,7 +17,8 @@
 
 ## Camera Keybinds
 - WASD to move camera
-__
+
+## Mouse controls
 - Space to choose Sprite to build
 - Left mouse button: place sprite
 - Right mouse button: remove object
