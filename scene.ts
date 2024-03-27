@@ -48,7 +48,10 @@ export class Tile {
 
     getCollisonRule() {
         return this.#collisonRule;
-    
+    }
+
+    setCollisonRule(rule: number) {
+        this.#collisonRule = rule;
     }
 }
 
@@ -74,7 +77,7 @@ export class TileCoordinate {
  * Turns a Scene object into a json string that can be saved
  */
 export function serilizeScene(scene: Scene){
-    const serilizedObject: {
+    const object: {
         [key: string]: {
             [key: string]:
                 { // Tile class
@@ -95,10 +98,10 @@ export function serilizeScene(scene: Scene){
             }
         } = {}; // Add index signature
     scene.getTiles().forEach((row, ys) => {
-        serilizedObject[ys] = {};
+        object[ys] = {};
 
         row.forEach((tile, xs) => {
-            serilizedObject[ys][xs] = {
+            object[ys][xs] = {
                 col: tile.getCollisonRule(),
                 /* This can be figured out by the 2 keys so this is redudant
                 pos: {
@@ -117,7 +120,7 @@ export function serilizeScene(scene: Scene){
             }
         });
     });
-    return JSON.stringify(serilizedObject);
+    return JSON.stringify(object);
 }
 
 

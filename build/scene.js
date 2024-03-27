@@ -53,6 +53,9 @@ export class Tile {
     getCollisonRule() {
         return __classPrivateFieldGet(this, _Tile_collisonRule, "f");
     }
+    setCollisonRule(rule) {
+        __classPrivateFieldSet(this, _Tile_collisonRule, rule, "f");
+    }
 }
 _Tile_pos = new WeakMap(), _Tile_collisonRule = new WeakMap(), _Tile_sprites = new WeakMap();
 export class TileCoordinate {
@@ -74,11 +77,11 @@ _TileCoordinate_x = new WeakMap(), _TileCoordinate_y = new WeakMap();
  * Turns a Scene object into a json string that can be saved
  */
 export function serilizeScene(scene) {
-    const serilizedObject = {}; // Add index signature
+    const object = {}; // Add index signature
     scene.getTiles().forEach((row, ys) => {
-        serilizedObject[ys] = {};
+        object[ys] = {};
         row.forEach((tile, xs) => {
-            serilizedObject[ys][xs] = {
+            object[ys][xs] = {
                 col: tile.getCollisonRule(),
                 /* This can be figured out by the 2 keys so this is redudant
                 pos: {
@@ -97,7 +100,7 @@ export function serilizeScene(scene) {
             };
         });
     });
-    return JSON.stringify(serilizedObject);
+    return JSON.stringify(object);
 }
 /**
  * Turns a json object of the correct format into a Scnene object
