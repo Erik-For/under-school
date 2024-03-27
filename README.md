@@ -2,6 +2,12 @@
 
 [Editor docs](https://github.com/Erik-For/under-school-testing/blob/master/EDITOR.md)
 
+## Setup and Building (you need node and npm)
+### Run the following commands to setup
+- ```npm i``` for installing necessary packages 
+- ```npx tsc -w ``` this will run and compile .ts file automatically to .js files
+### The page is in ```build/```
+
 
 # Docs
 
