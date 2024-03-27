@@ -10,7 +10,9 @@ const renderScale = 4;
 const modal = document.getElementById('modal');
 let modalActive = false;
 let selectedSprite = null;
+// what collision rule to set when clicking r on a tile or t on a selection
 let selectedCollisionRule = 1;
+// should render collision boxes
 let renderCollision = true;
 if (!ctx) {
     throw new Error('Canvas not found');
@@ -23,11 +25,14 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
     new Sprites.SpriteSheet("assets/mcwalk.png", tileSize),
     new Sprites.SpriteSheet("assets/collision_boxes.png", tileSize),
 ], () => {
+    // callback when all assets are loaded
     // delete loading screen when loading is finished
     document.getElementById('loading').style.display = 'none';
     canvas.style.display = 'block';
     // load data from session storage, if data is null load an empty object
     let scene = deserilizeScene(sessionStorage.getItem("data") || "{}");
+    // selection object
+    // allows the user to select an area of the map and prefore actions on it
     const selection = { startX: 0, startY: 0, endX: 0, endY: 0, active: false };
     const mouse = { x: 0, y: 0 };
     // init camera to 0,0
@@ -68,6 +73,8 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
         }
         camera.x += 1.5 * renderScale;
     });
+    // change collision rule with arrow keys
+    // selected collision rule is the value that will be set when the user clicks r on a tile or t on a selection
     const setCollisionRule = (rule) => {
         if (!(rule >= 0 && rule <= 10)) {
             return;
@@ -79,12 +86,14 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
     };
     input.onClick('ArrowUp', () => setCollisionRule(selectedCollisionRule + 1));
     input.onClick('ArrowDown', () => setCollisionRule(selectedCollisionRule - 1));
+    // toggle render collision
     input.onClick('KeyE', () => {
         if (modalActive) {
             return;
         }
         renderCollision = !renderCollision;
     });
+    // set collision rule on tile from selectedCollisionRule
     input.onClick('KeyR', () => {
         if (modalActive) {
             return;
@@ -130,7 +139,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
             scene = new Scene();
         }
     });
-    // area selection
+    // area selection with f, g, h, t
     const handleSelection = (mode) => {
         var _a;
         if (modalActive) {
@@ -141,10 +150,12 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
         }
         selection.active = !selection.active;
         if (selection.active) {
+            // get tile cooardinates of the start of the selection
             selection.startX = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
             selection.startY = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
         }
         else {
+            // get tile cooardinates of the end of the selection
             selection.endX = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
             selection.endY = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
             let minX = Math.min(selection.startX, selection.endX);
@@ -156,8 +167,10 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
                 let scalarString = prompt("Enter number 0-1", "1");
                 scalar = Number(scalarString);
             }
+            // loop through all tiles in the selection and preform the action
             for (let x = minX; x <= maxX; x++) {
                 for (let y = minY; y <= maxY; y++) {
+                    // diffrent actions for diffrent modes
                     if (mode == "remove") {
                         scene.removeTile(new TileCoordinate(x, y));
                     }
@@ -176,6 +189,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
             }
         }
     };
+    // bind the selection functions to keys
     input.onClick('KeyF', () => handleSelection("remove"));
     input.onClick('KeyG', () => handleSelection("add"));
     input.onClick('KeyH', () => handleSelection("random"));
@@ -200,6 +214,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
         }
         scene.setTile(new TileCoordinate(x, y), 0, [selectedSprite]);
     });
+    // remove
     canvas.addEventListener('contextmenu', (event) => {
         event.preventDefault();
         let x = Math.floor(((camera.x - canvas.width / 2) + event.clientX) / (tileSize * renderScale));
@@ -219,6 +234,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
         }
         scene.removeTile(new TileCoordinate(x, y));
     });
+    // some methods need this to work
     document.addEventListener('mousemove', (event) => {
         mouse.x = event.clientX;
         mouse.y = event.clientY;
@@ -227,7 +243,9 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
     setInterval(() => {
         sessionStorage.setItem("data", serilizeScene(scene));
     }, 5000);
+    // populate the modal with sprites to select from
     populateSpritesheetModal(spriteSheetManager);
+    // game loop
     requestAnimationFrame(function gameLoop() {
         input.update();
         render(camera, scene);
