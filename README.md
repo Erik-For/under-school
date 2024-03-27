@@ -49,9 +49,9 @@ class TileCoordinate {};
 // this file only has one class InputHandler
 class InputHandler {};
 /*
- the class has 2 diffrent features:
-   running a callback func every time the user presses a certain key
-   and running a callback func every frame while the user is holding a certain key
+ the class has 2 primary features:
+   running a callback func every time the user presses a certain key (onClick)
+   and running a callback func every frame while the user is holding a certain key (onHold)
 */
 //
 ```
