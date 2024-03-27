@@ -9,9 +9,3 @@
 - Right mouse button: remove object
 - Left mouse button + Left shift: place sprite on top of current sprites
 - Right mouse button + Left shift: remove top sprite
-
-## Setup and Building (you need node and npm)
-### Run the following commands to setup
-- ```npm i``` for installing necessary packages 
-- ```npx tsc -w ``` this will run and compile .ts file automatically to .js files
-### The page is in ```build/```
