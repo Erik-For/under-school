@@ -47,3 +47,10 @@ export class TilemapLoader {
         });
     }
 }
+export class TilemapItemEnum {
+    constructor(src, x, y) {
+        this.src = src;
+        this.x = x;
+        this.y = y;
+    }
+}

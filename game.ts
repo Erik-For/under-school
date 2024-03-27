@@ -1,4 +1,4 @@
-import { Tilemap, TilemapLoader } from './tilemap.js';
+import { Tilemap, TilemapLoader, TilemapItemEnum} from './tilemap.js';
 
 
 const canvas: HTMLCanvasElement | null = document.getElementById('game') as HTMLCanvasElement;
@@ -15,13 +15,16 @@ let tilemap: Tilemap = new Tilemap("assets/tilemap.png", 16, (src: string) => {
     canvas.style.display = 'block';
 });
 
-
 new TilemapLoader(
     [
         { src: "assets/tilemap.png", tileSize: 16 },
-        
+
     ], () => {
         document.getElementById('loading')!.style.display = 'none';
         canvas.style.display = 'block';
     }
 )
+
+const tm1 = Object.freeze({
+    WATER: new TilemapItemEnum("assets/tilemap.png", 0, 0),
+});
