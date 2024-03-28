@@ -125,7 +125,7 @@ export function serilizeScene(scene: Scene){
 
 
 /**
- * Turns a json object of the correct format into a Scnene object
+ * Turns a json object of the correct format into a Scene object
  */
 export function deserilizeScene(json: string): Scene {
     const serilizedObject: {

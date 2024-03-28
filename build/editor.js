@@ -194,8 +194,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
     input.onClick('KeyG', () => handleSelection("add"));
     input.onClick('KeyH', () => handleSelection("random"));
     input.onClick('KeyT', () => handleSelection("col"));
-    // place 
-    input.trackKey("ShiftLeft");
+    // place
     canvas.addEventListener('click', (event) => {
         if (selectedSprite == null) {
             return;
