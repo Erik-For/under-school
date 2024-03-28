@@ -186,7 +186,6 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader (
         
 
         // place 
-        input.trackKey("ShiftLeft")
         canvas.addEventListener('click', (event) => {
             if(selectedSprite == null){ return; }
             let x = Math.floor(((camera.x - canvas.width / 2) + event.clientX) / (tileSize * renderScale));
