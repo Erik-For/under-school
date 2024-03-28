@@ -103,7 +103,7 @@ export function serilizeScene(scene) {
     return JSON.stringify(object);
 }
 /**
- * Turns a json object of the correct format into a Scnene object
+ * Turns a json object of the correct format into a Scene object
  */
 export function deserilizeScene(json) {
     const serilizedObject = JSON.parse(json);

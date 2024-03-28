@@ -17,8 +17,6 @@ let renderCollision = true;
 if (!ctx) {
     throw new Error('Canvas not found');
 }
-ctx.imageSmoothingEnabled = false; //CRISP!, För fräsch pixelart
-//ctx.scale(renderScale, renderScale); UUH, vi hanterar det i draw istället
 // load all assets
 const spriteSheetManager = new Sprites.SpriteSheetLoader([
     new Sprites.SpriteSheet("assets/tilemap.png", tileSize),
@@ -194,7 +192,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
     input.onClick('KeyG', () => handleSelection("add"));
     input.onClick('KeyH', () => handleSelection("random"));
     input.onClick('KeyT', () => handleSelection("col"));
-    // place
+    // place 
     canvas.addEventListener('click', (event) => {
         if (selectedSprite == null) {
             return;
@@ -246,6 +244,9 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader([
     populateSpritesheetModal(spriteSheetManager);
     // game loop
     requestAnimationFrame(function gameLoop() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx.imageSmoothingEnabled = false; // For some reason this has to be done every frame when setting the canvas size to prevent blurring
         input.update();
         render(camera, scene);
         if (selection.active) {
