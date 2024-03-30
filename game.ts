@@ -1,23 +1,51 @@
-import * as Sprites from './sprite.js';
-import { deserilizeScene, Scene, serilizeScene, Tile, TileCoordinate } from './scene.js';
-import { InputHandler } from './input.js';
+import { Camera, Pos, Screen } from "./screen.js";
+import { InputHandler } from "./input.js";
+import { Player } from "./player.js";
+import { Scene } from "./scene.js";
+import { AssetLoader } from "./sprite.js";
 
-const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
-const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+export class Game {
+    #scene: Scene;
+    #player: Player;
+    #camera: Camera;
+    #screen: Screen;
+    #inputHandler: InputHandler;
+    #assetLoader: AssetLoader;
 
-const spriteSheetLoader = new Sprites.SpriteSheetLoader(
-    [
-        new Sprites.SpriteSheet("assets/tilemap.png", 16),
-        new Sprites.SpriteSheet("assets/mcwalk.png", 16),
-    ],
-    () => {
-        // remove loading screen
-        document.getElementById('loading')?.remove();
-        // show the canvas
-        canvas.style.display = 'block';
-        // start the game
-        
-        const scene = deserilizeScene(JSON.parse(localStorage.getItem('scene') || '{}'));
-        
+    constructor(scene: Scene, startPos: Pos, screen: Screen, assetLoader: AssetLoader) {
+        this.#screen = screen;
+        this.#assetLoader = assetLoader;
+        this.#scene = scene;
+        this.#camera = new Camera(startPos.x, startPos.y);
+        this.#inputHandler = new InputHandler();
+        this.#player = new Player(startPos.x, startPos.y, this);
     }
-);
+
+    getPlayer():Player {
+        return this.#player;
+    }
+
+    getScene():Scene {
+        return this.#scene;
+    }
+
+    getCamera():Camera {
+        return this.#camera;
+    }
+
+    getScreen():Screen {
+        return this.#screen;
+    }
+
+    getInputHandler():InputHandler {
+        return this.#inputHandler;
+    }
+
+    setScene(scene: Scene) {
+        this.#scene = scene;
+    }
+
+    getAssetLoader():AssetLoader {
+        return this.#assetLoader;
+    }
+}

@@ -1,3 +1,4 @@
+import { Pos } from "./screen.js";
 import * as Sprites from "./sprite.js";
 
 export class Scene {
@@ -8,14 +9,14 @@ export class Scene {
     }
     
     setTile(pos: TileCoordinate, collisonRule: number, sprites: Array<Sprites.Sprite>) {
-        if(!this.#mapData.has(pos.getY().toString())) {
-            this.#mapData.set(pos.getY().toString(), new Map());
+        if(!this.#mapData.has(pos.y.toString())) {
+            this.#mapData.set(pos.y.toString(), new Map());
         }
-        this.#mapData.get(pos.getY().toString())!.set(pos.getX().toString(), new Tile(pos, collisonRule, sprites));
+        this.#mapData.get(pos.y.toString())!.set(pos.x.toString(), new Tile(pos, collisonRule, sprites));
     }
 
-    getTile(x: number, y: number) {
-        return this.#mapData.get(y.toString())?.get(x.toString());
+    getTile(pos: TileCoordinate) {
+        return this.#mapData.get(pos.y.toString())?.get(pos.x.toString());
     }
 
     getTiles() {
@@ -23,7 +24,7 @@ export class Scene {
     }
 
     removeTile(pos: TileCoordinate) {
-        this.#mapData.get(pos.getY().toString())?.delete(pos.getX().toString());
+        this.#mapData.get(pos.y.toString())?.delete(pos.x.toString());
     }
 }
 
@@ -56,21 +57,27 @@ export class Tile {
 }
 
 export class TileCoordinate {
-    #x: number;
-    #y: number;
+    x: number;
+    y: number;
 
     constructor(x: number, y: number) {
-        this.#x = x;
-        this.#y = y;
+        this.x = x;
+        this.y = y;
     }
 
-    getX() {
-        return this.#x;
+    add(pos: TileCoordinate): TileCoordinate {
+        return new TileCoordinate(this.x + pos.x, this.y + pos.y);
+    }
+    subtract(pos: TileCoordinate): TileCoordinate {
+        return new TileCoordinate(this.x - pos.x, this.y - pos.y);
+    }
+    multiply(scalar: number): TileCoordinate {
+        return new TileCoordinate(this.x * scalar, this.y * scalar);
+    }
+    toPos(): Pos {
+        return new Pos(this.x, this.y);
     }
 
-    getY() {
-        return this.#y;   
-    }
 }
 
 /**
@@ -105,8 +112,8 @@ export function serilizeScene(scene: Scene){
                 col: tile.getCollisonRule(),
                 /* This can be figured out by the 2 keys so this is redudant
                 pos: {
-                    x: tile.getPosition().getX(),
-                    y: tile.getPosition().getY()
+                    x: tile.getPosition().x,
+                    y: tile.getPosition().y
                 },
                 */
                 spr: tile.getSprites().map((sprite) => {

@@ -1,0 +1,138 @@
+import * as Sprites from './sprite.js';
+import { deserilizeScene, Scene, serilizeScene, Tile, TileCoordinate } from './scene.js';
+import * as Animate from './animate.js';
+import * as Util from './util.js';
+import { InputHandler } from './input.js';
+import { Camera, Pos, Screen } from './screen.js';
+import { Player } from './player.js';
+import { Game } from './game.js';
+
+const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
+const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+let dev = false;
+const zoom = 1;
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'p') {
+        dev = !dev;
+    }
+});
+
+const assetLoader = new Sprites.AssetLoader(
+    [
+        new Sprites.SpriteSheet("assets/tilemap.png", 16),
+        new Sprites.SpriteSheet("assets/mcwalk.png", 16),
+        new Sprites.SpriteSheet("assets/collision_boxes.png", 16),
+        new Sprites.TextAsset("assets/test.json")
+    ],
+    () => {
+        // remove loading screen
+        document.getElementById('loading')!.remove();
+        // show the canvas
+        canvas.style.display = 'block';
+        // start the game
+
+        const screen = new Screen(window.innerWidth, window.innerHeight, 16);
+        let scene = deserilizeScene(assetLoader.getTextAsset("assets/test.json")!.data!);
+        
+        const game = new Game(scene, new Pos(16, 16), screen, assetLoader);
+
+        requestAnimationFrame(function gameLoop() {
+            game.getScreen().width = window.innerWidth;
+            game.getScreen().height = window.innerHeight;
+            game.getScreen().renderScale = Math.round(zoom * window.innerWidth / 480);
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.imageSmoothingEnabled = false;
+
+            render(game);
+            if(dev){
+                renderDevOverlay(game);
+                renderDevPlayerHitbox(game.getPlayer(), game.getCamera(), game.getScreen());
+            }
+            requestAnimationFrame(gameLoop);
+        })
+    }
+);
+
+function render(game: Game): void {
+    // Camera bounds
+    ctx!.clearRect(0, 0, game.getScreen().width, game.getScreen().height);
+
+    let renderBounds = {  
+        // Devison by renderScale to get the correct tile coordinate 
+        min: Util.convertWorldPosToTileCoordinate(
+            Util.convertCanvasPosToWorldPos(new Pos(0, 0), game.getCamera().getPosition(), game.getScreen())
+            , game.getScreen()),
+        max: Util.convertWorldPosToTileCoordinate(
+            Util.convertCanvasPosToWorldPos(new Pos(game.getScreen().width, game.getScreen().height), game.getCamera().getPosition(), game.getScreen())
+            , game.getScreen()
+        )
+    }
+
+    game.getScene().getTiles().forEach((row, ys) => {
+        let screen = game.getScreen();
+        // Get row y as int
+        let y =  Number(ys); 
+
+        row.forEach((tile, xs) => {
+            // Get current tiles y as int
+            let x =  Number(xs);            
+
+            // Check if the tile is outside the camera view
+            if(x < renderBounds.min.x || x > renderBounds.max.x || y < renderBounds.min.y || y > renderBounds.max.y) {
+            // if(x <= renderBounds.min.x || x >= renderBounds.max.x || y <= renderBounds.min.y || y >= renderBounds.max.y) { // try this to se how it looks to build understanding
+                return;
+            }
+            let pos = Util.convertWorldPosToCanvasPos(Util.convertTileCoordinateToWorldPos(new TileCoordinate(x, y), game.getScreen()), game.getCamera().getPosition(), game.getScreen()).round();
+            let xPos = pos.x;
+            let yPos = pos.y;
+            
+            // Sort tiles after zindex so that the tiles with the highest zindex are drawn last
+            Sprites.renderMany(ctx!, assetLoader, tile.getSprites(),
+                xPos,
+                yPos,
+                screen.tileSize*screen.renderScale,
+                screen.tileSize*screen.renderScale
+            );
+
+            // draw collision boxes if in dev mode
+            if(dev){
+                ctx.globalAlpha = 0.4;
+                ctx.drawImage(assetLoader.getSpriteSheet("assets/collision_boxes.png")!.getSprite(tile.getCollisonRule(), 0),
+                    xPos,
+                    yPos, 
+                    screen.tileSize*screen.renderScale,
+                    screen.tileSize*screen.renderScale
+                );
+                ctx.globalAlpha = 1;
+            }
+        });
+    });
+    game.getPlayer().render(ctx, game);
+}
+
+
+function renderDevOverlay(game: Game) {
+    const playerTilePos = Util.convertWorldPosToTileCoordinate(game.getPlayer().getPosition(), game.getScreen());
+    const mouseTilePos = Util.convertWorldPosToTileCoordinate(Util.convertCanvasPosToWorldPos(game.getInputHandler().getMousePos(), game.getCamera().getPosition(), game.getScreen()), game.getScreen());
+    
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "lighter 20px Arial";
+    ctx.fillText(`Standing on tile: ${playerTilePos.x}, ${playerTilePos.y}`, 10, 30);
+    ctx.fillText(`Mouse on tile: ${mouseTilePos.x}, ${mouseTilePos.y}`, 10, 60);
+
+}
+
+function renderDevPlayerHitbox(player: Player, camera: Camera, screen: Screen) {
+    const leftCollisionPoint = new Pos(player.x - screen.tileSize / 2, player.y);
+    const rightCollisionPoint = new Pos(player.x + screen.tileSize / 2, player.y);
+
+    const leftPoint = Util.convertWorldPosToCanvasPos(leftCollisionPoint, camera.getPosition(), screen);
+    const rightPoint = Util.convertWorldPosToCanvasPos(rightCollisionPoint, camera.getPosition(), screen);
+
+    ctx.fillStyle = "#FF0000";
+    ctx.fillRect(Math.round(leftPoint.x), Math.round(leftPoint.y), 1, 1);
+    ctx.fillRect(Math.round(rightPoint.x), Math.round(rightPoint.y), 1, 1);
+}

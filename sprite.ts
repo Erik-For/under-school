@@ -1,23 +1,28 @@
-export class SpriteSheet {
+export interface Asset {
+    src: string;
+    load(): Promise<string>;
+}
+
+export class SpriteSheet implements Asset {
     #spritemap: Array<Array<ImageBitmap>>;
-    #src: string;
+    src: string;
     width: number;
     height: number;
     spriteSize: number;
 
     constructor(src: string, spriteSize: number){
-        this.#src = src;
+        this.src = src;
         this.spriteSize = spriteSize;
         this.width = 0;
         this.height = 0;
         this.#spritemap = [];
     }
 
-    slice(): Promise<string> {
+    load(): Promise<string> {
         const promise = new Promise<string>((reslove, reject) => {
 
             let image = new Image();
-            image.src = this.#src;
+            image.src = this.src;
             image.onload = async (event) => {
                 this.width = (image.width - (image.width % this.spriteSize));
                 this.height = (image.height - (image.height % this.spriteSize));
@@ -32,7 +37,7 @@ export class SpriteSheet {
                     }
                 }
                 await asyncRun();
-                reslove(this.#src);
+                reslove(this.src);
             }
         });
         return promise;
@@ -53,35 +58,78 @@ export class SpriteSheet {
         return this.#spritemap;
     }
 }
+
+export class TextAsset implements Asset {
+    src: string;
+    data: string;
+    
+    constructor(src: string) {
+        this.src = src;
+        this.data = "";
+    }
+
+    load(): Promise<string> {
+        const promise = new Promise<string>((reslove, reject) => {
+            fetch(this.src).then((response) => {
+                response.text().then((data) => {
+                    this.data = data;
+                    reslove(this.src);
+                });
+            });
+        });
+        return promise;
+    }
+
+}
+
 /**
- * SpriteSheetLoader is a class that loads multiple spritesheets and stores them in a dictionary
+ * AssetLoader is a class that loads multiple spritesheets and stores them in a dictionary
  * it calls the @param onLoad callback when all spritesheets are loaded
  */
-export class SpriteSheetLoader {
-    spritesheets: Map<string, SpriteSheet>;
+export class AssetLoader {
+    assets: Map<string, Asset>;
 
-    constructor(spritesheets: Array<SpriteSheet>, onLoad: () => void) {
-        let remaining: number = spritesheets.length;
-        this.spritesheets = new Map();
+    constructor(assets: Array<Asset>, onLoad: () => void) {
+        let remaining: number = assets.length;
+        this.assets = new Map();
         setTimeout(() => {
             if(remaining > 0) {
                 throw new Error('Spritesheet loading timeout');
             }
         }, 10*1000)
-        spritesheets.forEach((spritesheet) => {
-            spritesheet.slice().then((src) => {
-                this.spritesheets.set(src, spritesheet);
+        assets.forEach((asset) => {
+            asset.load().then((src) => {
+                this.assets.set(src, asset);
                 remaining--;
                 if(remaining == 0) {
                     onLoad();
                 }
             });
         });
-        this.spritesheets
+        this.assets
     }
 
-    getSpriteSheet(src: string): SpriteSheet {
-        return this.spritesheets.get(src)!;
+    getSpriteSheet(src: string): SpriteSheet | undefined {
+        if(this.assets.get(src) instanceof SpriteSheet) {
+            return this.assets.get(src)! as SpriteSheet;
+        }
+    }
+
+    getTextAsset(src: string): TextAsset | undefined {
+        if(this.assets.get(src) instanceof TextAsset) {
+            return this.assets.get(src) as TextAsset;
+        }
+    }
+
+    getSpriteSheets() {
+        // return map of assets that are instances of SpriteSheet
+        let spritesheets = new Map<string, SpriteSheet>();
+        this.assets.forEach((asset) => {
+            if(asset instanceof SpriteSheet) {
+                spritesheets.set(asset.src, asset);
+            }
+        });
+        return spritesheets;
     }
 }
 
@@ -102,18 +150,18 @@ export class Sprite {
 /**
 * Renders ONE and only ONE sprite per tile
 */
-export function render(ctx: CanvasRenderingContext2D, spriteSheetLoader: SpriteSheetLoader, sprite: Sprite, x: number, y: number, width: number, height: number) {
-    let spritesheet: SpriteSheet = spriteSheetLoader.getSpriteSheet(sprite.spriteSheetSrc);
+export function render(ctx: CanvasRenderingContext2D, spriteSheetLoader: AssetLoader, sprite: Sprite, x: number, y: number, width: number, height: number) {
+    let spritesheet: SpriteSheet = spriteSheetLoader.getSpriteSheet(sprite.spriteSheetSrc)!;
     if(!spritesheet) {
         throw new Error('Spritesheet not found');
-    }
+    }    
     ctx.drawImage(spritesheet.getSprite(sprite.xOffset, sprite.yOffset), x, y, width, height);
 }
 
 /**
 * Renders multiple sprites on the same tile ordered by ascending z-index 
 */
-export function renderMany(ctx: CanvasRenderingContext2D, spriteSheetLoader: SpriteSheetLoader, sprites: Array<Sprite>, x: number, y: number, width: number, height: number) {
+export function renderMany(ctx: CanvasRenderingContext2D, spriteSheetLoader: AssetLoader, sprites: Array<Sprite>, x: number, y: number, width: number, height: number) {
     sprites.sort((a,b) => a.zindex - b.zindex).forEach((sprite) => {
         render(ctx, spriteSheetLoader, sprite, x, y, width, height);
     });

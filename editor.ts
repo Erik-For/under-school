@@ -23,7 +23,7 @@ if(!ctx) {
     throw new Error('Canvas not found');   
 }
 // load all assets
-const spriteSheetManager = new Sprites.SpriteSheetLoader (
+const spriteSheetManager = new Sprites.AssetLoader (
     [
         new Sprites.SpriteSheet("assets/tilemap.png", tileSize),
         new Sprites.SpriteSheet("assets/mcwalk.png", tileSize),
@@ -59,19 +59,19 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader (
         //movement
         input.onHold('KeyW', () => {
             if(modalActive){ return; }
-            camera.y -= 1.5*renderScale;
+            camera.y -= (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
         input.onHold('KeyS', () => {
             if(modalActive){ return; }
-            camera.y += 1.5*renderScale;
+            camera.y += (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
         input.onHold('KeyA', () => {
             if(modalActive){ return; }
-            camera.x -= 1.5*renderScale;
+            camera.x -= (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
         input.onHold('KeyD', () => {
             if(modalActive){ return; }
-            camera.x += 1.5*renderScale;
+            camera.x += (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
 
         // change collision rule with arrow keys
@@ -97,7 +97,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader (
             let x = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
             let y = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
 
-            let tile = scene.getTile(x, y);
+            let tile = scene.getTile(new TileCoordinate(x, y));
             if(tile == null){ return; }
             let currentRule = tile.getCollisonRule();
             tile.setCollisonRule(selectedCollisionRule);
@@ -107,7 +107,9 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader (
         input.onClick('KeyC', () => {
             if(modalActive){ return; }
             if(confirm("Do you want to copy the current scene? as a JSON string")){
-                navigator.clipboard.writeText(serilizeScene(scene));
+                let serilizedScene = serilizeScene(scene);
+                sessionStorage.setItem("data", serilizedScene);
+                navigator.clipboard.writeText(serilizedScene);
             }
         });
 
@@ -167,7 +169,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader (
                                 scene.setTile(new TileCoordinate(x, y), 0, [selectedSprite!]);
                             }
                         } else if(mode == "col"){
-                            scene.getTile(x, y)?.setCollisonRule(selectedCollisionRule);
+                            scene.getTile(new TileCoordinate(x, y))?.setCollisonRule(selectedCollisionRule);
                         }
                     }
                 }
@@ -190,7 +192,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader (
             // when holding shift add a sprite to the top of the tile
             // if not holding shift create/replace tile
             if(input.isKeyDown("ShiftLeft")){
-                let tile = scene.getTile(x, y);
+                let tile = scene.getTile(new TileCoordinate(x, y));
                 if(tile != null ){
                     let zindex = tile.getSprites().sort((a,b) => a.zindex - b.zindex)[0].zindex // get the zindex of the top sprite
                     tile.getSprites().push(new Sprites.Sprite(selectedSprite.spriteSheetSrc, selectedSprite.xOffset, selectedSprite.yOffset, zindex)); // create new sprite on the laste sprite
@@ -208,7 +210,7 @@ const spriteSheetManager = new Sprites.SpriteSheetLoader (
             // when holding shift remove the top sprite from the tile
             // if not holding shift delete the tile
             if(input.isKeyDown("ShiftLeft")){
-                let tile = scene.getTile(x, y);
+                let tile = scene.getTile(new TileCoordinate(x, y));
                 if(tile != null ){
                     if(tile.getSprites().length == 1){
                         scene.removeTile(new TileCoordinate(x, y));
@@ -283,8 +285,8 @@ function render(camera: { x: number, y: number}, scene: Scene): void {
 }
 
 
-function populateSpritesheetModal(spriteSheetManager: Sprites.SpriteSheetLoader) {
-    spriteSheetManager.spritesheets.forEach((spritesheet, src) => {
+function populateSpritesheetModal(spriteSheetManager: Sprites.AssetLoader) {
+    spriteSheetManager.getSpriteSheets().forEach((spritesheet, src) => {
         const margin = 10*(spritesheet.width/spritesheet.spriteSize);
         const width = Math.min(100, (window.innerWidth - margin) / (spritesheet.width/spritesheet.spriteSize));
 
@@ -345,9 +347,9 @@ function renderCollisionBox(ctx: CanvasRenderingContext2D, collisonRule: number,
     ctx.fillRect(35-3, 14-3, 16+6, 16+6);
     ctx.font = "lighter 20px Arial";
     ctx.fillText(`${selectedCollisionRule}`, 10, 30);
-    ctx.drawImage(spriteSheetManager.getSpriteSheet("assets/collision_boxes.png").getSprite(selectedCollisionRule, 0), 35, 14, 16, 16);
+    ctx.drawImage(spriteSheetManager.getSpriteSheet("assets/collision_boxes.png")!.getSprite(selectedCollisionRule, 0), 35, 14, 16, 16);
 
     ctx.globalAlpha = 0.4;
-    ctx.drawImage(spriteSheetManager.getSpriteSheet("assets/collision_boxes.png").getSprite(collisonRule, 0), x, y, w, h);
+    ctx.drawImage(spriteSheetManager.getSpriteSheet("assets/collision_boxes.png")!.getSprite(collisonRule, 0), x, y, w, h);
     ctx.globalAlpha = 1;
 }
