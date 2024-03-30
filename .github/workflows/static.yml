@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build TypeScript app
-        run: npm run build
+        run: npx tsc
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
