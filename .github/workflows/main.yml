@@ -23,8 +23,14 @@ jobs:
 
     - name: Build TypeScript app
       run: npx tsc
-      
+
+    - name: Copy files to GitHub Pages directory
+      run: |
+        mkdir -p ./gh-pages
+        rsync -av --exclude '*editor*' ./build/ ./gh-pages/
+
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@4.1.4
       with:
-        folder: build
+        branch: gh-pages
+        folder: gh-pages
