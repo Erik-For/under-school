@@ -1,5 +1,9 @@
 {
+  "name": "underschool",
+  "version": "1.0.0",
+  "description": "A simple Typescript game",
   "devDependencies": {
+    "typedoc": "^0.25.12",
     "typescript": "^5.4.3"
   }
 }

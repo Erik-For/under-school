@@ -41,6 +41,8 @@ jobs:
         run: npm ci
       - name: Build TypeScript app
         run: npx tsc
+      - name: Build TypeDoc
+        run: npx typedoc *.ts --name Underschool --exclude editor.ts --exclude init.ts --readme DOCS.md --out ./build/docs/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
