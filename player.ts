@@ -39,6 +39,12 @@ export class Player {
         );
     }
 
+    /**
+     * Registers the movement keys for the player
+     * This handles the movement logic for the player
+     * like collision detection and movement
+     * @private
+     */
     #registerMovmentKeys() {
         let inputHandler = this.#game.getInputHandler();
 
@@ -69,6 +75,13 @@ export class Player {
         });
     }
 
+    /**
+     * Checks if the player can move to the given position
+     * @param x - the x position
+     * @param y - the y position
+     * @returns true if the player can move to the given position otherwise false
+     * @private
+     */
     #canMove(x: number, y: number):boolean {
         const screen = this.#game.getScreen();
         const scene = this.#game.getScene();
@@ -99,6 +112,12 @@ export class Player {
         return true;
     }
 
+    /**
+     * Registers the animation keys for the player
+     * This handles the animation logic for the player
+     * like walking and idleing animations
+     * @private
+     */
     #registerAnimationKeys() {
         let inputHandler = this.#game.getInputHandler()
         function isOtherKeyHeld(){
@@ -145,6 +164,10 @@ export class Player {
     }
 }
 
+/**
+ * Initializes the animations for the player
+ * @param directionAnimation - the map to store the animations associated with the direction
+ */
 function initAnimations(directionAnimation: Map<String, PlayerAnimation>) {
     let duration = 750;
 
@@ -228,6 +251,12 @@ function initAnimations(directionAnimation: Map<String, PlayerAnimation>) {
     ));
 }
 
+/**
+ * Checks if the position within the tile is colliding with the collision box of the tile
+ * @param pos - the position within the tile
+ * @param collisionRule - the collision rule of the tile
+ * @returns true if the position is colliding with the collision box of the tile otherwise false
+ */
 function isColliding(pos: Pos, collisionRule: number) {
     if(collisionRule == 0) {
         return false;
@@ -235,15 +264,16 @@ function isColliding(pos: Pos, collisionRule: number) {
     const subBounds:  { [key: number]: { minX: number, minY: number, maxX: number, maxY: number } } = {
         1: { minX: 0, minY: 0, maxX: 16, maxY: 16 }, // full collision box
         2: { minX: 5, minY: 5, maxX: 12, maxY: 12 }, // center collision box
-        3: { minX: 0, minY: 0, maxX: 16, maxY: 8 }, // top half collision box
+        3: { minX: 0, minY: 0, maxX: 16, maxY: 7 }, // top half collision box
         4: { minX: 0, minY: 9, maxX: 16, maxY: 16 }, // bottom half collision box
-        5: { minX: 0, minY: 0, maxX: 8, maxY: 16 }, // left half collision box
+        5: { minX: 0, minY: 0, maxX: 7, maxY: 15 }, // left half collision box
         6: { minX: 9, minY: 0, maxX: 16, maxY: 16 }, // right half collision box
-        7: { minX: 0, minY: 0, maxX: 8, maxY: 8 }, // top left corner collision box
-        8: { minX: 9, minY: 0, maxX: 16, maxY: 8 }, // top right corner collision box
-        9: { minX: 0, minY: 9, maxX: 8, maxY: 16 }, // bottom left corner collision box
+        7: { minX: 0, minY: 0, maxX: 7, maxY: 7 }, // top left corner collision box
+        8: { minX: 9, minY: 0, maxX: 16, maxY: 7 }, // top right corner collision box
+        9: { minX: 0, minY: 9, maxX: 7, maxY: 16 }, // bottom left corner collision box
         10: { minX: 9, minY: 9, maxX: 16, maxY: 16 }, // bottom right corner collision box
     };
+    
     let subBound = subBounds[collisionRule];
     return subBound.minX <= pos.x && pos.x <= subBound.maxX && // if minX <= pos.x <= maxX
     subBound.minY <= pos.y && pos.y <= subBound.maxY; // if minY <= pos.y <= maxY

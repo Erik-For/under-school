@@ -4,6 +4,9 @@ import { Player } from "./player.js";
 import { Scene } from "./scene.js";
 import { AssetLoader } from "./sprite.js";
 
+/**
+ * Represents a game.
+ */
 export class Game {
     #scene: Scene;
     #player: Player;
@@ -12,6 +15,13 @@ export class Game {
     #inputHandler: InputHandler;
     #assetLoader: AssetLoader;
 
+    /**
+     * Creates a new instance of the Game class.
+     * @param scene The inital scene of the game.
+     * @param startPos The starting position of the player.
+     * @param screen The screen for rendering the game.
+     * @param assetLoader The asset loader of the game.
+     */
     constructor(scene: Scene, startPos: Pos, screen: Screen, assetLoader: AssetLoader) {
         this.#screen = screen;
         this.#assetLoader = assetLoader;
@@ -21,31 +31,59 @@ export class Game {
         this.#player = new Player(startPos.x, startPos.y, this);
     }
 
-    getPlayer():Player {
+    /**
+     * Gets the player of the game.
+     * @returns The player object.
+     */
+    getPlayer(): Player {
         return this.#player;
     }
 
-    getScene():Scene {
+    /**
+     * Gets the scene of the game.
+     * @returns The scene object.
+     */
+    getScene(): Scene {
         return this.#scene;
     }
 
-    getCamera():Camera {
+    /**
+     * Gets the camera of the game.
+     * @returns The camera object.
+     */
+    getCamera(): Camera {
         return this.#camera;
     }
 
-    getScreen():Screen {
+    /**
+     * Gets the screen of the game.
+     * @returns The screen object.
+     */
+    getScreen(): Screen {
         return this.#screen;
     }
 
-    getInputHandler():InputHandler {
+    /**
+     * Gets the input handler of the game.
+     * @returns The input handler object.
+     */
+    getInputHandler(): InputHandler {
         return this.#inputHandler;
     }
 
+    /**
+     * Sets the scene of the game.
+     * @param scene The new scene object.
+     */
     setScene(scene: Scene) {
         this.#scene = scene;
     }
 
-    getAssetLoader():AssetLoader {
+    /**
+     * Gets the asset loader of the game.
+     * @returns The asset loader object.
+     */
+    getAssetLoader(): AssetLoader {
         return this.#assetLoader;
     }
 }

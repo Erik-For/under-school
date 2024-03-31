@@ -1,14 +1,17 @@
 import { Pos } from "./screen.js";
 
+/**
+ * Represents an input handler for handling keyboard and mouse input.
+ */
 export class InputHandler {
     keys: Map<string, boolean>;
     /**
      * keyClick is a map of keycodes to functions that should be called when the key is clicked
-    */
+     */
     keyClick: Map<string, (() => any)[]>;
     /**
      * keyClick is a map of keycodes to functions that should be called when the update method is called and the key is held
-    */
+     */
     keyHeld: Map<string, (() => any)[]>;
     /**
      * keyRelease is a map of keycodes to functions that should be called when the key is released
@@ -17,13 +20,16 @@ export class InputHandler {
 
     #mousePos: Pos;
 
+    /**
+     * Creates an instance of InputHandler.
+     */
     constructor() {
         this.keys = new Map();
         this.keyClick = new Map();
         this.keyHeld = new Map();
         this.keyRelease = new Map();
         this.#mousePos = new Pos(0, 0);
-        
+
         window.addEventListener('keydown', (event) => {
             this.keys.set(event.code, true);
             if (this.keyClick.has(event.code)) {
@@ -41,21 +47,30 @@ export class InputHandler {
         });
         setInterval(() => {
             this.update();
-        }, Math.round(1000/60));
+        }, Math.round(1000 / 60));
     }
 
+    /**
+     * Checks if a specific key is currently being held down.
+     * @param key - The key to check.
+     * @returns A boolean indicating whether the key is currently being held down.
+     */
     isKeyDown(key: string): boolean {
         return this.keys.get(key) || false;
     }
 
+    /**
+     * Gets the current position of the mouse.
+     * @returns The current position of the mouse.
+     */
     getMousePos(): Pos {
         return this.#mousePos;
     }
 
     /**
-     * update is a function that should be called once per frame
-     * it will call the functions that are set to be called when a key is held
-     * this is meant to be run in a game loop
+     * Updates the input state. This method should be called once per frame.
+     * It will call the functions that are set to be called when a key is held.
+     * This method is meant to be run in a game loop.
      */
     update() {
         this.keys.forEach((value, key) => {
@@ -64,13 +79,14 @@ export class InputHandler {
             }
         });
     }
-    
+
     /**
-     * onClick is a function that takes a key and a function that should be called when the key is clicked
-     * onClick is run once per click
+     * Sets a function to be called when a specific key is clicked.
+     * @param key - The key to listen for.
+     * @param func - The function to be called when the key is clicked.
      */
     onClick(key: string, func: () => any) {
-        if(!this.keyClick.has(key)) {
+        if (!this.keyClick.has(key)) {
             this.keyClick.set(key, [func]);
             return;
         }
@@ -78,10 +94,12 @@ export class InputHandler {
     }
 
     /**
-     *  
+     * Sets a function to be called when a specific key is released.
+     * @param key - The key to listen for.
+     * @param func - The function to be called when the key is released.
      */
     onRelease(key: string, func: () => any) {
-        if(!this.keyRelease.has(key)) {
+        if (!this.keyRelease.has(key)) {
             this.keyRelease.set(key, [func]);
             return;
         }
@@ -89,11 +107,12 @@ export class InputHandler {
     }
 
     /**
-     * onHold is a function that takes a key and a function that should be called when the key is held
-     * onHold is run once per frame
+     * Sets a function to be called when a specific key is held.
+     * @param key - The key to listen for.
+     * @param func - The function to be called when the key is held.
      */
     onHold(key: string, func: () => any) {
-        if(!this.keyHeld.has(key)) {
+        if (!this.keyHeld.has(key)) {
             this.keyHeld.set(key, [func]);
             return;
         }

@@ -10,6 +10,11 @@ export class SpriteSheet implements Asset {
     height: number;
     spriteSize: number;
 
+    /**
+     * SpriteSheet is a class that loads a spritesheet and stores the sprites in a 2D array
+     * @param src - the source of the spritesheet
+     * @param spriteSize - the size of the sprites in the spritesheet
+    */
     constructor(src: string, spriteSize: number){
         this.src = src;
         this.spriteSize = spriteSize;
@@ -18,6 +23,11 @@ export class SpriteSheet implements Asset {
         this.#spritemap = [];
     }
 
+    /** 
+     * @returns a promise that resolves when the spritesheet is loaded
+     * the promise resolves with the src of the spritesheet
+     * the promise rejects with an error message
+     */
     load(): Promise<string> {
         const promise = new Promise<string>((reslove, reject) => {
 
@@ -43,8 +53,11 @@ export class SpriteSheet implements Asset {
         return promise;
     }
 
-
-
+    /**
+     * @param x - the x coordinate of the sprite in the spritesheet
+     * @param y - the y coordinate of the sprite in the spritesheet
+     * @returns the ImageBitmap of the sprite at the x and y coordinates
+     */
     getSprite(x: number, y: number): ImageBitmap {
         return this.#spritemap[y][x];
     }
@@ -63,11 +76,21 @@ export class TextAsset implements Asset {
     src: string;
     data: string;
     
+    /**
+     * TextAsset is a class that loads a text file
+     * @param src - the source of the text file
+     * the data of the text file is stored in the data field
+     */
     constructor(src: string) {
         this.src = src;
         this.data = "";
     }
 
+    /** 
+     * @returns a promise that resolves when the text file is loaded
+     * the promise resolves with the src of the text file
+     * the promise rejects with an error message
+     */
     load(): Promise<string> {
         const promise = new Promise<string>((reslove, reject) => {
             fetch(this.src).then((response) => {
@@ -89,6 +112,12 @@ export class TextAsset implements Asset {
 export class AssetLoader {
     assets: Map<string, Asset>;
 
+    /**
+     * AssetLoader is a class that loads multiple assets and stores them in a dictionary
+     * @param assets - an array of assets to load
+     * @param onLoad - a callback that is called when all assets are loaded
+     * the callback is called with no arguments
+     */
     constructor(assets: Array<Asset>, onLoad: () => void) {
         let remaining: number = assets.length;
         this.assets = new Map();
@@ -109,18 +138,31 @@ export class AssetLoader {
         this.assets
     }
 
+    /**
+     * @param src - the source of the spritesheet
+     * @returns the spritesheet with the key 'src'
+     */
     getSpriteSheet(src: string): SpriteSheet | undefined {
         if(this.assets.get(src) instanceof SpriteSheet) {
             return this.assets.get(src)! as SpriteSheet;
         }
     }
-
+   
+    /**
+     * @param src - the source of the text file
+     * @returns the text file with the key 'src'
+     */
     getTextAsset(src: string): TextAsset | undefined {
         if(this.assets.get(src) instanceof TextAsset) {
             return this.assets.get(src) as TextAsset;
         }
     }
-
+    
+    /**
+     * @returns a map of assets that are instances of SpriteSheet
+     * the key is the src of the spritesheet
+     * this is here for use in the editor
+     */
     getSpriteSheets() {
         // return map of assets that are instances of SpriteSheet
         let spritesheets = new Map<string, SpriteSheet>();
@@ -138,7 +180,19 @@ export class Sprite {
     xOffset: number;
     yOffset: number;
     zindex: number;
-
+    /**
+     * Sprite is a class that represents a sprite
+     * @param spriteSheetSrc - the source of the spritesheet
+     * @param x - the x coordinate of the sprite in the spritesheet
+     * @param y - the y coordinate of the sprite in the spritesheet
+     * @param zindex - the zindex of the sprite
+     * the zindex is used to determine the order of rendering
+     * the lower the zindex the earlier the sprite is rendered
+     * the higher the zindex the later the sprite is rendered
+     * the sprite class dosen't store the ImageBitmap of the sprite
+     * the ImageBitmap is stored in the SpriteSheet class
+     * the sprite class only stores the coordinates of the ImageBitmap in the spritesheet
+     */
     constructor(spriteSheetSrc: string, x: number, y: number, zindex: number) {
         this.spriteSheetSrc = spriteSheetSrc;
         this.xOffset = x;
@@ -148,7 +202,15 @@ export class Sprite {
 }
 
 /**
-* Renders ONE and only ONE sprite per tile
+* Renders a sprite on the canvas
+* @param ctx - the canvas rendering context
+* @param spriteSheetLoader - the asset loader that contains the spritesheet
+* @param sprite - the sprite to render
+* @param x - the x coordinate to render the sprite
+* @param y - the y coordinate to render the sprite
+* @param width - the width to render the sprite
+* @param height - the height to render the sprite
+* the width and height are used to scale the sprite
 */
 export function render(ctx: CanvasRenderingContext2D, spriteSheetLoader: AssetLoader, sprite: Sprite, x: number, y: number, width: number, height: number) {
     let spritesheet: SpriteSheet = spriteSheetLoader.getSpriteSheet(sprite.spriteSheetSrc)!;
@@ -159,7 +221,18 @@ export function render(ctx: CanvasRenderingContext2D, spriteSheetLoader: AssetLo
 }
 
 /**
-* Renders multiple sprites on the same tile ordered by ascending z-index 
+* Renders multiple sprites on the canvas
+* @param ctx - the canvas rendering context
+* @param spriteSheetLoader - the asset loader that contains the spritesheet
+* @param sprites - the sprites to render
+* @param x - the x coordinate to render the sprites
+* @param y - the y coordinate to render the sprites
+* @param width - the width to render the sprites
+* @param height - the height to render the sprites
+* the width and height are used to scale the sprites
+* the sprites are rendered in the order of their zindex
+* the lower the zindex the earlier the sprite is rendered
+* the higher the zindex the later the sprite is rendered
 */
 export function renderMany(ctx: CanvasRenderingContext2D, spriteSheetLoader: AssetLoader, sprites: Array<Sprite>, x: number, y: number, width: number, height: number) {
     sprites.sort((a,b) => a.zindex - b.zindex).forEach((sprite) => {

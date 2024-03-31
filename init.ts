@@ -1,8 +1,7 @@
 import * as Sprites from './sprite.js';
-import { deserilizeScene, Scene, serilizeScene, Tile, TileCoordinate } from './scene.js';
+import { deserilizeScene, TileCoordinate } from './scene.js';
 import * as Util from './util.js';
-import { Camera, Pos, Screen } from './screen.js';
-import { Player } from './player.js';
+import { Pos, Screen } from './screen.js';
 import { Game } from './game.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;

@@ -1,39 +1,54 @@
 import { Pos, Screen } from "./screen.js";
 import { TileCoordinate } from "./scene.js";
 
-// function convertCanvasPosToWorldPos(canvasPos: { x: number, y: number }, cameraPos: { x: number, y: number }, cameraWidth: number, cameraHeight: number): { x: number, y: number } {
-//     return {x: canvasPos.x + cameraPos.x - cameraWidth / 2, y: canvasPos.y + cameraPos.y - cameraHeight / 2};
-// }
-    
-// function convertWorldPosToTilePos(worldPos: { x: number, y: number }, screen: {}): { x: number, y: number } {
-//     return {x: Math.floor(worldPos.x / this.renderdTileScale), y: Math.floor(worldPos.y / this.renderdTileScale)};
-// }
-    
-// function convertTilePosToWorldPos(tilePos: { x: number, y: number }): { x: number, y: number } {
-//     return {x: tilePos.x * this.renderdTileScale, y: tilePos.y * this.renderdTileScale};
-// }
-    
-// function convertWorldPosToCanvasPos(worldPos: { x: number, y: number }, cameraPos: { x: number, y: number }, cameraWidth: number, cameraHeight: number): { x: number, y: number } {
-//     return {x: worldPos.x - cameraPos.x + cameraWidth / 2, y: worldPos.y - cameraPos.y + cameraHeight / 2};
-// }
-
-
+/**
+ * Converts the canvas position to world position.
+ * @param {Pos} canvasPos - The canvas position.
+ * @param {Pos} cameraPos - The camera position.
+ * @param {Screen} screen - The screen object.
+ * @returns {Pos} The world position.
+ */
 export function convertCanvasPosToWorldPos(canvasPos: Pos, cameraPos: Pos, screen: Screen): Pos {
-    return canvasPos.minus(new Pos(screen.width / 2, screen.height / 2)).devide(screen.renderScale).add(cameraPos);
+    return canvasPos.minus(new Pos(screen.width / 2, screen.height / 2)).divide(screen.renderScale).add(cameraPos);
 }
+
+/**
+ * Converts the world position to canvas position.
+ * @param {Pos} worldPos - The world position.
+ * @param {Pos} cameraPos - The camera position.
+ * @param {Screen} screen - The screen object.
+ * @returns {Pos} The canvas position.
+ */
 export function convertWorldPosToCanvasPos(worldPos: Pos, cameraPos: Pos, screen: Screen): Pos {
     return worldPos.minus(new Pos(cameraPos.x, cameraPos.y)).multiply(screen.renderScale).add(new Pos(screen.width / 2, screen.height / 2));
 }
 
+/**
+ * Converts the world position to tile coordinate.
+ * @param {Pos} worldPos - The world position.
+ * @param {Screen} screen - The screen object.
+ * @returns {TileCoordinate} The tile coordinate.
+ */
 export function convertWorldPosToTileCoordinate(worldPos: Pos, screen: Screen): TileCoordinate {
     return new TileCoordinate(Math.floor(worldPos.x / screen.tileSize), Math.floor(worldPos.y / screen.tileSize));
 }
+
+/**
+ * Converts the tile coordinate to world position.
+ * @param {TileCoordinate} tilePos - The tile coordinate.
+ * @param {Screen} screen - The screen object.
+ * @returns {Pos} The world position.
+ */
 export function convertTileCoordinateToWorldPos(tilePos: TileCoordinate, screen: Screen): Pos {
     return new Pos(tilePos.x * screen.tileSize, tilePos.y * screen.tileSize);
 }
 
+/**
+ * Gets the sub tile coordinate.
+ * @param {Pos} worldPos - The world position.
+ * @param {Screen} screen - The screen object.
+ * @returns {Pos} The sub tile coordinate.
+ */
 export function getSubTileCoordinate(worldPos: Pos, screen: Screen): Pos {
-    return worldPos.minus(convertWorldPosToTileCoordinate(worldPos, screen).toPos().multiply(screen.tileSize));
+    return worldPos.minus(convertWorldPosToTileCoordinate(worldPos, screen).toPos(screen.tileSize));
 }
-
-
