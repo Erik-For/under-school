@@ -1,8 +1,6 @@
 import * as Sprites from './sprite.js';
 import { deserilizeScene, Scene, serilizeScene, Tile, TileCoordinate } from './scene.js';
-import * as Animate from './animate.js';
 import * as Util from './util.js';
-import { InputHandler } from './input.js';
 import { Camera, Pos, Screen } from './screen.js';
 import { Player } from './player.js';
 import { Game } from './game.js';
@@ -41,7 +39,7 @@ const assetLoader = new Sprites.AssetLoader(
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;
             game.getScreen().height = window.innerHeight;
-            game.getScreen().renderScale = Math.round(zoom * window.innerWidth / 480);
+            game.getScreen().renderScale = Math.round(zoom * window.innerWidth / 480); // to prevent player from just scrolling out and seeing everything, and 480 is just an arbitrary number
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             ctx.imageSmoothingEnabled = false;
@@ -49,7 +47,7 @@ const assetLoader = new Sprites.AssetLoader(
             render(game);
             if(dev){
                 renderDevOverlay(game);
-                renderDevPlayerHitbox(game.getPlayer(), game.getCamera(), game.getScreen());
+                renderDevPlayerHitbox(game);
             }
             requestAnimationFrame(gameLoop);
         })
@@ -125,8 +123,12 @@ function renderDevOverlay(game: Game) {
 
 }
 
-function renderDevPlayerHitbox(player: Player, camera: Camera, screen: Screen) {
-    const leftCollisionPoint = new Pos(player.x - screen.tileSize / 2, player.y);
+function renderDevPlayerHitbox(game: Game) {
+    const camera = game.getCamera();
+    const screen = game.getScreen();
+    const player = game.getPlayer();
+
+    const leftCollisionPoint = new Pos(player.x -screen.tileSize / 2, player.y);
     const rightCollisionPoint = new Pos(player.x + screen.tileSize / 2, player.y);
 
     const leftPoint = Util.convertWorldPosToCanvasPos(leftCollisionPoint, camera.getPosition(), screen);

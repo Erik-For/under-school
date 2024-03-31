@@ -1,9 +1,7 @@
-import { Camera, Pos, Screen } from "./screen.js";
+import { Pos } from "./screen.js";
 import * as Util from "./util.js";
 import { PlayerAnimation, CyclicAnimation } from "./animate.js";
-import { InputHandler } from "./input.js";
-import { AssetLoader, Sprite } from "./sprite.js";
-import { Scene, serilizeScene } from "./scene.js";
+import { Sprite } from "./sprite.js";
 import { Game } from "./game.js";
 
 export class Player {
