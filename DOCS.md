@@ -123,9 +123,10 @@ const assetLoader: AssetLoader = new AssetLoader(
         let sprite3: Sprite = new Sprite("spritesheet3", 2, 7, 3);
     }
 );
-
-// you can also load other assets like text
-// here is an example of loading a text asset and a usage example
+```
+>You can also load other assets like text
+>Here is an example of loading a text asset and a usage example
+```ts
 const assetLoader: AssetLoader = new AssetLoader(
     [
         new TextAsset("scene.json"),
