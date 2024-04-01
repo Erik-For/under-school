@@ -1,4 +1,4 @@
-import { Pos } from "./screen.js";
+import { Pos } from "./game.js";
 import * as Sprites from "./sprite.js";
 
 /**
