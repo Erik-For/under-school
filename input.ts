@@ -1,4 +1,4 @@
-import { Pos } from "./screen.js";
+import { Pos } from "./game.js";
 
 /**
  * Represents an input handler for handling keyboard and mouse input.

@@ -1,8 +1,8 @@
 import * as Sprites from './sprite.js';
 import { deserilizeScene, TileCoordinate } from './scene.js';
 import * as Util from './util.js';
-import { Pos, Screen } from './screen.js';
-import { Game } from './game.js';
+import { Screen } from './screen.js';
+import { Pos, Game } from './game.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
