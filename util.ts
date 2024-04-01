@@ -1,5 +1,6 @@
-import { Pos, Screen } from "./screen.js";
+import { Screen } from "./screen.js";
 import { TileCoordinate } from "./scene.js";
+import { Pos } from "./game.js";
 
 /**
  * Converts the canvas position to world position.

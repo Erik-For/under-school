@@ -1,4 +1,4 @@
-import { Pos } from "./screen.js";
+import { Pos } from "./game.js";
 import * as Util from "./util.js";
 import { PlayerAnimation, CyclicAnimation } from "./animate.js";
 import { Sprite } from "./sprite.js";
