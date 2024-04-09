@@ -5,10 +5,12 @@ import * as Sprites from "./sprite.js";
  * Represents a scene containing tiles.
  */
 export class Scene {
-    #mapData: Map<string, Map<string, Tile>>;
+    #mapData: Map<number, Map<number, Tile>>;
+    #scriptedObjectData: Map<number, Map<number, ScriptedObject>>;
 
     constructor() {
         this.#mapData = new Map();
+        this.#scriptedObjectData = new Map();
     }
     
     /**
@@ -18,10 +20,10 @@ export class Scene {
      * @param sprites - The array of sprites for the tile.
      */
     setTile(pos: TileCoordinate, collisonRule: number, sprites: Array<Sprites.Sprite>) {
-        if(!this.#mapData.has(pos.y.toString())) {
-            this.#mapData.set(pos.y.toString(), new Map());
+        if(!this.#mapData.has(pos.y)) {
+            this.#mapData.set(pos.y, new Map());
         }
-        this.#mapData.get(pos.y.toString())!.set(pos.x.toString(), new Tile(pos, collisonRule, sprites));
+        this.#mapData.get(pos.y)!.set(pos.x, new Tile(pos, collisonRule, sprites));
     }
 
     /**
@@ -30,7 +32,7 @@ export class Scene {
      * @returns The tile at the specified position, or undefined if not found.
      */
     getTile(pos: TileCoordinate) {
-        return this.#mapData.get(pos.y.toString())?.get(pos.x.toString());
+        return this.#mapData.get(pos.y)?.get(pos.x);
     }
 
     /**
@@ -46,7 +48,7 @@ export class Scene {
      * @param pos - The position of the tile to remove.
      */
     removeTile(pos: TileCoordinate) {
-        this.#mapData.get(pos.y.toString())?.delete(pos.x.toString());
+        this.#mapData.get(pos.y)?.delete(pos.x);
     }
 }
 
@@ -187,6 +189,42 @@ export class TileCoordinate {
         return new Pos(this.x * tileSize, this.y * tileSize);
     }
 }
+
+export interface ScriptedObject {
+    getPosition(): Pos;
+    setPositon(pos: Pos): void;
+    getWidth(): number;
+    getHeight(): number;
+    onInteract: () => void;
+    onPush: (x: number, y: number) => void;
+}
+
+/**
+ * Represents a pushable object in the scene.
+ */
+export abstract class PushableObject implements ScriptedObject {
+    pos: Pos;
+    
+    constructor(pos: Pos) {
+        this.pos = pos;
+    }
+    setPositon(pos: Pos): void {
+        this.pos = pos;
+    }
+    getPosition(): Pos {
+        return this.pos;
+    }
+    
+    abstract getWidth(): number;
+    abstract getHeight(): number;
+    abstract onInteract(): void;
+
+    onPush(x: number, y: number) {
+        this.pos.x += x;
+        this.pos.y += y;
+    }
+}
+
 
 /**
  * Serializes the scene object into a JSON string.

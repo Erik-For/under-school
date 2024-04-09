@@ -1,6 +1,7 @@
+import { Game } from "./game.js";
 import { InputHandler } from "./input.js";
 import { Screen } from "./screen.js";
-import { AssetLoader, Sprite } from "./sprite.js";
+import { AssetLoader, Sprite, render } from "./sprite.js";
 
 export class CyclicAnimation {
     #frames: Array<Sprite>;
@@ -71,39 +72,85 @@ export class PlayerAnimation {
     }
 }
 
-export class TextAnimation {
-    #text: string;
-    #duration: number;
-    #startTime: number;
-    #onFinish: () => void;
-    #inputHandler: InputHandler;
+export class NPCTalkingSprite {
+    topLeft: Sprite;
+    topRight: Sprite;
+    bottomLeft: Sprite;
+    bottomRight: Sprite;
 
-    constructor(text: string, duration: number, inputHandler: InputHandler,  onFinish: () => void) {
-        this.#text = text;
-        this.#duration = duration;
-        this.#startTime = 0;
-        this.#onFinish = onFinish;
-        this.#inputHandler = inputHandler;
+    constructor(topLeft: Sprite, topRight: Sprite, bottomLeft: Sprite, bottomRight: Sprite) {
+        this.topLeft = topLeft;
+        this.topRight = topRight;
+        this.bottomLeft = bottomLeft;
+        this.bottomRight = bottomRight;
     }
 
-    render(ctx: CanvasRenderingContext2D, screen: Screen, x: number, y: number) {
+    render(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader, x: number, y: number, width: number, height: number) {
+        render(ctx, assetLoader, this.topLeft, x, y, width / 2, height / 2);
+        render(ctx, assetLoader, this.topRight, x + width / 2, y, width / 2, height / 2);
+        render(ctx, assetLoader, this.bottomLeft, x, y + height / 2, width / 2, height / 2);
+        render(ctx, assetLoader, this.bottomRight, x + width / 2, y + height / 2, width / 2, height / 2);
+    }
+}
+
+export class NPCTextAnimation {
+    talkingSprite: NPCTalkingSprite;
+    text: string;
+    duration: number;
+    startTime: number;
+    onFinish: () => void;
+    inputHandler: InputHandler;
+
+    constructor(talkingSprite: NPCTalkingSprite, text: string, duration: number, inputHandler: InputHandler, onFinish: () => void) {
+        this.talkingSprite = talkingSprite;
+        this.text = text;
+        this.duration = duration;
+        this.startTime = 0;
+        this.onFinish = onFinish;
+        this.inputHandler = inputHandler;
+    }
+
+    render(ctx: CanvasRenderingContext2D, game: Game, screen: Screen) {
         // Make text print out acording to time
-        if(this.#startTime == 0) {
-            this.#startTime = Date.now();
+        if(this.startTime == 0) {
+            this.startTime = Date.now();
         }
-        if(Date.now() - this.#startTime > this.#duration) {
-            this.#onFinish();
+        if(Date.now() - this.startTime > this.duration) {
+            this.onFinish();
             return;
         }
         
-        if(this.#inputHandler.isKeyDown("Enter")) {
-            this.#onFinish();
+        if(this.inputHandler.isKeyDown("KeyZ") || this.inputHandler.isKeyDown("Enter")) {
+            this.onFinish();
             return;
         };
 
-        ctx.font = "30px underschool";
+        // render a "modal" that takes up the bottom 1/3 of the screen
+        ctx.fillStyle = "black";
+        ctx.globalAlpha = 0.7;
+        ctx.fillRect(0, screen.height - screen.height / 3, screen.width, screen.height / 3);
+        ctx.globalAlpha = 1;
+        
+        // render the text with wraping if the text is too long and padding
         ctx.fillStyle = "white";
-        ctx.fillText(this.#text.substring(0, (Date.now() - this.#startTime) / this.#duration * this.#text.length + 1),
-            x, y);
+        ctx.font = "30px underschool";
+        let words = this.text.split(" ");
+        let lines = [];
+        let line = "";
+        for(let word of words) {
+            if(ctx.measureText(line + word).width < screen.width - 16) {
+                line += word + " ";
+            } else {
+                lines.push(line);
+                line = word + " ";
+            }
+        }
+        
+        lines.push(line);
+        for(let i = 0; i < lines.length; i++) {
+            ctx.fillText(lines[i], 8, screen.height - screen.height / 3 + 30 + 30 * i);
+        }
+
+        this.talkingSprite.render(ctx, game.getAssetLoader(), screen.width - 64, screen.height - 64, 64, 64);
     }
 }

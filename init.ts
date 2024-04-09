@@ -3,7 +3,7 @@ import { deserilizeScene, TileCoordinate } from './scene.js';
 import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { Pos, Game } from './game.js';
-import { TextAnimation } from './animate.js';
+import { NPCTextAnimation, NPCTalkingSprite } from './animate.js';
 import { InputHandler } from './input.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
@@ -37,6 +37,15 @@ const assetLoader = new Sprites.AssetLoader(
         
         const game = new Game(scene, new Pos(16, 16), screen, assetLoader);
         
+        let charecter = new NPCTalkingSprite(
+            new Sprites.Sprite("assets/mcwalk.png", 0, 0, 0),
+            new Sprites.Sprite("assets/mcwalk.png", 1, 0, 0),
+            new Sprites.Sprite("assets/mcwalk.png", 0, 1, 0),
+            new Sprites.Sprite("assets/mcwalk.png", 1, 1, 0)
+        );
+        
+        let text = new NPCTextAnimation(charecter, "Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!", 5000, game.getInputHandler(), () => {});
+
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;
             game.getScreen().height = window.innerHeight;
@@ -51,7 +60,7 @@ const assetLoader = new Sprites.AssetLoader(
                 renderDevOverlay(game);
                 renderDevPlayerHitbox(game);
             }
-
+            text.render(ctx, game, game.getScreen());
             requestAnimationFrame(gameLoop);
         })
     }

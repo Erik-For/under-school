@@ -86,6 +86,7 @@ export class Player {
                 } else {
                     this.x += movmentSpeed;
                 }
+                
                 this.#game.getCamera().setPosition(this.getPosition())
             }
         });
