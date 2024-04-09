@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Underschool</title>
     <style>
+        @font-face {
+            font-family: underschool;
+            src: url('assets/text.ttf') format('truetype');
+        }
+
         html, body {
             margin: 0;
             padding: 0;
@@ -26,8 +31,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-family: Arial, sans-serif;
+            font-family: "underschool";
             font-size: 2em;
+            text-align: center;
             color: #ecf0f1;
         }
         body {
@@ -38,7 +44,8 @@
 </head>
 <body>
     <div id="loading">
-        <h1>Loading...</h1>
+        <h1>Underschool</h1>
+        <h2>Loading ...</h2>
     </div>
     <canvas style="display: none" id="game"></canvas>
 </body>

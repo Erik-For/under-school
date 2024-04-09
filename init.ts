@@ -3,6 +3,8 @@ import { deserilizeScene, TileCoordinate } from './scene.js';
 import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { Pos, Game } from './game.js';
+import { TextAnimation } from './animate.js';
+import { InputHandler } from './input.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -34,20 +36,22 @@ const assetLoader = new Sprites.AssetLoader(
         let scene = deserilizeScene(assetLoader.getTextAsset("assets/test.json")!.data!);
         
         const game = new Game(scene, new Pos(16, 16), screen, assetLoader);
-
+        
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;
             game.getScreen().height = window.innerHeight;
-            game.getScreen().renderScale = Math.round(zoom * window.innerWidth / 480); // to prevent player from just scrolling out and seeing everything, and 480 is just an arbitrary number
+            game.getScreen().renderScale = Math.floor(zoom * window.innerWidth / 480); // to prevent player from just scrolling out and seeing everything, and 480 is just an arbitrary number
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             ctx.imageSmoothingEnabled = false;
+            ctx.font = "underschool";
 
             render(game);
             if(dev){
                 renderDevOverlay(game);
                 renderDevPlayerHitbox(game);
             }
+
             requestAnimationFrame(gameLoop);
         })
     }

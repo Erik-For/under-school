@@ -1,3 +1,4 @@
+import { InputHandler } from "./input.js";
 import { Screen } from "./screen.js";
 import { AssetLoader, Sprite } from "./sprite.js";
 
@@ -67,5 +68,42 @@ export class PlayerAnimation {
 
         this.#head.render(ctx, assetLoader, centerX, y - 2*height, width, height);
         this.#feet.render(ctx, assetLoader, centerX, y - 1*height, width, height);
+    }
+}
+
+export class TextAnimation {
+    #text: string;
+    #duration: number;
+    #startTime: number;
+    #onFinish: () => void;
+    #inputHandler: InputHandler;
+
+    constructor(text: string, duration: number, inputHandler: InputHandler,  onFinish: () => void) {
+        this.#text = text;
+        this.#duration = duration;
+        this.#startTime = 0;
+        this.#onFinish = onFinish;
+        this.#inputHandler = inputHandler;
+    }
+
+    render(ctx: CanvasRenderingContext2D, screen: Screen, x: number, y: number) {
+        // Make text print out acording to time
+        if(this.#startTime == 0) {
+            this.#startTime = Date.now();
+        }
+        if(Date.now() - this.#startTime > this.#duration) {
+            this.#onFinish();
+            return;
+        }
+        
+        if(this.#inputHandler.isKeyDown("Enter")) {
+            this.#onFinish();
+            return;
+        };
+
+        ctx.font = "30px underschool";
+        ctx.fillStyle = "white";
+        ctx.fillText(this.#text.substring(0, (Date.now() - this.#startTime) / this.#duration * this.#text.length + 1),
+            x, y);
     }
 }

@@ -181,9 +181,6 @@ const spriteSheetManager = new Sprites.AssetLoader (
         input.onClick('KeyH', () => handleSelection("random"));
         input.onClick('KeyT', () => handleSelection("col"));
 
-        
-        
-
         // place 
         canvas.addEventListener('click', (event) => {
             if(selectedSprite == null){ return; }
@@ -279,6 +276,7 @@ function render(camera: { x: number, y: number}, scene: Scene): void {
             // render collision box
             if(renderCollision){
                 renderCollisionBox(ctx!, tile.getCollisonRule(), x * tileSize * renderScale - camera.x + canvas.width / 2, y * tileSize * renderScale - camera.y + canvas.height / 2, tileSize * renderScale, tileSize * renderScale);
+                render
             }
         });
     });
@@ -351,5 +349,13 @@ function renderCollisionBox(ctx: CanvasRenderingContext2D, collisonRule: number,
 
     ctx.globalAlpha = 0.4;
     ctx.drawImage(spriteSheetManager.getSpriteSheet("assets/collision_boxes.png")!.getSprite(collisonRule, 0), x, y, w, h);
+    ctx.globalAlpha = 1;
+}
+
+function renderActionZones(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+    ctx.fillStyle = "#FFA500";
+
+    ctx.globalAlpha = 0.4;
+    ctx.fillRect(x, y, w, h);
     ctx.globalAlpha = 1;
 }
