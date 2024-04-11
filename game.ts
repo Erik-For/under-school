@@ -3,6 +3,7 @@ import { InputHandler } from "./input.js";
 import { Player } from "./player.js";
 import { Scene, TileCoordinate } from "./scene.js";
 import { AssetLoader } from "./sprite.js";
+import { SequenceExecutor } from "./sequence.js";
 
 /**
  * Represents a game.
@@ -14,6 +15,7 @@ export class Game {
     #screen: Screen;
     #inputHandler: InputHandler;
     #assetLoader: AssetLoader;
+    #sequenceExecutor: SequenceExecutor;
 
     /**
      * Creates a new instance of the Game class.
@@ -29,6 +31,7 @@ export class Game {
         this.#camera = new Camera(startPos.x, startPos.y);
         this.#inputHandler = new InputHandler();
         this.#player = new Player(startPos.x, startPos.y, this);
+        this.#sequenceExecutor = new SequenceExecutor();
     }
 
     /**
@@ -85,6 +88,10 @@ export class Game {
      */
     getAssetLoader(): AssetLoader {
         return this.#assetLoader;
+    }
+
+    getSequenceExecutor(): SequenceExecutor {
+        return this.#sequenceExecutor;
     }
 }
 

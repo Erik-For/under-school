@@ -190,6 +190,9 @@ export class TileCoordinate {
     }
 }
 
+/**
+ * Represents a scene object with extended functionality compared to normal tiles
+ */
 export interface ScriptedObject {
     getPosition(): Pos;
     setPositon(pos: Pos): void;
@@ -233,9 +236,14 @@ export abstract class PushableObject implements ScriptedObject {
  */
 export function serilizeScene(scene: Scene){
     const object: {
-        [key: string]: {
-            [key: string]:
-                { // Tile class
+        objectData: {
+            [key: string]: {
+                type: string // 
+            }
+        },
+        tileData: {
+            [key: string]: {
+                [key: string]:{ // Tile class
                     col: number,
                     /* This can be figured out by the 2 keys so this is redudant
                     pos: { // class TileCoordinate serilized
@@ -251,12 +259,13 @@ export function serilizeScene(scene: Scene){
                     }[]
                 }
             }
-        } = {}; // Add index signature
+        }
+    } = { objectData: {}, tileData: {}}; // Add index signature
     scene.getTiles().forEach((row, ys) => {
-        object[ys] = {};
+        object.tileData[ys] = {};
 
         row.forEach((tile, xs) => {
-            object[ys][xs] = {
+            object.tileData[ys][xs] = {
                 col: tile.getCollisonRule(),
                 /* This can be figured out by the 2 keys so this is redudant
                 pos: {
@@ -285,31 +294,45 @@ export function serilizeScene(scene: Scene){
  */
 export function deserilizeScene(json: string): Scene {
     const serilizedObject: {
-        [key: string]: {
-            [key: string]:{ // Tile class
-                col: number,
-                /* This can be figured out by the 2 keys so this is redudant
-                pos: { // class TileCoordinate serilized
-                    x: number,
-                    y: number 
-                },
-                */
-                spr: { // sprites list of Sprite classes serilized
-                    src: string, // spriteSheetSrc
-                    xO: number, // xOffset
-                    yO: number, // yOffset
-                    zi: number // zindex
-                }[]
+        objectData: {
+            [key: string]: {
+                type: string // 
+            }
+        },
+        tileData: {
+            [key: string]: {
+                [key: string]:{ // Tile class
+                    col: number,
+                    /* This can be figured out by the 2 keys so this is redudant
+                    pos: { // class TileCoordinate serilized
+                        x: number,
+                        y: number 
+                    },
+                    */
+                    spr: { // sprites list of Sprite classes serilized
+                        src: string, // spriteSheetSrc
+                        xO: number, // xOffset
+                        yO: number, // yOffset
+                        zi: number // zindex
+                    }[]
+                }
             }
         }
     } = JSON.parse(json);
     let scene = new Scene();
-    Object.keys(serilizedObject).forEach((yString) => {
-        Object.keys(serilizedObject[yString]).forEach((xString) => {
+
+    // Load object data
+    Object.keys(serilizedObject.objectData).forEach((key) => {
+        
+    })
+
+    // Load tile data
+    Object.keys(serilizedObject.tileData).forEach((yString) => {
+        Object.keys(serilizedObject.tileData[yString]).forEach((xString) => {
             // get the pos based on the keys of the dicts inside of each other
             const pos = new TileCoordinate(Number(xString), Number(yString));
-            const collisonRule = serilizedObject[yString][xString].col;
-            const sprites: Array<Sprites.Sprite> = serilizedObject[yString][xString].spr.map((spriteData, index) => {
+            const collisonRule = serilizedObject.tileData[yString][xString].col;
+            const sprites: Array<Sprites.Sprite> = serilizedObject.tileData[yString][xString].spr.map((spriteData, index) => {
                 return new Sprites.Sprite(spriteData.src, spriteData.xO, spriteData.yO, spriteData.zi);
             })
             scene.setTile(pos, collisonRule, sprites);

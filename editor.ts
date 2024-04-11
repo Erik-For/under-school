@@ -25,8 +25,9 @@ if(!ctx) {
 // load all assets
 const spriteSheetManager = new Sprites.AssetLoader (
     [
-        new Sprites.SpriteSheet("assets/tilemap.png", tileSize),
+        //new Sprites.SpriteSheet("assets/tilemap.png", tileSize),
         new Sprites.SpriteSheet("assets/mcwalk.png", tileSize),
+        new Sprites.SpriteSheet("assets/goli.png", 16),
         new Sprites.SpriteSheet("assets/collision_boxes.png", tileSize),
     ], () => { 
         // callback when all assets are loaded
@@ -35,8 +36,8 @@ const spriteSheetManager = new Sprites.AssetLoader (
         document.getElementById('loading')!.style.display = 'none';
         canvas.style.display = 'block';
 
-        // load data from session storage, if data is null load an empty object
-        let scene: Scene = deserilizeScene(sessionStorage.getItem("data") || "{}");
+        // load data from session storage, if data is null load an empty object        
+        let scene: Scene = deserilizeScene(sessionStorage.getItem("data") || '{ "tileData": {}, "objectData": {} }');
 
         // selection object
         // allows the user to select an area of the map and prefore actions on it

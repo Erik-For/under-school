@@ -5,6 +5,7 @@ import { Screen } from './screen.js';
 import { Pos, Game } from './game.js';
 import { NPCTextAnimation, NPCTalkingSprite } from './animate.js';
 import { InputHandler } from './input.js';
+import { Sequence, SequenceItem } from './sequence.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -23,7 +24,8 @@ const assetLoader = new Sprites.AssetLoader(
         new Sprites.SpriteSheet("assets/tilemap.png", 16),
         new Sprites.SpriteSheet("assets/mcwalk.png", 16),
         new Sprites.SpriteSheet("assets/collision_boxes.png", 16),
-        new Sprites.TextAsset("assets/test.json")
+        new Sprites.SpriteSheet("assets/goli.png", 16),
+        new Sprites.TextAsset("assets/test2.json")
     ],
     () => {
         // remove loading screen
@@ -33,19 +35,48 @@ const assetLoader = new Sprites.AssetLoader(
         // start the game
 
         const screen = new Screen(window.innerWidth, window.innerHeight, 16);
-        let scene = deserilizeScene(assetLoader.getTextAsset("assets/test.json")!.data!);
+        let scene = deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);
         
         const game = new Game(scene, new Pos(16, 16), screen, assetLoader);
         
+        //GOOOLII!
         let charecter = new NPCTalkingSprite(
-            new Sprites.Sprite("assets/mcwalk.png", 0, 0, 0),
-            new Sprites.Sprite("assets/mcwalk.png", 1, 0, 0),
-            new Sprites.Sprite("assets/mcwalk.png", 0, 1, 0),
-            new Sprites.Sprite("assets/mcwalk.png", 1, 1, 0)
+            new Sprites.Sprite("assets/goli.png", 13, 14, 0),
+            new Sprites.Sprite("assets/goli.png", 14, 14, 0),
+            new Sprites.Sprite("assets/goli.png", 13, 15, 0),
+            new Sprites.Sprite("assets/goli.png", 14, 15, 0)
         );
         
-        let text = new NPCTextAnimation(charecter, "Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!Hello, World!", 5000, game.getInputHandler(), () => {});
-
+        let text3 = new NPCTextAnimation(charecter, "Välkommen till ÅVA en skola med bra skolma!(#/&¤=!)(# ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO", 8000, game.getInputHandler());
+        
+        let sequence = new Sequence([
+            new SequenceItem(
+                new NPCTextAnimation(charecter, "Hej jag heter Göran, men du kan kalla mig GOLI...", 3000, game.getInputHandler()),
+                (item) => {
+                    (item as NPCTextAnimation).render(ctx, game);
+                }
+            ),
+            new SequenceItem(
+                new NPCTextAnimation(charecter, "Jag är lärare i DAODAC, DVS Arduinokunskap.", 3000, game.getInputHandler()),
+                (item) => {
+                    (item as NPCTextAnimation).render(ctx, game);
+                }
+            ),
+            new SequenceItem(
+                new NPCTextAnimation(charecter, "Själv gillar jag att se på itläraren.se du vet, skåningen, och köra lastbil... Vet du vad....", 3000, game.getInputHandler()),
+                (item) => {
+                    (item as NPCTextAnimation).render(ctx, game);
+               }
+            ),
+            new SequenceItem(
+                new NPCTextAnimation(charecter, "Kom till it support i bibblan 9:30 - 10:15 eller något så kan jag fixa din dator.... Eller din arduino uno eller router eller skrivare eller... Ja, jag kan visst fixa allting.", 5000, game.getInputHandler()),
+                (item) => {
+                    (item as NPCTextAnimation).render(ctx, game);
+               }
+            ),
+        ])
+        game.getSequenceExecutor().setSequence(sequence);
+        
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;
             game.getScreen().height = window.innerHeight;
@@ -60,7 +91,7 @@ const assetLoader = new Sprites.AssetLoader(
                 renderDevOverlay(game);
                 renderDevPlayerHitbox(game);
             }
-            text.render(ctx, game, game.getScreen());
+            game.getSequenceExecutor().execute();
             requestAnimationFrame(gameLoop);
         })
     }
@@ -132,7 +163,6 @@ function renderDevOverlay(game: Game) {
     ctx.font = "lighter 20px Arial";
     ctx.fillText(`Standing on tile: ${playerTilePos.x}, ${playerTilePos.y}`, 10, 30);
     ctx.fillText(`Mouse on tile: ${mouseTilePos.x}, ${mouseTilePos.y}`, 10, 60);
-
 }
 
 function renderDevPlayerHitbox(game: Game) {
