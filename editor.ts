@@ -1,6 +1,7 @@
 import * as Sprites from './sprite.js';
 import { deserilizeScene, Scene, serilizeScene, Tile, TileCoordinate } from './scene.js';
 import { InputHandler } from './input.js';
+import { AssetLoader } from './assetloader.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -9,8 +10,11 @@ const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d');
 const tileSize = 16; // size of tile and sprite
 const renderScale = 4;
 
-const modal = document.getElementById('modal') as HTMLDivElement;
-let modalActive = false;
+const spriteModal = document.getElementById('sprite-modal') as HTMLDivElement;
+const objectModal = document.getElementById('object-modal') as HTMLDivElement;
+
+let selectSpriteModalActive = false;
+let placeScriptedObjectModalActive = false;
 let selectedSprite: Sprites.Sprite | null = null;
 
 // what collision rule to set when clicking r on a tile or t on a selection
@@ -23,7 +27,7 @@ if(!ctx) {
     throw new Error('Canvas not found');   
 }
 // load all assets
-const spriteSheetManager = new Sprites.AssetLoader (
+const spriteSheetManager = new AssetLoader (
     [
         //new Sprites.SpriteSheet("assets/tilemap.png", tileSize),
         new Sprites.SpriteSheet("assets/mcwalk.png", tileSize),
@@ -53,25 +57,25 @@ const spriteSheetManager = new Sprites.AssetLoader (
         document.addEventListener("keydown", (event) => {
             if(event.code != "Space") { return; }
             event.preventDefault();
-            modalActive = !modalActive;
-            modal.style.display = modalActive ? 'block' : 'none';
+            selectSpriteModalActive = !selectSpriteModalActive;
+            spriteModal.style.display = selectSpriteModalActive ? 'block' : 'none';
         });
         
         //movement
         input.onHold('KeyW', () => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             camera.y -= (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
         input.onHold('KeyS', () => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             camera.y += (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
         input.onHold('KeyA', () => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             camera.x -= (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
         input.onHold('KeyD', () => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             camera.x += (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
 
@@ -87,13 +91,13 @@ const spriteSheetManager = new Sprites.AssetLoader (
 
         // toggle render collision
         input.onClick('KeyE', () => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             renderCollision = !renderCollision;
         });
 
         // set collision rule on tile from selectedCollisionRule
         input.onClick('KeyR', () => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(!renderCollision) { return; }
             let x = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
             let y = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
@@ -106,7 +110,7 @@ const spriteSheetManager = new Sprites.AssetLoader (
 
         // copy scene to clipboard as json string
         input.onClick('KeyC', () => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(confirm("Do you want to copy the current scene? as a JSON string")){
                 let serilizedScene = serilizeScene(scene);
                 sessionStorage.setItem("data", serilizedScene);
@@ -116,7 +120,7 @@ const spriteSheetManager = new Sprites.AssetLoader (
 
         // load scene from clipboard json string
         input.onClick('KeyV', () => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(confirm("Do you want to paste to the current scene? from a JSON string")){
                 navigator.clipboard.readText().then((text) => {
                     scene = deserilizeScene(text);
@@ -126,7 +130,7 @@ const spriteSheetManager = new Sprites.AssetLoader (
 
         // clear scene
         input.onClick('KeyX', () => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(confirm("Do you want to clear the current scene?")){
                 scene = new Scene();
             }
@@ -135,7 +139,7 @@ const spriteSheetManager = new Sprites.AssetLoader (
 
         // area selection with f, g, h, t
         const handleSelection = (mode : "remove" | "add" | "random" | "col") => {
-            if(modalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(!selectedSprite && (mode == "random" || mode == "add")){ return; }
             selection.active = !selection.active;
 
@@ -221,6 +225,42 @@ const spriteSheetManager = new Sprites.AssetLoader (
             scene.removeTile(new TileCoordinate(x, y));
         })
 
+        input.onClick('KeyJ', () => {
+            if(selectSpriteModalActive){ return; }
+            let x = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
+            let y = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
+            let tile = scene.getTile(new TileCoordinate(x, y));
+            placeScriptedObjectModalActive = !placeScriptedObjectModalActive;
+            objectModal.style.display = placeScriptedObjectModalActive ? 'block' : 'none';
+
+        });
+
+        document.getElementById('object-save')!.addEventListener('click', (event) => {
+            event.preventDefault();
+            placeScriptedObjectModalActive = false;
+            objectModal.style.display = placeScriptedObjectModalActive ? 'block' : 'none';
+            let objectType = (document.getElementById('object-type') as HTMLInputElement).value;
+            let objectData = (document.getElementById('object-data') as HTMLInputElement).value;
+            console.log(objectType, objectData);
+        });
+
+        document.getElementById('object-type')!.addEventListener('change', (event) => {
+            let hasData: Array<string> = [
+                "NPC",
+                "ChangeScene",
+                "Sign",
+                "Chest",
+                "ConveyorBelt"
+            ]
+            let type = (event.target as HTMLInputElement).value;
+            let dataInput = document.getElementById('object-data') as HTMLInputElement;
+            if(hasData.indexOf(type) != -1 ){
+                dataInput.style.display = 'block';
+            } else {
+                dataInput.style.display = 'none';
+            }
+        });
+
         // some methods need this to work
         document.addEventListener('mousemove', (event) => {
             mouse.x = event.clientX;
@@ -245,6 +285,13 @@ const spriteSheetManager = new Sprites.AssetLoader (
             if(selection.active){
                 renderSelection(selection, camera, ctx!, tileSize, renderScale, mouse);
             }
+
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(35-3, 14-3, 16+6, 16+6);
+            ctx.font = "lighter 20px Arial";
+            ctx.fillText(`${selectedCollisionRule}`, 10, 30);
+            ctx.drawImage(spriteSheetManager.getSpriteSheet("assets/collision_boxes.png")!.getSprite(selectedCollisionRule, 0), 35, 14, 16, 16);
+
             requestAnimationFrame(gameLoop);
         });
     }
@@ -284,14 +331,14 @@ function render(camera: { x: number, y: number}, scene: Scene): void {
 }
 
 
-function populateSpritesheetModal(spriteSheetManager: Sprites.AssetLoader) {
+function populateSpritesheetModal(spriteSheetManager: AssetLoader) {
     spriteSheetManager.getSpriteSheets().forEach((spritesheet, src) => {
         const margin = 10*(spritesheet.width/spritesheet.spriteSize);
         const width = Math.min(100, (window.innerWidth - margin) / (spritesheet.width/spritesheet.spriteSize));
 
         const tileMapSrcText = document.createElement('p');
         tileMapSrcText.innerText = src;
-        modal.appendChild(tileMapSrcText);
+        spriteModal.appendChild(tileMapSrcText);
 
         spritesheet.getSprites().forEach((row, y) => {
             
@@ -310,7 +357,7 @@ function populateSpritesheetModal(spriteSheetManager: Sprites.AssetLoader) {
                 a.appendChild(c);
                 rowDiv.appendChild(a);
             });
-            modal.appendChild(rowDiv);
+            spriteModal.appendChild(rowDiv);
         });
     });   
 }
@@ -342,12 +389,6 @@ function renderSelection(selection: { startX: number; startY: number; endX: numb
 }
 
 function renderCollisionBox(ctx: CanvasRenderingContext2D, collisonRule: number, x: number, y: number, w: number, h: number) {
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(35-3, 14-3, 16+6, 16+6);
-    ctx.font = "lighter 20px Arial";
-    ctx.fillText(`${selectedCollisionRule}`, 10, 30);
-    ctx.drawImage(spriteSheetManager.getSpriteSheet("assets/collision_boxes.png")!.getSprite(selectedCollisionRule, 0), 35, 14, 16, 16);
-
     ctx.globalAlpha = 0.4;
     ctx.drawImage(spriteSheetManager.getSpriteSheet("assets/collision_boxes.png")!.getSprite(collisonRule, 0), x, y, w, h);
     ctx.globalAlpha = 1;

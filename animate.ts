@@ -1,7 +1,8 @@
 import { Game } from "./game.js";
 import { InputHandler } from "./input.js";
 import { Screen } from "./screen.js";
-import { AssetLoader, Sprite, render } from "./sprite.js";
+import { render, Sprite } from "./sprite.js";
+import { AssetLoader } from "./assetloader.js";
 import { SequenceCallback } from "./sequence.js";
 
 /**

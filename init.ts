@@ -2,9 +2,9 @@ import * as Sprites from './sprite.js';
 import { deserilizeScene, TileCoordinate } from './scene.js';
 import * as Util from './util.js';
 import { Screen } from './screen.js';
+import { AssetLoader, TextAsset } from './assetloader.js';
 import { Pos, Game } from './game.js';
 import { NPCTextAnimation, NPCTalkingSprite } from './animate.js';
-import { InputHandler } from './input.js';
 import { Sequence, SequenceItem } from './sequence.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
@@ -19,13 +19,13 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-const assetLoader = new Sprites.AssetLoader(
+const assetLoader = new AssetLoader(
     [
         new Sprites.SpriteSheet("assets/tilemap.png", 16),
         new Sprites.SpriteSheet("assets/mcwalk.png", 16),
         new Sprites.SpriteSheet("assets/collision_boxes.png", 16),
         new Sprites.SpriteSheet("assets/goli.png", 16),
-        new Sprites.TextAsset("assets/test2.json")
+        new TextAsset("assets/test2.json")
     ],
     () => {
         // remove loading screen
@@ -48,7 +48,7 @@ const assetLoader = new Sprites.AssetLoader(
         );
         
         let text3 = new NPCTextAnimation(charecter, "Välkommen till ÅVA en skola med bra skolma!(#/&¤=!)(# ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO", 8000, game.getInputHandler());
-        
+    
         let sequence = new Sequence([
             new SequenceItem(
                 new NPCTextAnimation(charecter, "Hej jag heter Göran, men du kan kalla mig GOLI...", 3000, game.getInputHandler()),

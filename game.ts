@@ -2,7 +2,7 @@ import { Camera, Screen } from "./screen.js";
 import { InputHandler } from "./input.js";
 import { Player } from "./player.js";
 import { Scene, TileCoordinate } from "./scene.js";
-import { AssetLoader } from "./sprite.js";
+import { AssetLoader } from "./assetloader.js";
 import { SequenceExecutor } from "./sequence.js";
 
 /**

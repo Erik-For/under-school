@@ -1,4 +1,5 @@
-import { Pos } from "./game.js";
+import { Asset, TextAsset } from "./assetloader.js";
+import { Game, Pos } from "./game.js";
 import * as Sprites from "./sprite.js";
 
 /**
@@ -49,6 +50,22 @@ export class Scene {
      */
     removeTile(pos: TileCoordinate) {
         this.#mapData.get(pos.y)?.delete(pos.x);
+    }
+}
+
+export class SceneAsset extends TextAsset implements Asset {
+    scene: Scene | undefined;
+
+    constructor(src: string) {
+        super(src);
+    }
+
+    load(): Promise<string> {
+        return super.load().then((data) => {
+            this.scene = deserilizeScene(data);
+            return this.src;
+        });
+    
     }
 }
 
@@ -190,44 +207,56 @@ export class TileCoordinate {
     }
 }
 
+export enum ObjectBehaviour {
+    ChangeScene, // when the player walks into this object they are transported to a new scene
+    NPC, // non player character that when the player is facing that tile and presses the interact key (z) they will talk to the npc
+    Sign, // when the player is facing that tile and presses the interact key (z) they will read the sign
+    Chest, // when the player is facing that tile and presses the interact key (z) they will open the chest
+    Movable, // when waling into this object the player will be able to push it
+    ConveyorBelt, // when the player is standing on this tile they will be moved in the direction of the arrow
+}
+
+const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScene: Scene, pos: Pos, data: string) => void> = {
+    [ObjectBehaviour.ChangeScene]: (game, scene, pos, data) => {
+        // Teleport the player to a new location
+        game.getAssetLoader().getSceneAsset(data)!.scene;
+        game.setScene(scene);
+    },
+    [ObjectBehaviour.NPC]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+        throw new Error("Function not implemented.");
+    },
+    [ObjectBehaviour.Sign]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+        throw new Error("Function not implemented.");
+    },
+    [ObjectBehaviour.Chest]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+        throw new Error("Function not implemented.");
+    },
+    [ObjectBehaviour.Movable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+        throw new Error("Function not implemented.");
+    },
+    [ObjectBehaviour.ConveyorBelt]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+        throw new Error("Function not implemented.");
+    }
+};
+
 /**
  * Represents a scene object with extended functionality compared to normal tiles
  */
-export interface ScriptedObject {
-    getPosition(): Pos;
-    setPositon(pos: Pos): void;
-    getWidth(): number;
-    getHeight(): number;
-    onInteract: () => void;
-    onPush: (x: number, y: number) => void;
-}
-
-/**
- * Represents a pushable object in the scene.
- */
-export abstract class PushableObject implements ScriptedObject {
+export class ScriptedObject {
     pos: Pos;
+    type: ObjectBehaviour;
+    behaviourData: string;
+    sprite: Sprites.Sprite;
     
-    constructor(pos: Pos) {
+    constructor(pos: Pos, type: ObjectBehaviour, behaviourData: string,  sprite: Sprites.Sprite) {
         this.pos = pos;
+        this.type = type;
+        this.behaviourData = behaviourData;
+        this.sprite = sprite;
     }
-    setPositon(pos: Pos): void {
-        this.pos = pos;
-    }
-    getPosition(): Pos {
-        return this.pos;
-    }
-    
-    abstract getWidth(): number;
-    abstract getHeight(): number;
-    abstract onInteract(): void;
 
-    onPush(x: number, y: number) {
-        this.pos.x += x;
-        this.pos.y += y;
-    }
+    
 }
-
 
 /**
  * Serializes the scene object into a JSON string.
