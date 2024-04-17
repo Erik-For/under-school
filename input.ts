@@ -45,9 +45,6 @@ export class InputHandler {
         window.addEventListener('mousemove', (event) => {
             this.#mousePos = new Pos(event.clientX, event.clientY);
         });
-        setInterval(() => {
-            this.update();
-        }, Math.round(1000 / 60));
     }
 
     /**

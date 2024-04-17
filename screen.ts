@@ -4,6 +4,10 @@ import { Pos } from "./game.js";
 export class Camera {
     #x: number;
     #y: number;
+    #offsetX: number = 0;
+    #offsetY: number = 0;
+    #amplitude = 1;
+    rippleEffect: boolean = false;
 
     /** 
      * 
@@ -14,11 +18,16 @@ export class Camera {
     }
 
 
-    /** 
+    /** m
      * @returns the camera position
      */
     getPosition(): Pos {
-        return new Pos(this.#x, this.#y);
+        if(this.rippleEffect){
+            const angle = 2 * Math.PI * Math.random();
+            this.#offsetX = this.#amplitude * Math.cos(angle);
+            this.#offsetY = this.#amplitude * Math.sin(angle);
+        }
+        return new Pos(this.#x + this.#offsetX, this.#y + this.#offsetY);
     }
 
     /** 
@@ -32,6 +41,22 @@ export class Camera {
         this.#y = pos.y;
     }
     
+    /** 
+     * Shakes the camera in a random pattern along the unit circle multiplied with the specified amplitude for the specified duration measured in ms.
+     * 
+     */
+    cameraShake(duration: number, amplitude: number): void{
+        let shakeInterval = setInterval(() => {
+            const angle = 2 * Math.PI * Math.random();
+            this.#offsetX = amplitude * Math.cos(angle);
+            this.#offsetY = amplitude * Math.sin(angle);
+        }, 1000/60);
+
+        setTimeout(() => {
+            clearInterval(shakeInterval);
+        }, duration)
+    }
+
 }
 
 export class Screen {

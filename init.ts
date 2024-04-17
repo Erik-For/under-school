@@ -27,7 +27,7 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/goli.png", 16),
         new TextAsset("assets/test2.json")
     ],
-    () => {
+    async () => {
         // remove loading screen
         document.getElementById('loading')!.remove();
         // show the canvas
@@ -35,9 +35,20 @@ const assetLoader = new AssetLoader(
         // start the game
 
         const screen = new Screen(window.innerWidth, window.innerHeight, 16);
-        let scene = deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);
-        
+        let scene = await deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);        
         const game = new Game(scene, new Pos(16, 16), screen, assetLoader);
+
+        scene.onLoad(game, scene);
+        //testcase! ta bort vid senare tillfälle
+        document.addEventListener("keydown", (event) =>{
+            if(event.key === "l"){
+                game.getCamera().cameraShake(2500, 1.75);
+            }
+
+            if(event.key === "r"){
+                game.getCamera().rippleEffect = !game.getCamera().rippleEffect;
+            }
+        });
         
         //GOOOLII!
         let charecter = new NPCTalkingSprite(
@@ -90,6 +101,7 @@ const assetLoader = new AssetLoader(
             if(dev){
                 renderDevOverlay(game);
                 renderDevPlayerHitbox(game);
+                
             }
             game.getSequenceExecutor().execute();
             requestAnimationFrame(gameLoop);

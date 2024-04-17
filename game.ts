@@ -32,6 +32,11 @@ export class Game {
         this.#inputHandler = new InputHandler();
         this.#player = new Player(startPos.x, startPos.y, this);
         this.#sequenceExecutor = new SequenceExecutor();
+
+        setInterval(() => { // Game ticks
+            this.#inputHandler.update();
+            
+        }, Math.round(1000 / 60));
     }
 
     /**

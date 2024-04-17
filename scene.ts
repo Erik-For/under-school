@@ -6,12 +6,18 @@ import * as Sprites from "./sprite.js";
  * Represents a scene containing tiles.
  */
 export class Scene {
+    #sceneScript: SceneScript;
     #mapData: Map<number, Map<number, Tile>>;
-    #scriptedObjectData: Map<number, Map<number, ScriptedObject>>;
+    #scriptedObjectData: Array<ScriptedObject>;
 
     constructor() {
         this.#mapData = new Map();
-        this.#scriptedObjectData = new Map();
+        this.#scriptedObjectData = new Array();
+        this.#sceneScript = {
+            onEnter: (prevScene: Scene, game: Game, currentScene: Scene) => {},
+            onExit: (game: Game, currentScene: Scene) => {},
+            render: (game: Game, currentScene: Scene) => {}
+        }
     }
     
     /**
@@ -25,6 +31,10 @@ export class Scene {
             this.#mapData.set(pos.y, new Map());
         }
         this.#mapData.get(pos.y)!.set(pos.x, new Tile(pos, collisonRule, sprites));
+    }
+
+    setSceneScript(sceneScript: SceneScript){
+        this.#sceneScript = sceneScript;
     }
 
     /**
@@ -51,6 +61,25 @@ export class Scene {
     removeTile(pos: TileCoordinate) {
         this.#mapData.get(pos.y)?.delete(pos.x);
     }
+
+    getScriptedObjects(): Array<ScriptedObject>{
+        return this.#scriptedObjectData;
+    }
+
+    addScriptedObject(scriptedObject: ScriptedObject){
+        this.#scriptedObjectData.push(scriptedObject);
+    }
+
+    removeScriptedObject(scriptedObject: ScriptedObject){
+        const index = this.#scriptedObjectData.indexOf(scriptedObject);
+        if(index > -1){
+            this.#scriptedObjectData.splice(index, 1);
+        }
+    }
+
+    onLoad(game: Game, prevScene: Scene) {
+        this.#sceneScript.onEnter(this, game, prevScene);
+    }
 }
 
 export class SceneAsset extends TextAsset implements Asset {
@@ -61,11 +90,11 @@ export class SceneAsset extends TextAsset implements Asset {
     }
 
     load(): Promise<string> {
-        return super.load().then((data) => {
-            this.scene = deserilizeScene(data);
-            return this.src;
-        });
-    
+        return new Promise(async (resolve, reject) => {
+            let data = await super.load()
+            this.scene =  await deserilizeScene(data)
+            resolve(this.src)
+        })
     }
 }
 
@@ -207,6 +236,12 @@ export class TileCoordinate {
     }
 }
 
+export interface SceneScript {
+    onEnter: (prevScene: Scene ,game: Game, currentScene: Scene) => void;
+    onExit: (game: Game, currentScene: Scene) => void;
+    render: (game: Game, currentScene: Scene) => void;
+}
+
 export enum ObjectBehaviour {
     ChangeScene, // when the player walks into this object they are transported to a new scene
     NPC, // non player character that when the player is facing that tile and presses the interact key (z) they will talk to the npc
@@ -219,8 +254,9 @@ export enum ObjectBehaviour {
 const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScene: Scene, pos: Pos, data: string) => void> = {
     [ObjectBehaviour.ChangeScene]: (game, scene, pos, data) => {
         // Teleport the player to a new location
-        game.getAssetLoader().getSceneAsset(data)!.scene;
-        game.setScene(scene);
+        let newScene = game.getAssetLoader().getSceneAsset(data)!.scene!;
+        game.setScene(newScene);
+        newScene.onLoad(game, scene);
     },
     [ObjectBehaviour.NPC]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         throw new Error("Function not implemented.");
@@ -254,8 +290,6 @@ export class ScriptedObject {
         this.behaviourData = behaviourData;
         this.sprite = sprite;
     }
-
-    
 }
 
 /**
@@ -265,9 +299,16 @@ export class ScriptedObject {
  */
 export function serilizeScene(scene: Scene){
     const object: {
+        sceneScriptName: string,
         objectData: {
             [key: string]: {
-                type: string // 
+                type: string // type "ChangeScene", "NPC", "Sign", "Chest", "Movable", "ConveyorBelt" 
+                data: string // data for the type, some types like Movable will have no data
+                spr: {
+                    src: string, // spriteSheetSrc
+                    xO: number, // xOffset
+                    yO: number, // yOffset
+                }
             }
         },
         tileData: {
@@ -289,7 +330,10 @@ export function serilizeScene(scene: Scene){
                 }
             }
         }
-    } = { objectData: {}, tileData: {}}; // Add index signature
+    } = {
+        objectData: {}, tileData: {},
+        sceneScriptName: ""
+    }; // Add index signature
     scene.getTiles().forEach((row, ys) => {
         object.tileData[ys] = {};
 
@@ -321,51 +365,63 @@ export function serilizeScene(scene: Scene){
  * @param json - The JSON string to be deserialized.
  * @returns The deserialized Scene object.
  */
-export function deserilizeScene(json: string): Scene {
-    const serilizedObject: {
-        objectData: {
-            [key: string]: {
-                type: string // 
-            }
-        },
-        tileData: {
-            [key: string]: {
-                [key: string]:{ // Tile class
-                    col: number,
-                    /* This can be figured out by the 2 keys so this is redudant
-                    pos: { // class TileCoordinate serilized
-                        x: number,
-                        y: number 
-                    },
-                    */
-                    spr: { // sprites list of Sprite classes serilized
+export function deserilizeScene(json: string): Promise<Scene> {
+    return new Promise(async (resolve, reject) => {
+        const serilizedObject: {
+            sceneScriptName: string,
+            objectData: {
+                [key: string]: {
+                    type: string // type "ChangeScene", "NPC", "Sign", "Chest", "Movable", "ConveyorBelt" 
+                    data: string // data for the type, some types like Movable will have no data
+                    spr: {
                         src: string, // spriteSheetSrc
                         xO: number, // xOffset
                         yO: number, // yOffset
-                        zi: number // zindex
-                    }[]
+                    }
+                }
+            },
+            tileData: {
+                [key: string]: {
+                    [key: string]:{ // Tile class
+                        col: number,
+                        /* This can be figured out by the 2 keys so this is redudant
+                        pos: { // class TileCoordinate serilized
+                            x: number,
+                            y: number 
+                        },
+                        */
+                        spr: { // sprites list of Sprite classes serilized
+                            src: string, // spriteSheetSrc
+                            xO: number, // xOffset
+                            yO: number, // yOffset
+                            zi: number // zindex
+                        }[]
+                    }
                 }
             }
-        }
-    } = JSON.parse(json);
-    let scene = new Scene();
-
-    // Load object data
-    Object.keys(serilizedObject.objectData).forEach((key) => {
-        
-    })
-
-    // Load tile data
-    Object.keys(serilizedObject.tileData).forEach((yString) => {
-        Object.keys(serilizedObject.tileData[yString]).forEach((xString) => {
-            // get the pos based on the keys of the dicts inside of each other
-            const pos = new TileCoordinate(Number(xString), Number(yString));
-            const collisonRule = serilizedObject.tileData[yString][xString].col;
-            const sprites: Array<Sprites.Sprite> = serilizedObject.tileData[yString][xString].spr.map((spriteData, index) => {
-                return new Sprites.Sprite(spriteData.src, spriteData.xO, spriteData.yO, spriteData.zi);
-            })
-            scene.setTile(pos, collisonRule, sprites);
+        } = JSON.parse(json);
+        let scene = new Scene();
+        const module = await import(`./scene_scripts/${serilizedObject.sceneScriptName}`)
+        const script = new module.default();
+        scene.setSceneScript(script as SceneScript);
+    
+        // Load object data
+        Object.keys(serilizedObject.objectData).forEach((key) => {
+            
         })
-    });
-    return scene;
+    
+        // Load tile data
+        Object.keys(serilizedObject.tileData).forEach((yString) => {
+            Object.keys(serilizedObject.tileData[yString]).forEach((xString) => {
+                // get the pos based on the keys of the dicts inside of each other
+                const pos = new TileCoordinate(Number(xString), Number(yString));
+                const collisonRule = serilizedObject.tileData[yString][xString].col;
+                const sprites: Array<Sprites.Sprite> = serilizedObject.tileData[yString][xString].spr.map((spriteData, index) => {
+                    return new Sprites.Sprite(spriteData.src, spriteData.xO, spriteData.yO, spriteData.zi);
+                })
+                scene.setTile(pos, collisonRule, sprites);
+            })
+        });
+        resolve(scene);
+    })
 }
