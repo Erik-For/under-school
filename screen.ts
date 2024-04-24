@@ -7,7 +7,7 @@ export class Camera {
     #offsetX: number = 0;
     #offsetY: number = 0;
     #amplitude = 1;
-    rippleEffect: boolean = false;
+    #rippleEffect: boolean = false;
 
     /** 
      * 
@@ -22,7 +22,7 @@ export class Camera {
      * @returns the camera position
      */
     getPosition(): Pos {
-        if(this.rippleEffect){
+        if (this.#rippleEffect) {
             const angle = 2 * Math.PI * Math.random();
             this.#offsetX = this.#amplitude * Math.cos(angle);
             this.#offsetY = this.#amplitude * Math.sin(angle);
@@ -40,21 +40,25 @@ export class Camera {
         this.#x = pos.x;
         this.#y = pos.y;
     }
-    
+
     /** 
      * Shakes the camera in a random pattern along the unit circle multiplied with the specified amplitude for the specified duration measured in ms.
      * 
      */
-    cameraShake(duration: number, amplitude: number): void{
+    cameraShake(duration: number, amplitude: number): void {
         let shakeInterval = setInterval(() => {
             const angle = 2 * Math.PI * Math.random();
             this.#offsetX = amplitude * Math.cos(angle);
             this.#offsetY = amplitude * Math.sin(angle);
-        }, 1000/60);
+        }, 1000 / 60);
 
         setTimeout(() => {
             clearInterval(shakeInterval);
         }, duration)
+    }
+
+    toggleRippleEffect(): void {
+        this.#rippleEffect = !this.#rippleEffect;
     }
 
 }

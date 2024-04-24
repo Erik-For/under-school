@@ -43,52 +43,19 @@ const assetLoader = new AssetLoader(
         // start the game
 
         const screen = new Screen(window.innerWidth, window.innerHeight, 16);
-        let scene = await deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);        
+        let scene = await deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);
         const game = new Game(scene, new Pos(16, 16), screen, assetLoader);
         scene.onLoad(game, scene);
         //testcase! ta bort vid senare tillfälle
-
-        game.getInputHandler().onClick("KeyR", () => {
-            game.getCamera().rippleEffect = !game.getCamera().rippleEffect;
-        })
-
-        game.getInputHandler().onClick("KeyL", () => {
-            game.getCamera().cameraShake(2500, 1.75);
-        })
-
-        game.getInputHandler().onClick("KeyZ", () => {
-            const direction = game.getPlayer().getDirection();
-            let lookingAtPos = game.getPlayer().getPosition();
-            
-            const tileSize = game.getScreen().tileSize;
-            switch (direction) {
-                case "up":
-                    lookingAtPos.y -= tileSize / 2;
-                    break;
-                case "down":
-                    lookingAtPos.y += tileSize / 2;
-                    break;
-                case "left":
-                    lookingAtPos.x -= tileSize / 2;
-                    break;
-                case "right":
-                    lookingAtPos.x += tileSize / 2;
-                    break;
+        document.addEventListener("keydown", (event) =>{
+            if(event.key === "l"){
+                game.getCamera().cameraShake(2500, 1.75);
             }
-            const tilePos = new TileCoordinate(Math.floor(lookingAtPos.x / tileSize), Math.floor(lookingAtPos.y / tileSize));
-            let scriptedObject = game.getScene().getScriptedObjects().find((scriptedObject) => {
-                console.log(scriptedObject.pos, tilePos.toPos(16));
-                
-                return scriptedObject.pos.equals(tilePos.toPos(16))
-            }); 
-            if (scriptedObject) {
-                console.log(scriptedObject);
-                
-                if(scriptedObject.type == ObjectBehaviour.Interactable) {
-                    executeBehaviour(game, game.getScene(), scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData)
-                }
-            }  
-        })
+
+            if(event.key === "r"){
+                game.getCamera().rippleEffect = !game.getCamera().rippleEffect;
+            }
+        });
         
         //GOOOLII!
         let charecter = new NPCTalkingSprite(
@@ -97,9 +64,9 @@ const assetLoader = new AssetLoader(
             new Sprites.Sprite("assets/goli.png", 13, 15, 0),
             new Sprites.Sprite("assets/goli.png", 14, 15, 0)
         );
-        
+
         let text3 = new NPCTextAnimation(charecter, "Välkommen till ÅVA en skola med bra skolma!(#/&¤=!)(# ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO", 8000, game.getInputHandler());
-    
+
         let sequence = new Sequence([
             new SequenceItem(
                 new NPCTextAnimation(charecter, "Hej jag heter Göran, men du kan kalla mig GOLI...", 3000, game.getInputHandler()),
@@ -117,17 +84,17 @@ const assetLoader = new AssetLoader(
                 new NPCTextAnimation(charecter, "Själv gillar jag att se på itläraren.se du vet, skåningen, och köra lastbil... Vet du vad....", 3000, game.getInputHandler()),
                 (item) => {
                     (item as NPCTextAnimation).render(ctx, game);
-               }
+                }
             ),
             new SequenceItem(
                 new NPCTextAnimation(charecter, "Kom till it support i bibblan 9:30 - 10:15 eller något så kan jag fixa din dator.... Eller din arduino uno eller router eller skrivare eller... Ja, jag kan visst fixa allting.", 5000, game.getInputHandler()),
                 (item) => {
                     (item as NPCTextAnimation).render(ctx, game);
-               }
+                }
             ),
         ])
         game.getSequenceExecutor().setSequence(sequence);
-        
+
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;
             game.getScreen().height = window.innerHeight;
@@ -138,10 +105,10 @@ const assetLoader = new AssetLoader(
             ctx.font = "underschool";
 
             render(game);
-            if(dev){
+            if (dev) {
                 renderDevOverlay(game);
                 renderDevPlayerHitbox(game);
-                
+
             }
             game.getSequenceExecutor().execute();
             requestAnimationFrame(gameLoop);
@@ -153,7 +120,7 @@ function render(game: Game): void {
     // Camera bounds
     ctx!.clearRect(0, 0, game.getScreen().width, game.getScreen().height);
 
-    let renderBounds = {  
+    let renderBounds = {
         // Devison by renderScale to get the correct tile coordinate 
         min: Util.convertWorldPosToTileCoordinate(
             Util.convertCanvasPosToWorldPos(new Pos(0, 0), game.getCamera().getPosition(), game.getScreen())
@@ -167,37 +134,37 @@ function render(game: Game): void {
     game.getScene().getTiles().forEach((row, ys) => {
         let screen = game.getScreen();
         // Get row y as int
-        let y =  Number(ys); 
+        let y = Number(ys);
 
         row.forEach((tile, xs) => {
             // Get current tiles y as int
-            let x =  Number(xs);            
+            let x = Number(xs);
 
             // Check if the tile is outside the camera view
-            if(x < renderBounds.min.x || x > renderBounds.max.x || y < renderBounds.min.y || y > renderBounds.max.y) {
-            // if(x <= renderBounds.min.x || x >= renderBounds.max.x || y <= renderBounds.min.y || y >= renderBounds.max.y) { // try this to se how it looks to build understanding
+            if (x < renderBounds.min.x || x > renderBounds.max.x || y < renderBounds.min.y || y > renderBounds.max.y) {
+                // if(x <= renderBounds.min.x || x >= renderBounds.max.x || y <= renderBounds.min.y || y >= renderBounds.max.y) { // try this to se how it looks to build understanding
                 return;
             }
             let pos = Util.convertWorldPosToCanvasPos(Util.convertTileCoordinateToWorldPos(new TileCoordinate(x, y), game.getScreen()), game.getCamera().getPosition(), game.getScreen()).round();
             let xPos = pos.x;
             let yPos = pos.y;
-            
+
             // Sort tiles after zindex so that the tiles with the highest zindex are drawn last
             Sprites.renderMany(ctx!, assetLoader, tile.getSprites(),
                 xPos,
                 yPos,
-                screen.tileSize*screen.renderScale,
-                screen.tileSize*screen.renderScale
+                screen.tileSize * screen.renderScale,
+                screen.tileSize * screen.renderScale
             );
 
             // draw collision boxes if in dev mode
-            if(dev){
+            if (dev) {
                 ctx.globalAlpha = 0.4;
                 ctx.drawImage(assetLoader.getSpriteSheet("assets/collision_boxes.png")!.getSprite(tile.getCollisonRule(), 0),
                     xPos,
-                    yPos, 
-                    screen.tileSize*screen.renderScale,
-                    screen.tileSize*screen.renderScale
+                    yPos,
+                    screen.tileSize * screen.renderScale,
+                    screen.tileSize * screen.renderScale
                 );
                 ctx.globalAlpha = 1;
             }
@@ -211,7 +178,7 @@ function render(game: Game): void {
 function renderDevOverlay(game: Game) {
     const playerTilePos = Util.convertWorldPosToTileCoordinate(game.getPlayer().getPosition(), game.getScreen());
     const mouseTilePos = Util.convertWorldPosToTileCoordinate(Util.convertCanvasPosToWorldPos(game.getInputHandler().getMousePos(), game.getCamera().getPosition(), game.getScreen()), game.getScreen());
-    
+
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "lighter 20px Arial";
     ctx.fillText(`Standing on tile: ${playerTilePos.x}, ${playerTilePos.y}`, 10, 30);
@@ -223,8 +190,8 @@ function renderDevPlayerHitbox(game: Game) {
     const screen = game.getScreen();
     const player = game.getPlayer();
 
-    const leftCollisionPoint = new Pos(player.x - (screen.tileSize / 2 - 3), player.y);
-    const rightCollisionPoint = new Pos(player.x + (screen.tileSize / 2 - 3), player.y);
+    const leftCollisionPoint = new Pos(player.x -screen.tileSize / 2, player.y);
+    const rightCollisionPoint = new Pos(player.x + screen.tileSize / 2, player.y);
 
     const leftPoint = Util.convertWorldPosToCanvasPos(leftCollisionPoint, camera.getPosition(), screen);
     const rightPoint = Util.convertWorldPosToCanvasPos(rightCollisionPoint, camera.getPosition(), screen);
