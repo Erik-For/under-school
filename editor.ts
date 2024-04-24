@@ -44,7 +44,7 @@ const spriteSheetManager = new AssetLoader (
         canvas.style.display = 'block';
 
         // load data from session storage, if data is null load an empty object        
-        let scene: Scene = await deserilizeScene(sessionStorage.getItem("data") || '{ "tileData": {}, "objectData": {} }');
+        let scene: Scene = await deserilizeScene(sessionStorage.getItem("data") || '{ "tileData": {}, "objectData": {}, "sceneScriptName": "scene1.js" }');
 
         // selection object
         // allows the user to select an area of the map and prefore actions on it

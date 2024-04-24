@@ -1,5 +1,5 @@
 import * as Sprites from './sprite.js';
-import { deserilizeScene, TileCoordinate } from './scene.js';
+import { deserilizeScene, executeBehaviour, ObjectBehaviour, SceneAsset, TileCoordinate } from './scene.js';
 import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { AssetLoader, TextAsset } from './assetloader.js';
@@ -12,7 +12,13 @@ const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRendering
 
 let dev = false;
 const zoom = 1;
-
+const audio = new Audio('/build/assets/bad.wav');
+//playsound on pree space
+document.addEventListener('keydown', function (event) {
+    if (event.code == 'Space') {
+        audio.play();
+    }
+});
 document.addEventListener('keydown', (event) => {
     if (event.key === 'p') {
         dev = !dev;
@@ -25,7 +31,9 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/mcwalk.png", 16),
         new Sprites.SpriteSheet("assets/collision_boxes.png", 16),
         new Sprites.SpriteSheet("assets/goli.png", 16),
-        new TextAsset("assets/test2.json")
+        new TextAsset("assets/test2.json"),
+        new TextAsset("assets/test3.json"),
+        //new AudioAsset("assets/hej.mp3"),
     ],
     async () => {
         // remove loading screen
@@ -37,18 +45,50 @@ const assetLoader = new AssetLoader(
         const screen = new Screen(window.innerWidth, window.innerHeight, 16);
         let scene = await deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);        
         const game = new Game(scene, new Pos(16, 16), screen, assetLoader);
-
         scene.onLoad(game, scene);
         //testcase! ta bort vid senare tillfälle
-        document.addEventListener("keydown", (event) =>{
-            if(event.key === "l"){
-                game.getCamera().cameraShake(2500, 1.75);
-            }
 
-            if(event.key === "r"){
-                game.getCamera().rippleEffect = !game.getCamera().rippleEffect;
+        game.getInputHandler().onClick("KeyR", () => {
+            game.getCamera().rippleEffect = !game.getCamera().rippleEffect;
+        })
+
+        game.getInputHandler().onClick("KeyL", () => {
+            game.getCamera().cameraShake(2500, 1.75);
+        })
+
+        game.getInputHandler().onClick("KeyZ", () => {
+            const direction = game.getPlayer().getDirection();
+            let lookingAtPos = game.getPlayer().getPosition();
+            
+            const tileSize = game.getScreen().tileSize;
+            switch (direction) {
+                case "up":
+                    lookingAtPos.y -= tileSize / 2;
+                    break;
+                case "down":
+                    lookingAtPos.y += tileSize / 2;
+                    break;
+                case "left":
+                    lookingAtPos.x -= tileSize / 2;
+                    break;
+                case "right":
+                    lookingAtPos.x += tileSize / 2;
+                    break;
             }
-        });
+            const tilePos = new TileCoordinate(Math.floor(lookingAtPos.x / tileSize), Math.floor(lookingAtPos.y / tileSize));
+            let scriptedObject = game.getScene().getScriptedObjects().find((scriptedObject) => {
+                console.log(scriptedObject.pos, tilePos.toPos(16));
+                
+                return scriptedObject.pos.equals(tilePos.toPos(16))
+            }); 
+            if (scriptedObject) {
+                console.log(scriptedObject);
+                
+                if(scriptedObject.type == ObjectBehaviour.Interactable) {
+                    executeBehaviour(game, game.getScene(), scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData)
+                }
+            }  
+        })
         
         //GOOOLII!
         let charecter = new NPCTalkingSprite(
@@ -164,6 +204,7 @@ function render(game: Game): void {
         });
     });
     game.getPlayer().render(ctx, game);
+    game.getScene().onRender(game);
 }
 
 
@@ -182,8 +223,8 @@ function renderDevPlayerHitbox(game: Game) {
     const screen = game.getScreen();
     const player = game.getPlayer();
 
-    const leftCollisionPoint = new Pos(player.x -screen.tileSize / 2, player.y);
-    const rightCollisionPoint = new Pos(player.x + screen.tileSize / 2, player.y);
+    const leftCollisionPoint = new Pos(player.x - (screen.tileSize / 2 - 3), player.y);
+    const rightCollisionPoint = new Pos(player.x + (screen.tileSize / 2 - 3), player.y);
 
     const leftPoint = Util.convertWorldPosToCanvasPos(leftCollisionPoint, camera.getPosition(), screen);
     const rightPoint = Util.convertWorldPosToCanvasPos(rightCollisionPoint, camera.getPosition(), screen);

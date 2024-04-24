@@ -1,9 +1,10 @@
 import { Camera, Screen } from "./screen.js";
 import { InputHandler } from "./input.js";
 import { Player } from "./player.js";
-import { Scene, TileCoordinate } from "./scene.js";
+import { Scene, TileCoordinate, executeBehaviour } from "./scene.js";
 import { AssetLoader } from "./assetloader.js";
 import { SequenceExecutor } from "./sequence.js";
+import * as Util from "./util.js";
 
 /**
  * Represents a game.
@@ -35,7 +36,13 @@ export class Game {
 
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
+            // check if the player is in a scripted object
+            const playerTilePos = Util.convertWorldPosToTileCoordinate(this.getPlayer().getPosition(), this.getScreen());
             
+            let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTilePos.toPos(16)));            
+            if(scriptedObject){
+                executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
+            }
         }, Math.round(1000 / 60));
     }
 
@@ -173,5 +180,9 @@ export class Pos {
      */
     abs(): Pos {
         return new Pos(Math.abs(this.x), Math.abs(this.y));
+    }
+
+    equals(pos: Pos): boolean {
+        return this.x == pos.x && this.y == pos.y;
     }
 }

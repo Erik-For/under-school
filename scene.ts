@@ -9,17 +9,23 @@ export class Scene {
     #sceneScript: SceneScript;
     #mapData: Map<number, Map<number, Tile>>;
     #scriptedObjectData: Array<ScriptedObject>;
-
+    
     constructor() {
         this.#mapData = new Map();
         this.#scriptedObjectData = new Array();
         this.#sceneScript = {
+            name: "default",
             onEnter: (prevScene: Scene, game: Game, currentScene: Scene) => {},
             onExit: (game: Game, currentScene: Scene) => {},
             render: (game: Game, currentScene: Scene) => {}
         }
+        
     }
     
+    getScriptName(): string {
+        return this.#sceneScript.name;
+    }
+
     /**
      * Sets a tile at the specified position with collision rule and sprites.
      * @param pos - The position of the tile.
@@ -78,7 +84,16 @@ export class Scene {
     }
 
     onLoad(game: Game, prevScene: Scene) {
-        this.#sceneScript.onEnter(this, game, prevScene);
+        prevScene.onExit(game, this);
+        this.#sceneScript.onEnter(prevScene, game, this);
+    }
+
+    onExit(game: Game, prevScene: Scene) {
+        this.#sceneScript.onExit(game, prevScene);
+    }
+
+    onRender(game: Game) {
+        this.#sceneScript.render(game, this);
     }
 }
 
@@ -237,6 +252,7 @@ export class TileCoordinate {
 }
 
 export interface SceneScript {
+    name: string;
     onEnter: (prevScene: Scene ,game: Game, currentScene: Scene) => void;
     onExit: (game: Game, currentScene: Scene) => void;
     render: (game: Game, currentScene: Scene) => void;
@@ -244,27 +260,19 @@ export interface SceneScript {
 
 export enum ObjectBehaviour {
     ChangeScene, // when the player walks into this object they are transported to a new scene
-    NPC, // non player character that when the player is facing that tile and presses the interact key (z) they will talk to the npc
-    Sign, // when the player is facing that tile and presses the interact key (z) they will read the sign
-    Chest, // when the player is facing that tile and presses the interact key (z) they will open the chest
+    Interactable, // when the player is facing that tile and presses the interact key (z) they will open the chest
     Movable, // when waling into this object the player will be able to push it
     ConveyorBelt, // when the player is standing on this tile they will be moved in the direction of the arrow
 }
 
 const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScene: Scene, pos: Pos, data: string) => void> = {
-    [ObjectBehaviour.ChangeScene]: (game, scene, pos, data) => {
-        // Teleport the player to a new location
-        let newScene = game.getAssetLoader().getSceneAsset(data)!.scene!;
+    [ObjectBehaviour.ChangeScene]: async (game, scene, pos, data) => {
+        
+        let newScene = await deserilizeScene(game.getAssetLoader().getTextAsset(data)!.data!);  
         game.setScene(newScene);
         newScene.onLoad(game, scene);
     },
-    [ObjectBehaviour.NPC]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
-        throw new Error("Function not implemented.");
-    },
-    [ObjectBehaviour.Sign]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
-        throw new Error("Function not implemented.");
-    },
-    [ObjectBehaviour.Chest]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+    [ObjectBehaviour.Interactable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         throw new Error("Function not implemented.");
     },
     [ObjectBehaviour.Movable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
@@ -274,6 +282,10 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
         throw new Error("Function not implemented.");
     }
 };
+
+export function executeBehaviour(game: Game, currentScene: Scene, pos: Pos, type: ObjectBehaviour, data: string): void {
+    behaivourImplementations[type](game, currentScene, pos, data);
+}
 
 /**
  * Represents a scene object with extended functionality compared to normal tiles
@@ -332,7 +344,7 @@ export function serilizeScene(scene: Scene){
         }
     } = {
         objectData: {}, tileData: {},
-        sceneScriptName: ""
+        sceneScriptName: scene.getScriptName()
     }; // Add index signature
     scene.getTiles().forEach((row, ys) => {
         object.tileData[ys] = {};

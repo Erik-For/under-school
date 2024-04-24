@@ -24,8 +24,17 @@ export class Player {
 
     }
 
+    setPos(pos: Pos) {
+        this.x = pos.x;
+        this.y = pos.y;
+    }
+
     getPosition(): Pos {
         return new Pos(this.x, this.y);
+    }
+
+    getDirection() {
+        return this.#direction.replace("idle", "").replace("walk", ""); // returns the direction of the player without the action, this is kinda hacky but it works fine and is probably not prone to errors
     }
 
     render(ctx: CanvasRenderingContext2D, game: Game) {                        
@@ -105,8 +114,8 @@ export class Player {
 
         // the player has 2 hitpoints one at the left side and one at the right side
         // if you press p in game you can see the hitboxes if you besides the player, (they are very small so you have to look closely)
-        const leftCollisionPoint = new Pos(x - screen.tileSize / 2, y);
-        const rightCollisionPoint = new Pos(x + screen.tileSize / 2, y);
+        const leftCollisionPoint = new Pos(x - (screen.tileSize / 2 - 3), y);
+        const rightCollisionPoint = new Pos(x + (screen.tileSize / 2 - 3), y);
 
         // get tile that the player is trying to move to
         const leftCollisionPointTile = scene.getTile(Util.convertWorldPosToTileCoordinate(leftCollisionPoint, this.#game.getScreen()));

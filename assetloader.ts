@@ -38,6 +38,7 @@ export class TextAsset implements Asset {
     }
 }
 
+
 /**
  * AssetLoader is a class that loads multiple spritesheets and stores them in a dictionary
  * it calls the @param onLoad callback when all spritesheets are loaded
@@ -56,7 +57,7 @@ export class AssetLoader {
         this.assets = new Map();
         setTimeout(() => {
             if(remaining > 0) {
-                throw new Error('Spritesheet loading timeout');
+                throw new Error('Assetloader loading timeout');
             }
         }, 10*1000)
         assets.forEach((asset) => {
