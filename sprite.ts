@@ -110,7 +110,7 @@ export class Sprite {
 export function render(ctx: CanvasRenderingContext2D, spriteSheetLoader: AssetLoader, sprite: Sprite, x: number, y: number, width: number, height: number) {
     let spritesheet: SpriteSheet = spriteSheetLoader.getSpriteSheet(sprite.spriteSheetSrc)!;
     if(!spritesheet) {
-        throw new Error('Spritesheet not found');
+        throw new Error('Spritesheet not found' + sprite.spriteSheetSrc);
     }    
     ctx.drawImage(spritesheet.getSprite(sprite.xOffset, sprite.yOffset), x, y, width, height);
 }

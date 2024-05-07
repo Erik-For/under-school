@@ -10,6 +10,7 @@ export class Player {
     #direction: string;
     #directionAnimation: Map<String, PlayerAnimation>;
     #game: Game;
+    #movmentFrezze: boolean;
 
     constructor(x: number, y: number, game: Game) {
         this.x = x;
@@ -17,6 +18,7 @@ export class Player {
         this.#direction = "idledown";
         this.#directionAnimation = new Map();
         this.#game = game;
+        this.#movmentFrezze = false;
 
         initAnimations(this.#directionAnimation);
         this.#registerAnimationKeys(); // this handles animation logic, like walking and idleing animations
@@ -24,12 +26,19 @@ export class Player {
 
     }
 
+    freezeMovment() {
+        this.#movmentFrezze = true;
+    }
+    unfreezeMovment() {
+        this.#movmentFrezze = false;
+    }
+
     setPos(pos: Pos) {
         this.x = pos.x;
         this.y = pos.y;
     }
 
-    getPosition(): Pos {
+    getPos(): Pos {
         return new Pos(this.x, this.y);
     }
 
@@ -39,7 +48,7 @@ export class Player {
 
     render(ctx: CanvasRenderingContext2D, game: Game) {                        
         let animation = this.#directionAnimation.get(this.#direction);
-        let pos = Util.convertWorldPosToCanvasPos(this.getPosition(), game.getCamera().getPosition(), game.getScreen());
+        let pos = Util.convertWorldPosToCanvasPos(this.getPos(), game.getCamera().getPosition(), game.getScreen());
         animation!.render(ctx, game.getAssetLoader(),
             Math.round(pos.x),
             Math.round(pos.y),
@@ -65,7 +74,6 @@ export class Player {
                 } else {
                     this.y -= movmentSpeed;
                 }
-                this.#game.getCamera().setPosition(this.getPosition())
             }
         });
         inputHandler.onHold("KeyS", () => {
@@ -75,7 +83,6 @@ export class Player {
                 } else {
                     this.y += movmentSpeed;
                 }
-                this.#game.getCamera().setPosition(this.getPosition())
             }
         });
         inputHandler.onHold("KeyA", () => {
@@ -85,7 +92,6 @@ export class Player {
                 } else {
                     this.x -= movmentSpeed;
                 }
-                this.#game.getCamera().setPosition(this.getPosition())
             }
         });
         inputHandler.onHold("KeyD", () => {
@@ -96,7 +102,6 @@ export class Player {
                     this.x += movmentSpeed;
                 }
                 
-                this.#game.getCamera().setPosition(this.getPosition())
             }
         });
     }
@@ -109,6 +114,10 @@ export class Player {
      * @private
      */
     #canMove(x: number, y: number):boolean {
+        if (this.#movmentFrezze) {
+            return false;
+        }
+
         const screen = this.#game.getScreen();
         const scene = this.#game.getScene();
 

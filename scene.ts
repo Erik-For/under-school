@@ -1,6 +1,7 @@
 import { Asset, TextAsset } from "./assetloader.js";
 import { Game, Pos } from "./game.js";
 import * as Sprites from "./sprite.js";
+import { convertWorldPosToCanvasPos, convertWorldPosToTileCoordinate, getSubTileCoordinate } from "./util.js";
 
 /**
  * Represents a scene containing tiles.
@@ -9,6 +10,7 @@ export class Scene {
     #sceneScript: SceneScript;
     #mapData: Map<number, Map<number, Tile>>;
     #scriptedObjectData: Array<ScriptedObject>;
+    #scriptedBehaviour: Map<String, (game: Game, currentScene: Scene, pos: Pos, data: string) => void>;
     
     constructor() {
         this.#mapData = new Map();
@@ -19,7 +21,7 @@ export class Scene {
             onExit: (game: Game, currentScene: Scene) => {},
             render: (game: Game, currentScene: Scene) => {}
         }
-        
+        this.#scriptedBehaviour = new Map();        
     }
     
     getScriptName(): string {
@@ -76,6 +78,10 @@ export class Scene {
         this.#scriptedObjectData.push(scriptedObject);
     }
 
+    addManyScriptedObjects(...scriptedObjects: ScriptedObject[]){
+        this.#scriptedObjectData.push(...scriptedObjects);
+    }
+
     removeScriptedObject(scriptedObject: ScriptedObject){
         const index = this.#scriptedObjectData.indexOf(scriptedObject);
         if(index > -1){
@@ -94,6 +100,14 @@ export class Scene {
 
     onRender(game: Game) {
         this.#sceneScript.render(game, this);
+    }
+
+    registerBehaviour(name: string, behaviour: (game: Game, currentScene: Scene, pos: Pos, data: string) => void){
+        this.#scriptedBehaviour.set(name, behaviour);
+    }
+
+    getBehaviour(data: string) {
+        return this.#scriptedBehaviour.get(data);
     }
 }
 
@@ -268,22 +282,70 @@ export enum ObjectBehaviour {
 const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScene: Scene, pos: Pos, data: string) => void> = {
     [ObjectBehaviour.ChangeScene]: async (game, scene, pos, data) => {
         
-        let newScene = await deserilizeScene(game.getAssetLoader().getTextAsset(data)!.data!);  
+        let newScene = await deserilizeScene(game.getAssetLoader().getTextAsset(data)!.data!);
         game.setScene(newScene);
         newScene.onLoad(game, scene);
     },
     [ObjectBehaviour.Interactable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
-        throw new Error("Function not implemented.");
+        currentScene.getBehaviour(data)?.(game, currentScene, pos, data);
     },
     [ObjectBehaviour.Movable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         throw new Error("Function not implemented.");
     },
     [ObjectBehaviour.ConveyorBelt]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
-        throw new Error("Function not implemented.");
+        game.getPlayer().freezeMovment();
+        let playerPos = game.getPlayer().getPos();        
+        let playerSubPos = getSubTileCoordinate(playerPos, game.getScreen());
+        switch (data) {
+            case "u": // up
+                if(playerSubPos.x > 0 && playerSubPos.x < 7){
+                    playerPos.x += 1;
+                } else if(playerSubPos.x > 8) {
+                    playerPos.x -= 1;
+                }
+                playerPos.y -= 1;
+                break;
+            case "d": // down
+                if(playerSubPos.x > 0 && playerSubPos.x < 7){
+                    playerPos.x += 1;
+                } else if(playerSubPos.x > 8) {
+                    playerPos.x -= 1;
+                }
+                playerPos.y += 1;
+                break;
+            case "l": // left
+                if(playerSubPos.y > 0 && playerSubPos.y < 7){
+                    playerPos.y += 1;
+                } else if(playerSubPos.y > 8) {
+                    playerPos.y -= 1;
+                }
+                playerPos.x -= 1;
+                break;
+            case "r": // right
+                if(playerSubPos.y > 0 && playerSubPos.y < 7){
+                    playerPos.y += 1;
+                } else if(playerSubPos.y > 8) {
+                    playerPos.y -= 1;
+                }
+                playerPos.x += 1;
+                break;
+        }
+
+        let tilePos = convertWorldPosToTileCoordinate(playerPos, game.getScreen());
+        let moveObj = game.getScene().getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(tilePos.toPos(game.getScreen().tileSize)));
+        console.log(moveObj, playerPos, tilePos);
+        
+        if(moveObj?.type != ObjectBehaviour.ConveyorBelt) {
+            game.getPlayer().unfreezeMovment();
+            return;
+        }
+        game.getPlayer().setPos(playerPos);
     }
 };
 
 export function executeBehaviour(game: Game, currentScene: Scene, pos: Pos, type: ObjectBehaviour, data: string): void {
+    console.log(type);
+    
     behaivourImplementations[type](game, currentScene, pos, data);
 }
 

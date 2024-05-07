@@ -11,12 +11,19 @@ export default class Script implements SceneScript {
         } else {
             game.getPlayer().setPos(new TileCoordinate(-4, 2).toPos(tileSize).add(new Pos(tileSize/2, tileSize/2)));
         }
-        let scriptedObject1 = new ScriptedObject(new Pos(-4, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/test3.json", new Sprite("assets/goli.png", 13, 14, 0));
-        let scriptedObject2 = new ScriptedObject(new Pos(-3, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/test3.json", new Sprite("assets/goli.png", 13, 14, 0));
-        let scriptedObject3 = new ScriptedObject(new Pos(-2, -1).multiply(16), ObjectBehaviour.Interactable, "assets/test3.json", new Sprite("assets/goli.png", 13, 14, 0));
-        currentScene.addScriptedObject(scriptedObject1);
-        currentScene.addScriptedObject(scriptedObject2);
-        currentScene.addScriptedObject(scriptedObject3);
+
+        currentScene.addManyScriptedObjects(
+            new ScriptedObject(new Pos(-4, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/test3.json", new Sprite("assets/goli.png", 13, 14, 0)),
+            new ScriptedObject(new Pos(-2, -1).multiply(16), ObjectBehaviour.Interactable, "assets/test3.json", new Sprite("assets/goli.png", 13, 14, 0)),
+            new ScriptedObject(new Pos(-3, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/test3.json", new Sprite("assets/goli.png", 13, 14, 0)),
+            new ScriptedObject(new Pos(-9, -1).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/goli.png", 13, 14, 0)),
+            new ScriptedObject(new Pos(-8, -1).multiply(16), ObjectBehaviour.ConveyorBelt, "l", new Sprite("assets/goli.png", 13, 14, 0)),
+            new ScriptedObject(new Pos(-9, 1).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/goli.png", 13, 14, 0)),
+            new ScriptedObject(new Pos(-9, 0).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/goli.png", 13, 14, 0)),
+            new ScriptedObject(new Pos(-9, 3).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/goli.png", 13, 14, 0)),
+            new ScriptedObject(new Pos(-9, 2).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/goli.png", 13, 14, 0)),
+        );
+
     };
     onExit (game: Game, currentScene: Scene) {
 

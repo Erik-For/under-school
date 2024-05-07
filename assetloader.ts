@@ -38,6 +38,39 @@ export class TextAsset implements Asset {
     }
 }
 
+/**
+ * AudioAsset is a class that loads an audio file
+ */
+export class AudioAsset implements Asset {
+    src: string;
+    audio: HTMLAudioElement;
+
+    constructor(src: string) {
+        this.src = src;
+        this.audio = new Audio(src);
+    }
+
+    /**
+     * @returns a promise that resolves when the audio file is loaded
+     */
+    load(): Promise<string> {
+        const promise = new Promise<string>((reslove, reject) => {
+            this.audio.load();
+            this.audio.addEventListener('canplaythrough', () => {
+                reslove(this.src);
+            });
+        });
+        return promise;
+    }
+
+    /**
+     * plays the audio file
+     */
+    play() {
+        this.audio.play();
+    }
+}
+
 
 /**
  * AssetLoader is a class that loads multiple spritesheets and stores them in a dictionary
@@ -89,6 +122,12 @@ export class AssetLoader {
     getTextAsset(src: string): TextAsset | undefined {
         if(this.assets.get(src) instanceof TextAsset) {
             return this.assets.get(src) as TextAsset;
+        }
+    }
+
+    getAudioAsset(src: string): AudioAsset | undefined {
+        if(this.assets.get(src) instanceof AudioAsset) {
+            return this.assets.get(src) as AudioAsset;
         }
     }
 

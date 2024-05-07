@@ -2,8 +2,8 @@ import * as Sprites from './sprite.js';
 import { deserilizeScene, executeBehaviour, ObjectBehaviour, SceneAsset, TileCoordinate } from './scene.js';
 import * as Util from './util.js';
 import { Screen } from './screen.js';
-import { AssetLoader, TextAsset } from './assetloader.js';
-import { Pos, Game } from './game.js';
+import { TextAsset, AudioAsset, AssetLoader} from './assetloader.js';
+import { Pos, Game, AudioManager } from './game.js';
 import { NPCTextAnimation, NPCTalkingSprite } from './animate.js';
 import { Sequence, SequenceItem } from './sequence.js';
 
@@ -12,13 +12,7 @@ const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRendering
 
 let dev = false;
 const zoom = 1;
-const audio = new Audio('/build/assets/bad.wav');
-//playsound on pree space
-document.addEventListener('keydown', function (event) {
-    if (event.code == 'Space') {
-        audio.play();
-    }
-});
+
 document.addEventListener('keydown', (event) => {
     if (event.key === 'p') {
         dev = !dev;
@@ -31,9 +25,10 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/mcwalk.png", 16),
         new Sprites.SpriteSheet("assets/collision_boxes.png", 16),
         new Sprites.SpriteSheet("assets/goli.png", 16),
+        new Sprites.SpriteSheet("assets/teknik.png", 16),
         new TextAsset("assets/test2.json"),
         new TextAsset("assets/test3.json"),
-        //new AudioAsset("assets/hej.mp3"),
+        new AudioAsset("assets/test.mp3"),
     ],
     async () => {
         // remove loading screen
@@ -44,7 +39,8 @@ const assetLoader = new AssetLoader(
 
         const screen = new Screen(window.innerWidth, window.innerHeight, 16);
         let scene = await deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);
-        const game = new Game(scene, new Pos(16, 16), screen, assetLoader);
+        let audioManager = new AudioManager();
+        const game = new Game(scene, new Pos(16, 16), screen, audioManager, assetLoader);
         scene.onLoad(game, scene);
         //testcase! ta bort vid senare tillfälle
         document.addEventListener("keydown", (event) =>{
@@ -53,8 +49,12 @@ const assetLoader = new AssetLoader(
             }
 
             if(event.key === "r"){
-                game.getCamera().rippleEffect = !game.getCamera().rippleEffect;
+                game.getCamera().toggleRippleEffect();
             }
+        });
+
+        game.getInputHandler().onClick("Space", () => {
+            assetLoader.getAudioAsset("assets/test.mp3")!.play(); 
         });
         
         //GOOOLII!
@@ -64,8 +64,6 @@ const assetLoader = new AssetLoader(
             new Sprites.Sprite("assets/goli.png", 13, 15, 0),
             new Sprites.Sprite("assets/goli.png", 14, 15, 0)
         );
-
-        let text3 = new NPCTextAnimation(charecter, "Välkommen till ÅVA en skola med bra skolma!(#/&¤=!)(# ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO ARDUINO", 8000, game.getInputHandler());
 
         let sequence = new Sequence([
             new SequenceItem(
@@ -94,7 +92,6 @@ const assetLoader = new AssetLoader(
             ),
         ])
         game.getSequenceExecutor().setSequence(sequence);
-
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;
             game.getScreen().height = window.innerHeight;
@@ -174,9 +171,8 @@ function render(game: Game): void {
     game.getScene().onRender(game);
 }
 
-
 function renderDevOverlay(game: Game) {
-    const playerTilePos = Util.convertWorldPosToTileCoordinate(game.getPlayer().getPosition(), game.getScreen());
+    const playerTilePos = Util.convertWorldPosToTileCoordinate(game.getPlayer().getPos(), game.getScreen());
     const mouseTilePos = Util.convertWorldPosToTileCoordinate(Util.convertCanvasPosToWorldPos(game.getInputHandler().getMousePos(), game.getCamera().getPosition(), game.getScreen()), game.getScreen());
 
     ctx.fillStyle = "#FFFFFF";

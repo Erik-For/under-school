@@ -1,8 +1,8 @@
 import { Camera, Screen } from "./screen.js";
 import { InputHandler } from "./input.js";
 import { Player } from "./player.js";
-import { Scene, TileCoordinate, executeBehaviour } from "./scene.js";
-import { AssetLoader } from "./assetloader.js";
+import { ObjectBehaviour, Scene, TileCoordinate, executeBehaviour } from "./scene.js";
+import { AssetLoader, AudioAsset } from "./assetloader.js";
 import { SequenceExecutor } from "./sequence.js";
 import * as Util from "./util.js";
 
@@ -14,6 +14,7 @@ export class Game {
     #player: Player;
     #camera: Camera;
     #screen: Screen;
+    #audioManager: AudioManager;
     #inputHandler: InputHandler;
     #assetLoader: AssetLoader;
     #sequenceExecutor: SequenceExecutor;
@@ -25,10 +26,11 @@ export class Game {
      * @param screen The screen for rendering the game.
      * @param assetLoader The asset loader of the game.
      */
-    constructor(scene: Scene, startPos: Pos, screen: Screen, assetLoader: AssetLoader) {
+    constructor(scene: Scene, startPos: Pos, screen: Screen, audioManager: AudioManager, assetLoader: AssetLoader) {
         this.#screen = screen;
         this.#assetLoader = assetLoader;
         this.#scene = scene;
+        this.#audioManager = audioManager;
         this.#camera = new Camera(startPos.x, startPos.y);
         this.#inputHandler = new InputHandler();
         this.#player = new Player(startPos.x, startPos.y, this);
@@ -37,13 +39,40 @@ export class Game {
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
             // check if the player is in a scripted object
-            const playerTilePos = Util.convertWorldPosToTileCoordinate(this.getPlayer().getPosition(), this.getScreen());
+            
+            this.getCamera().setPosition(this.getPlayer().getPos());
+            const playerTilePos = Util.convertWorldPosToTileCoordinate(this.getPlayer().getPos(), this.getScreen());
             
             let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTilePos.toPos(16)));            
             if(scriptedObject){
                 executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
             }
         }, Math.round(1000 / 60));
+        this.#inputHandler.onClick("KeyZ", () => {
+            // calculate tile in front of player ( 8 pixels in front of player)
+            const playerPos = this.getPlayer().getPos();
+            const playerDirection = this.getPlayer().getDirection();
+            let range = 12;
+            switch (playerDirection) {
+                case "up":
+                    playerPos.y -= range;
+                    break;
+                case "down":
+                    playerPos.y += range;
+                    break;
+                case "left":
+                    playerPos.x -= range;
+                    break;
+                case "right":
+                    playerPos.x += range;
+                    break;
+            }
+            const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen())
+            let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTargetPos.toPos(screen.tileSize)));
+            if(scriptedObject && scriptedObject.type === ObjectBehaviour.Interactable){
+                executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
+            }
+        });
     }
 
     /**
@@ -76,6 +105,14 @@ export class Game {
      */
     getScreen(): Screen {
         return this.#screen;
+    }
+
+    /**
+     * Gets the audio manager of the game.
+     * @returns The audio manager object.
+     */
+    getAudioManager(): AudioManager {
+        return this.#audioManager;
     }
 
     /**
@@ -184,5 +221,70 @@ export class Pos {
 
     equals(pos: Pos): boolean {
         return this.x == pos.x && this.y == pos.y;
+    }
+}
+
+//example usage code
+//game.getAudioManager().playSoundEffect(assetLoader.getAudioAsset("assets/test.mp3")!);
+export class AudioManager {
+    #backGroundMusic: AudioAsset | undefined;
+    #volume: number;
+
+    constructor() {
+        this.#backGroundMusic;
+        this.#volume = 1;
+    }
+
+    /**
+     * Plays a sound effect.
+     * @param audio The audio asset to play.
+     */
+    playSoundEffect(audio: AudioAsset): void {
+        audio.audio.volume = this.#volume;
+        audio.play();
+    }
+
+    /**
+     * Sets and plays a background music track.
+     * @param audio The audio asset to play.
+     */
+    playBackgroundMusic(audio: AudioAsset): void {
+        if(this.#backGroundMusic) {
+            this.#backGroundMusic.audio.pause();
+        }
+        this.#backGroundMusic = audio;
+        this.#backGroundMusic.audio.volume = this.#volume;
+        this.#backGroundMusic.audio.loop = true;
+        this.#backGroundMusic.play();
+    }
+
+    /**
+     * Pauses the background music.
+     */
+    pauseBackgroundMusic(): void {
+        if(this.#backGroundMusic) {
+            this.#backGroundMusic.audio.pause();
+        }
+    }
+
+    /**
+     * Resumes the background music.
+     */
+    resumeBackgroundMusic(): void {
+        if(this.#backGroundMusic) {
+            this.#backGroundMusic.audio.play();
+        }
+    }
+
+    /**
+     * Sets the current volume of the audio manager.
+     * Immediately changes the volume of the background music if it is playing.
+     * @param volume The volume to set.
+     */
+    setVolume(volume: number): void {
+        this.#volume = volume;
+        if(this.#backGroundMusic) {
+            this.#backGroundMusic.audio.volume = volume;
+        }
     }
 }
