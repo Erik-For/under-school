@@ -1,5 +1,15 @@
 import { Pos } from "./game.js";
 
+class InputCallback {
+    func: () => any;
+    ignoreInteractionPrevention: boolean;
+
+    constructor(func: () => any, ignoreInteractionPrevention: boolean) {
+        this.func = func;
+        this.ignoreInteractionPrevention = ignoreInteractionPrevention;
+    }
+}
+
 /**
  * Represents an input handler for handling keyboard and mouse input.
  */
@@ -8,16 +18,16 @@ export class InputHandler {
     /**
      * keyClick is a map of keycodes to functions that should be called when the key is clicked
      */
-    keyClick: Map<string, (() => any)[]>;
+    keyClick: Map<string, InputCallback[]>;
     /**
      * keyClick is a map of keycodes to functions that should be called when the update method is called and the key is held
      */
-    keyHeld: Map<string, (() => any)[]>;
+    keyHeld: Map<string, InputCallback[]>;
     /**
      * keyRelease is a map of keycodes to functions that should be called when the key is released
      */
-    keyRelease: Map<string, (() => any)[]>;
-
+    keyRelease: Map<string, InputCallback[]>;
+    #preventInteraction: boolean = false;
     #mousePos: Pos;
 
     /**
@@ -33,13 +43,23 @@ export class InputHandler {
         window.addEventListener('keydown', (event) => {
             this.keys.set(event.code, true);
             if (this.keyClick.has(event.code)) {
-                this.keyClick.get(event.code)!.forEach((func) => func());
+                this.keyClick.get(event.code)!.forEach((func) => {
+                    if (!func.ignoreInteractionPrevention && this.#preventInteraction) {
+                        return;
+                    }
+                    func.func()
+                });
             }
         });
         window.addEventListener('keyup', (event) => {
             this.keys.set(event.code, false);
-            if (this.keyRelease.has(event.code)) {
-                this.keyRelease.get(event.code)!.forEach((func) => func());
+            if (this.keyRelease.has(event.code)){
+                this.keyRelease.get(event.code)!.forEach((func) => {
+                    if (!func.ignoreInteractionPrevention && this.#preventInteraction) {
+                        return;
+                    }
+                    func.func()
+                });
             }
         });
         window.addEventListener('mousemove', (event) => {
@@ -72,7 +92,7 @@ export class InputHandler {
     update() {
         this.keys.forEach((value, key) => {
             if (value && this.keyHeld.has(key)) {
-                this.keyHeld.get(key)!.forEach((func) => func());
+                this.keyHeld.get(key)!.forEach((func) => func.func());
             }
         });
     }
@@ -82,12 +102,12 @@ export class InputHandler {
      * @param key - The key to listen for.
      * @param func - The function to be called when the key is clicked.
      */
-    onClick(key: string, func: () => any) {
+    onClick(key: string, func: () => any, ignoreInteractionPrevention: boolean = false) {
         if (!this.keyClick.has(key)) {
-            this.keyClick.set(key, [func]);
+            this.keyClick.set(key, [new InputCallback(func, ignoreInteractionPrevention)]);
             return;
         }
-        this.keyClick.get(key)!.push(func);
+        this.keyClick.get(key)!.push(new InputCallback(func, ignoreInteractionPrevention));
     }
 
     /**
@@ -95,12 +115,12 @@ export class InputHandler {
      * @param key - The key to listen for.
      * @param func - The function to be called when the key is released.
      */
-    onRelease(key: string, func: () => any) {
+    onRelease(key: string, func: () => any, ignoreInteractionPrevention: boolean = false) {
         if (!this.keyRelease.has(key)) {
-            this.keyRelease.set(key, [func]);
+            this.keyRelease.set(key, [new InputCallback(func, ignoreInteractionPrevention)]);
             return;
         }
-        this.keyRelease.get(key)!.push(func);
+        this.keyRelease.get(key)!.push(new InputCallback(func, ignoreInteractionPrevention));
     }
 
     /**
@@ -108,11 +128,33 @@ export class InputHandler {
      * @param key - The key to listen for.
      * @param func - The function to be called when the key is held.
      */
-    onHold(key: string, func: () => any) {
+    onHold(key: string, func: () => any, ignoreInteractionPrevention: boolean = false) {
         if (!this.keyHeld.has(key)) {
-            this.keyHeld.set(key, [func]);
+            this.keyHeld.set(key, [new InputCallback(func, ignoreInteractionPrevention)]);
             return;
         }
-        this.keyHeld.get(key)!.push(func);
+        this.keyHeld.get(key)!.push(new InputCallback(func, ignoreInteractionPrevention));
+    }
+
+    /**
+     * Prevents the player from interacting with the game.
+     */
+    preventInteraction() {
+        this.#preventInteraction = true;
+    }
+
+    /**
+     * Allows the player to interact with the game.
+     */
+    allowInteraction() {
+        this.#preventInteraction = false;
+    }
+
+    /**
+     * Returns whether the player is allowed to interact with the game.
+     * @returns True if the player is allowed to interact, false otherwise.
+     */
+    isInteractionAllowed(): boolean {
+        return !this.#preventInteraction;
     }
 }

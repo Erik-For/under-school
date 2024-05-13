@@ -3,10 +3,10 @@ export abstract class SequenceCallback {
 }
 
 export class SequenceItem {
-    execute: (item: SequenceCallback) => void
+    execute: (item: SequenceCallback, ctx: CanvasRenderingContext2D) => void
     item: SequenceCallback;
-
-    constructor(item: SequenceCallback, execute: (item: SequenceCallback) => void) {
+    
+    constructor(item: SequenceCallback, execute: (item: SequenceCallback, ctx: CanvasRenderingContext2D) => void) {
         this.execute = execute;
         this.item = item;
     }
@@ -19,13 +19,29 @@ export class SequenceExecutor {
         this.sequence = undefined;
     }
 
-    execute() {
-        this.sequence?.execute();
+    execute(ctx: CanvasRenderingContext2D) {
+        this.sequence?.execute(ctx);
     }
 
     setSequence(sequence: Sequence) {
         this.sequence = sequence;
     }
+}
+
+export class CodeSequenceItem extends SequenceCallback {
+    #code: () => void;
+
+    constructor(code: () => void) {
+        super();
+        this.#code = code;
+    }
+
+    run() {
+        this.#code();
+        this.onFinish();
+    }
+
+
 }
 
 export class Sequence {
@@ -43,10 +59,20 @@ export class Sequence {
         })
     }
 
-    execute() {
+    execute(ctx: CanvasRenderingContext2D) {
         if(this.currentIndex >= this.items.length){
             return;
         }
-        this.items[this.currentIndex].execute(this.items[this.currentIndex].item);
+        this.items[this.currentIndex].execute(this.items[this.currentIndex].item, ctx);
+    }
+
+    reset() {
+        this.currentIndex = 0;
+        this.items.forEach((item) => {
+            item.item.onFinish = () => {
+                item.item.onFinish = () => {};
+                this.currentIndex++;
+            }
+        })
     }
 }

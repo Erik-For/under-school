@@ -47,7 +47,7 @@ export class Player {
     }
 
     render(ctx: CanvasRenderingContext2D, game: Game) {                        
-        let animation = this.#directionAnimation.get(this.#direction);
+        let animation = this.#movmentFrezze ? this.#directionAnimation.get("idle" + this.getDirection()) : this.#directionAnimation.get(this.#direction);
         let pos = Util.convertWorldPosToCanvasPos(this.getPos(), game.getCamera().getPosition(), game.getScreen());
         animation!.render(ctx, game.getAssetLoader(),
             Math.round(pos.x),

@@ -209,10 +209,10 @@ export class NPCTextAnimation extends SequenceCallback {
             if(Date.now() - this.startTime > this.duration) {
                 this.onFinish();
             }
-        })
+        }, true);
         this.inputHandler.onClick("KeyX", () => {
             this.startTime = Date.now() - this.duration;
-        });
+        }, true);
 
         // render a "modal" that takes up the bottom 1/3 of the screen
         ctx.fillStyle = "black";

@@ -35,6 +35,7 @@ const spriteSheetManager = new AssetLoader (
         //new Sprites.SpriteSheet("assets/tilemap.png", tileSize),
         new Sprites.SpriteSheet("assets/mcwalk.png", tileSize),
         new Sprites.SpriteSheet("assets/collision_boxes.png", tileSize),
+        new Sprites.SpriteSheet("assets/goli.png", tileSize),
         new Sprites.SpriteSheet("assets/teknik.png", tileSize),
     ], async () => { 
         // callback when all assets are loaded

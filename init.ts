@@ -3,7 +3,7 @@ import { deserilizeScene, executeBehaviour, ObjectBehaviour, SceneAsset, TileCoo
 import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { TextAsset, AudioAsset, AssetLoader} from './assetloader.js';
-import { Pos, Game, AudioManager } from './game.js';
+import { Pos, Game, AudioManager, ParticleManager, Particle } from './game.js';
 import { NPCTextAnimation, NPCTalkingSprite } from './animate.js';
 import { Sequence, SequenceItem } from './sequence.js';
 
@@ -11,6 +11,7 @@ const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasE
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 let dev = false;
+let fade = false;
 const zoom = 1;
 
 document.addEventListener('keydown', (event) => {
@@ -26,6 +27,7 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/collision_boxes.png", 16),
         new Sprites.SpriteSheet("assets/goli.png", 16),
         new Sprites.SpriteSheet("assets/teknik.png", 16),
+        new Sprites.SpriteSheet("assets/saker.png", 16),
         new TextAsset("assets/test2.json"),
         new TextAsset("assets/test3.json"),
         new AudioAsset("assets/test.mp3"),
@@ -40,8 +42,10 @@ const assetLoader = new AssetLoader(
         const screen = new Screen(window.innerWidth, window.innerHeight, 16);
         let scene = await deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);
         let audioManager = new AudioManager();
-        const game = new Game(scene, new Pos(16, 16), screen, audioManager, assetLoader);
+        let particleManager = new ParticleManager();
+        const game = new Game(scene, new Pos(-5, 2), screen, audioManager, particleManager, assetLoader);
         scene.onLoad(game, scene);
+
         //testcase! ta bort vid senare tillfälle
         document.addEventListener("keydown", (event) =>{
             if(event.key === "l"){
@@ -53,45 +57,15 @@ const assetLoader = new AssetLoader(
             }
         });
 
-        game.getInputHandler().onClick("Space", () => {
-            assetLoader.getAudioAsset("assets/test.mp3")!.play(); 
-        });
-        
-        //GOOOLII!
-        let charecter = new NPCTalkingSprite(
-            new Sprites.Sprite("assets/goli.png", 13, 14, 0),
-            new Sprites.Sprite("assets/goli.png", 14, 14, 0),
-            new Sprites.Sprite("assets/goli.png", 13, 15, 0),
-            new Sprites.Sprite("assets/goli.png", 14, 15, 0)
-        );
+        //Ännu ett test case TAG BORT SENARE TACKAR!
+        for(let i = 0; i < 1_000; i++){
+            let velocity = new Pos(2 * (Math.random()-0.5), 2 * (Math.random()-0.5)).normalize().multiply(Math.random()); // Randomize velocity
+            let lifetime = 120 * Math.random(); // Randomize lifetime
+            let particle = new Particle(new Pos(-5, 2).multiply(16), velocity, lifetime, game.getAssetLoader().getSpriteSheet("assets/goli.png")!.getSprite(13, 14), true);
+            game.getParticleManager().addParticle(particle);
+        }
 
-        let sequence = new Sequence([
-            new SequenceItem(
-                new NPCTextAnimation(charecter, "Hej jag heter Göran, men du kan kalla mig GOLI...", 3000, game.getInputHandler()),
-                (item) => {
-                    (item as NPCTextAnimation).render(ctx, game);
-                }
-            ),
-            new SequenceItem(
-                new NPCTextAnimation(charecter, "Jag är lärare i DAODAC, DVS Arduinokunskap.", 3000, game.getInputHandler()),
-                (item) => {
-                    (item as NPCTextAnimation).render(ctx, game);
-                }
-            ),
-            new SequenceItem(
-                new NPCTextAnimation(charecter, "Själv gillar jag att se på itläraren.se du vet, skåningen, och köra lastbil... Vet du vad....", 3000, game.getInputHandler()),
-                (item) => {
-                    (item as NPCTextAnimation).render(ctx, game);
-                }
-            ),
-            new SequenceItem(
-                new NPCTextAnimation(charecter, "Kom till it support i bibblan 9:30 - 10:15 eller något så kan jag fixa din dator.... Eller din arduino uno eller router eller skrivare eller... Ja, jag kan visst fixa allting.", 5000, game.getInputHandler()),
-                (item) => {
-                    (item as NPCTextAnimation).render(ctx, game);
-                }
-            ),
-        ])
-        game.getSequenceExecutor().setSequence(sequence);
+        //game.getSequenceExecutor().setSequence(sequence);
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;
             game.getScreen().height = window.innerHeight;
@@ -105,9 +79,8 @@ const assetLoader = new AssetLoader(
             if (dev) {
                 renderDevOverlay(game);
                 renderDevPlayerHitbox(game);
-
             }
-            game.getSequenceExecutor().execute();
+            game.getSequenceExecutor().execute(ctx);
             requestAnimationFrame(gameLoop);
         })
     }
@@ -167,9 +140,29 @@ function render(game: Game): void {
             }
         });
     });
+    game.getScene().getScriptedObjects().forEach((object) => {
+        let pos = object.pos;
+        let tilePos = object.pos.divide(game.getScreen().tileSize).round();
+        if (tilePos.x < renderBounds.min.x || tilePos.x > renderBounds.max.x || tilePos.y < renderBounds.min.y || tilePos.y > renderBounds.max.y) {
+            return;
+        }
+        const screen = game.getScreen();
+        const sprite = object.sprite;
+        const canvasPos = Util.convertWorldPosToCanvasPos(pos, game.getCamera().getPosition(), game.getScreen()).round();
+        
+        Sprites.render(ctx, assetLoader, sprite, canvasPos.x, canvasPos.y, screen.tileSize * screen.renderScale, screen.tileSize * screen.renderScale);
+    });
+
     game.getPlayer().render(ctx, game);
     game.getScene().onRender(game);
+    game.getParticleManager().render(ctx, game);
 }
+
+function fadeOut() { //RUBEN FIXA HÄRRRR; FUNKAR INTE SKA FADEA TILL BLACK OCH SEDAN TAGA BORTJA.
+    fade = true;
+}
+
+fadeOut();
 
 function renderDevOverlay(game: Game) {
     const playerTilePos = Util.convertWorldPosToTileCoordinate(game.getPlayer().getPos(), game.getScreen());

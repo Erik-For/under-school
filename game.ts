@@ -15,6 +15,7 @@ export class Game {
     #camera: Camera;
     #screen: Screen;
     #audioManager: AudioManager;
+    #particleManager: ParticleManager;
     #inputHandler: InputHandler;
     #assetLoader: AssetLoader;
     #sequenceExecutor: SequenceExecutor;
@@ -26,11 +27,12 @@ export class Game {
      * @param screen The screen for rendering the game.
      * @param assetLoader The asset loader of the game.
      */
-    constructor(scene: Scene, startPos: Pos, screen: Screen, audioManager: AudioManager, assetLoader: AssetLoader) {
+    constructor(scene: Scene, startPos: Pos, screen: Screen, audioManager: AudioManager, particleManager: ParticleManager, assetLoader: AssetLoader) {
         this.#screen = screen;
         this.#assetLoader = assetLoader;
         this.#scene = scene;
         this.#audioManager = audioManager;
+        this.#particleManager = particleManager;
         this.#camera = new Camera(startPos.x, startPos.y);
         this.#inputHandler = new InputHandler();
         this.#player = new Player(startPos.x, startPos.y, this);
@@ -45,8 +47,11 @@ export class Game {
             
             let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTilePos.toPos(16)));            
             if(scriptedObject){
-                executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
+                if (scriptedObject.type === ObjectBehaviour.ConveyorBelt || scriptedObject.type === ObjectBehaviour.ChangeScene) {
+                    executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
+                }
             }
+            this.#particleManager.update();
         }, Math.round(1000 / 60));
         this.#inputHandler.onClick("KeyZ", () => {
             // calculate tile in front of player ( 8 pixels in front of player)
@@ -113,6 +118,14 @@ export class Game {
      */
     getAudioManager(): AudioManager {
         return this.#audioManager;
+    }
+
+    /**
+     * Gets the particle manager of the game.
+     * @returns The particle manager object.
+     */
+    getParticleManager(): ParticleManager {
+        return this.#particleManager;
     }
 
     /**
@@ -219,8 +232,21 @@ export class Pos {
         return new Pos(Math.abs(this.x), Math.abs(this.y));
     }
 
+    /**
+     * Returns the length of this position
+     * @returns the length
+     */
     equals(pos: Pos): boolean {
         return this.x == pos.x && this.y == pos.y;
+    }
+
+    /**
+     * Returns the normalized version of this position
+     * @returns the normalized position
+     */
+    normalize(): Pos {
+        let length = Math.sqrt(this.x * this.x + this.y * this.y);
+        return new Pos(this.x / length, this.y / length);
     }
 }
 
@@ -286,5 +312,60 @@ export class AudioManager {
         if(this.#backGroundMusic) {
             this.#backGroundMusic.audio.volume = volume;
         }
+    }
+}
+
+export class Particle {
+    pos: Pos;
+    velocity: Pos;
+    lifeTime: number;
+    image: ImageBitmap;
+    useGravity: boolean;
+
+    constructor(pos: Pos, velocity: Pos, lifeTime: number, image: ImageBitmap, gravity: boolean = false) {
+        this.pos = pos;
+        this.velocity = velocity;
+        this.lifeTime = lifeTime;
+        this.image = image;
+        this.useGravity = gravity;
+    }
+
+    update() {
+        this.pos = this.pos.add(this.velocity);
+
+        if(this.useGravity){
+            this.velocity.y += 9.82 / 350;
+        }
+        this.lifeTime--;
+    }
+
+    render(ctx: CanvasRenderingContext2D, game: Game){
+        let canvasPos = Util.convertWorldPosToCanvasPos(this.pos, game.getCamera().getPosition(), game.getScreen());
+        ctx.drawImage(this.image, canvasPos.x, canvasPos.y);
+    }
+}
+
+export class ParticleManager{
+    particles: Particle[];
+
+    constructor(){
+        this.particles = [];
+    }
+
+    addParticle(particle: Particle){
+        this.particles.push(particle);
+    }
+
+    update(){
+        this.particles.forEach(particle => {
+            particle.update();
+        });
+        this.particles = this.particles.filter(particle => particle.lifeTime > 0);
+    }
+
+    render(ctx: CanvasRenderingContext2D, game: Game){
+        this.particles.forEach(particle => {
+            particle.render(ctx, game);
+        });
     }
 }

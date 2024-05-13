@@ -61,6 +61,7 @@ export class Camera {
         this.#rippleEffect = !this.#rippleEffect;
     }
 
+    
 }
 
 export class Screen {

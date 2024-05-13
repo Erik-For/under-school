@@ -333,7 +333,6 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
 
         let tilePos = convertWorldPosToTileCoordinate(playerPos, game.getScreen());
         let moveObj = game.getScene().getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(tilePos.toPos(game.getScreen().tileSize)));
-        console.log(moveObj, playerPos, tilePos);
         
         if(moveObj?.type != ObjectBehaviour.ConveyorBelt) {
             game.getPlayer().unfreezeMovment();
@@ -344,8 +343,6 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
 };
 
 export function executeBehaviour(game: Game, currentScene: Scene, pos: Pos, type: ObjectBehaviour, data: string): void {
-    console.log(type);
-    
     behaivourImplementations[type](game, currentScene, pos, data);
 }
 
@@ -364,27 +361,24 @@ export class ScriptedObject {
         this.behaviourData = behaviourData;
         this.sprite = sprite;
     }
+
+    static constructFamily(itterations: number, constructor: (itteration: number) => ScriptedObject): ScriptedObject[] {
+        let family: ScriptedObject[] = [];
+        for(let i = 0; i < itterations; i++) {
+            family.push(constructor(i));
+        }
+        return family;
+    }
 }
 
 /**
  * Serializes the scene object into a JSON string.
  * @param scene - The scene object to be serialized.
  * @returns A JSON string representing the serialized scene.
- */
+*/
 export function serilizeScene(scene: Scene){
     const object: {
         sceneScriptName: string,
-        objectData: {
-            [key: string]: {
-                type: string // type "ChangeScene", "NPC", "Sign", "Chest", "Movable", "ConveyorBelt" 
-                data: string // data for the type, some types like Movable will have no data
-                spr: {
-                    src: string, // spriteSheetSrc
-                    xO: number, // xOffset
-                    yO: number, // yOffset
-                }
-            }
-        },
         tileData: {
             [key: string]: {
                 [key: string]:{ // Tile class
@@ -395,17 +389,17 @@ export function serilizeScene(scene: Scene){
                         y: number 
                     },
                     */
-                    spr: { // sprites list of Sprite classes serilized
-                        src: string, // spriteSheetSrc
-                        xO: number, // xOffset
-                        yO: number, // yOffset
-                        zi: number // zindex
-                    }[]
-                }
+                   spr: { // sprites list of Sprite classes serilized
+                    src: string, // spriteSheetSrc
+                    xO: number, // xOffset
+                    yO: number, // yOffset
+                    zi: number // zindex
+                }[]
             }
         }
-    } = {
-        objectData: {}, tileData: {},
+    }
+} = {
+        tileData: {},
         sceneScriptName: scene.getScriptName()
     }; // Add index signature
     scene.getTiles().forEach((row, ys) => {
@@ -443,17 +437,6 @@ export function deserilizeScene(json: string): Promise<Scene> {
     return new Promise(async (resolve, reject) => {
         const serilizedObject: {
             sceneScriptName: string,
-            objectData: {
-                [key: string]: {
-                    type: string // type "ChangeScene", "NPC", "Sign", "Chest", "Movable", "ConveyorBelt" 
-                    data: string // data for the type, some types like Movable will have no data
-                    spr: {
-                        src: string, // spriteSheetSrc
-                        xO: number, // xOffset
-                        yO: number, // yOffset
-                    }
-                }
-            },
             tileData: {
                 [key: string]: {
                     [key: string]:{ // Tile class
@@ -478,12 +461,7 @@ export function deserilizeScene(json: string): Promise<Scene> {
         const module = await import(`./scene_scripts/${serilizedObject.sceneScriptName}`)
         const script = new module.default();
         scene.setSceneScript(script as SceneScript);
-    
-        // Load object data
-        Object.keys(serilizedObject.objectData).forEach((key) => {
-            
-        })
-    
+       
         // Load tile data
         Object.keys(serilizedObject.tileData).forEach((yString) => {
             Object.keys(serilizedObject.tileData[yString]).forEach((xString) => {
