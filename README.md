@@ -1,3 +1,6 @@
+[Game demo](https://underschool.vibevault.se/game.html)
+[Editor demo](https://underschool.vibevault.se/editor.html)
+
 # Bästa spelet någonsin gjort förmodligen
 
 [Docs](https://underschool.vibevault.se/docs/)
