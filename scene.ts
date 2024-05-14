@@ -1,6 +1,7 @@
 import { Asset, TextAsset } from "./assetloader.js";
-import { Game, Pos } from "./game.js";
+import { Game, Pos} from "./game.js";
 import * as Sprites from "./sprite.js";
+import {fadeIn, fadeOut} from "./init.js";
 import { convertWorldPosToCanvasPos, convertWorldPosToTileCoordinate, getSubTileCoordinate } from "./util.js";
 
 /**
@@ -19,7 +20,8 @@ export class Scene {
             name: "default",
             onEnter: (prevScene: Scene, game: Game, currentScene: Scene) => {},
             onExit: (game: Game, currentScene: Scene) => {},
-            render: (game: Game, currentScene: Scene) => {}
+            render: (game: Game, currentScene: Scene) => {},
+            getStartTile: () => new Map()
         }
         this.#scriptedBehaviour = new Map();        
     }
@@ -90,8 +92,13 @@ export class Scene {
     }
 
     onLoad(game: Game, prevScene: Scene) {
+        const tileSize = game.getScreen().tileSize;
         prevScene.onExit(game, this);
         this.#sceneScript.onEnter(prevScene, game, this);
+        let startPos = this.#sceneScript.getStartTile().get(prevScene.getScriptName())?.toPos(tileSize);
+        let defaultPos = this.#sceneScript.getStartTile().get("default")?.toPos(tileSize);
+        // new TileCoordinate(-4, -1).toPos(tileSize).add(new Pos(tileSize/2, tileSize/2))
+        game.getPlayer().setPos(startPos? startPos : defaultPos? defaultPos : new Pos(0, 0));
     }
 
     onExit(game: Game, prevScene: Scene) {
@@ -270,9 +277,11 @@ export interface SceneScript {
     onEnter: (prevScene: Scene ,game: Game, currentScene: Scene) => void;
     onExit: (game: Game, currentScene: Scene) => void;
     render: (game: Game, currentScene: Scene) => void;
+    getStartTile: () => Map<String, TileCoordinate>;
 }
 
 export enum ObjectBehaviour {
+    None,
     ChangeScene, // when the player walks into this object they are transported to a new scene
     Interactable, // when the player is facing that tile and presses the interact key (z) they will open the chest
     Movable, // when waling into this object the player will be able to push it
@@ -281,10 +290,20 @@ export enum ObjectBehaviour {
 
 const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScene: Scene, pos: Pos, data: string) => void> = {
     [ObjectBehaviour.ChangeScene]: async (game, scene, pos, data) => {
-        
+
         let newScene = await deserilizeScene(game.getAssetLoader().getTextAsset(data)!.data!);
-        game.setScene(newScene);
-        newScene.onLoad(game, scene);
+        game.getPlayer().denyCollisions();
+        game.getPlayer().freezeMovment();
+        const fadeToBlack = fadeIn(game);
+        fadeToBlack.then(() => {
+            game.setScene(newScene);
+            newScene.onLoad(game, scene);
+            const fade = fadeOut(game);
+            fade.then(() => {
+                game.getPlayer().allowCollisions();
+                game.getPlayer().unfreezeMovment();
+            });
+        });
     },
     [ObjectBehaviour.Interactable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         currentScene.getBehaviour(data)?.(game, currentScene, pos, data);
@@ -294,37 +313,37 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
     },
     [ObjectBehaviour.ConveyorBelt]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         game.getPlayer().freezeMovment();
-        let playerPos = game.getPlayer().getPos();        
+        let playerPos = game.getPlayer().getPos();
         let playerSubPos = getSubTileCoordinate(playerPos, game.getScreen());
         switch (data) {
             case "u": // up
-                if(playerSubPos.x > 0 && playerSubPos.x < 7){
+                if (playerSubPos.x > 0 && playerSubPos.x < 7) {
                     playerPos.x += 1;
-                } else if(playerSubPos.x > 8) {
+                } else if (playerSubPos.x > 8) {
                     playerPos.x -= 1;
                 }
                 playerPos.y -= 1;
                 break;
             case "d": // down
-                if(playerSubPos.x > 0 && playerSubPos.x < 7){
+                if (playerSubPos.x > 0 && playerSubPos.x < 7) {
                     playerPos.x += 1;
-                } else if(playerSubPos.x > 8) {
+                } else if (playerSubPos.x > 8) {
                     playerPos.x -= 1;
                 }
                 playerPos.y += 1;
                 break;
             case "l": // left
-                if(playerSubPos.y > 0 && playerSubPos.y < 7){
+                if (playerSubPos.y > 0 && playerSubPos.y < 7) {
                     playerPos.y += 1;
-                } else if(playerSubPos.y > 8) {
+                } else if (playerSubPos.y > 8) {
                     playerPos.y -= 1;
                 }
                 playerPos.x -= 1;
                 break;
             case "r": // right
-                if(playerSubPos.y > 0 && playerSubPos.y < 7){
+                if (playerSubPos.y > 0 && playerSubPos.y < 7) {
                     playerPos.y += 1;
-                } else if(playerSubPos.y > 8) {
+                } else if (playerSubPos.y > 8) {
                     playerPos.y -= 1;
                 }
                 playerPos.x += 1;
@@ -333,12 +352,14 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
 
         let tilePos = convertWorldPosToTileCoordinate(playerPos, game.getScreen());
         let moveObj = game.getScene().getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(tilePos.toPos(game.getScreen().tileSize)));
-        
-        if(moveObj?.type != ObjectBehaviour.ConveyorBelt) {
+
+        if (moveObj?.type != ObjectBehaviour.ConveyorBelt) {
             game.getPlayer().unfreezeMovment();
             return;
         }
         game.getPlayer().setPos(playerPos);
+    },
+    [ObjectBehaviour.None]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
     }
 };
 

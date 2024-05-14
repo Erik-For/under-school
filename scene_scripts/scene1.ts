@@ -1,5 +1,5 @@
-import { NPCTalkingSprite, NPCTextAnimation } from "../animate.js";
-import { Game, Pos } from "../game.js";
+import { BigSprite, NPCTextAnimation } from "../animate.js";
+import { Game, Particle, Pos } from "../game.js";
 import { ObjectBehaviour, Scene, SceneScript, ScriptedObject, TileCoordinate } from "../scene.js";
 import { CodeSequenceItem, Sequence, SequenceItem } from "../sequence.js";
 import { Sprite } from "../sprite.js";
@@ -14,8 +14,17 @@ export default class Script implements SceneScript {
             game.getPlayer().setPos(new TileCoordinate(-4, 2).toPos(tileSize).add(new Pos(tileSize/2, tileSize/2)));
         }
         
+        //Ännu ett test case TAG BORT SENARE TACKAR!
+        // for(let i = 0; i < 1_000; i++){
+        //     let velocity = new Pos(2 * (Math.random()-0.5), 2 * (Math.random()-0.5)).normalize().multiply(Math.random()); // Randomize velocity
+        //     let lifetime = 120 * Math.random(); // Randomize lifetime
+        //     let particle = new Particle(new Pos(-5, 2).multiply(16), velocity, lifetime, game.getAssetLoader().getSpriteSheet("assets/goli.png")!.getSprite(13, 14), true);
+        //     game.getParticleManager().addParticle(particle);
+        // }
+
+
         currentScene.registerBehaviour("test", (object) => {
-            let charecter = new NPCTalkingSprite(
+            let charecter = new BigSprite(
                 new Sprite("assets/goli.png", 13, 14, 0),
                 new Sprite("assets/goli.png", 14, 14, 0),
                 new Sprite("assets/goli.png", 13, 15, 0),
@@ -26,7 +35,7 @@ export default class Script implements SceneScript {
                 new SequenceItem(
                     new CodeSequenceItem(() => {
                         game.getPlayer().freezeMovment();
-                        game.getInputHandler().preventInteraction()
+                        game.getInputHandler().preventInteraction();
                     }),
                     (item, ctx) => {
                         (item as CodeSequenceItem).run();
@@ -72,9 +81,12 @@ export default class Script implements SceneScript {
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(-4, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/test3.json", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-3, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/test3.json", new Sprite("assets/saker.png", 8, 0, 0)),
-            new ScriptedObject(new Pos(-2, -1).multiply(16), ObjectBehaviour.Interactable, "test", new Sprite("assets/goli.png", 13, 14, 0)),
-            new ScriptedObject(new Pos(-8, -1).multiply(16), ObjectBehaviour.ConveyorBelt, "l", new Sprite("assets/saker.png", 3, 0, 0)),
-            ...ScriptedObject.constructFamily(20, (i) => new ScriptedObject(new Pos(-9, i-1).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/saker.png", 2, 0, 0))),
+            new ScriptedObject(new Pos(-2, -1).multiply(16), ObjectBehaviour.Interactable, "test", new Sprite("assets/goli.png", 15, 15, 0)),
+            new ScriptedObject(new Pos(-2, -2).multiply(16), ObjectBehaviour.None, "", new Sprite("assets/goli.png", 15, 14, 0)),
+            ...ScriptedObject.constructFamily(2, (i) => new ScriptedObject(new Pos(-5-i,-1).multiply(16), ObjectBehaviour.ConveyorBelt, "l", new Sprite("assets/saker.png", 3, 0, 0))),
+            ...ScriptedObject.constructFamily(2, (i) => new ScriptedObject(new Pos(-7, i-1).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/saker.png", 2, 0, 0))),
+            ...ScriptedObject.constructFamily(2, (i) => new ScriptedObject(new Pos(-7+i, 1).multiply(16), ObjectBehaviour.ConveyorBelt, "r", new Sprite("assets/saker.png", 1, 0, 0))),
+            ...ScriptedObject.constructFamily(2, (i) => new ScriptedObject(new Pos(-5, i).multiply(16), ObjectBehaviour.ConveyorBelt, "u", new Sprite("assets/saker.png", 0, 0, 0))),
         );
     };
     onExit (game: Game, currentScene: Scene) {
@@ -82,5 +94,12 @@ export default class Script implements SceneScript {
     };
     render(game: Game, currentScene: Scene) {
         
+    };
+
+    getStartTile(): Map<String, TileCoordinate> {
+        return new Map([
+            ["scene3.js", new TileCoordinate(-3, -0.5)],
+            ["default", new TileCoordinate(-3, 3)]
+        ]);
     };
 }

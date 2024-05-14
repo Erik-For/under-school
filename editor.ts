@@ -374,7 +374,6 @@ function selectSprite(src: string, x: number, y: number) {
     selectedSprite = new Sprites.Sprite(src, x, y, 5);
 }
 
-
 function renderSelection(selection: { startX: number; startY: number; endX: number; endY: number; active: boolean; }, camera: { x: number; y: number; }, ctx: CanvasRenderingContext2D, tileSize: number, renderScale: number, mouse: { x: number; y: number; }) {
     const endX =  Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
     const endY =  Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));

@@ -19,14 +19,15 @@ export class Game {
     #inputHandler: InputHandler;
     #assetLoader: AssetLoader;
     #sequenceExecutor: SequenceExecutor;
-
+    #mode: Mode;
+    
     /**
      * Creates a new instance of the Game class.
      * @param scene The inital scene of the game.
      * @param startPos The starting position of the player.
      * @param screen The screen for rendering the game.
      * @param assetLoader The asset loader of the game.
-     */
+    */
     constructor(scene: Scene, startPos: Pos, screen: Screen, audioManager: AudioManager, particleManager: ParticleManager, assetLoader: AssetLoader) {
         this.#screen = screen;
         this.#assetLoader = assetLoader;
@@ -37,20 +38,24 @@ export class Game {
         this.#inputHandler = new InputHandler();
         this.#player = new Player(startPos.x, startPos.y, this);
         this.#sequenceExecutor = new SequenceExecutor();
-
+        this.#mode = Mode.OpenWorld;
+        
+        
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
             // check if the player is in a scripted object
             
             this.getCamera().setPosition(this.getPlayer().getPos());
             const playerTilePos = Util.convertWorldPosToTileCoordinate(this.getPlayer().getPos(), this.getScreen());
-            
-            let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTilePos.toPos(16)));            
-            if(scriptedObject){
-                if (scriptedObject.type === ObjectBehaviour.ConveyorBelt || scriptedObject.type === ObjectBehaviour.ChangeScene) {
-                    executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
+            if(this.#player.getCanCollide()){
+                let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTilePos.toPos(16)));            
+                if(scriptedObject){
+                    if (scriptedObject.type === ObjectBehaviour.ConveyorBelt || scriptedObject.type === ObjectBehaviour.ChangeScene) {
+                        executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
+                    }
                 }
             }
+            
             this.#particleManager.update();
         }, Math.round(1000 / 60));
         this.#inputHandler.onClick("KeyZ", () => {
@@ -68,11 +73,11 @@ export class Game {
                 case "left":
                     playerPos.x -= range;
                     break;
-                case "right":
-                    playerPos.x += range;
+                    case "right":
+                        playerPos.x += range;
                     break;
             }
-            const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen())
+            const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen());
             let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTargetPos.toPos(screen.tileSize)));
             if(scriptedObject && scriptedObject.type === ObjectBehaviour.Interactable){
                 executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
@@ -91,17 +96,17 @@ export class Game {
     /**
      * Gets the scene of the game.
      * @returns The scene object.
-     */
-    getScene(): Scene {
+    */
+   getScene(): Scene {
         return this.#scene;
     }
-
+    
     /**
      * Gets the camera of the game.
      * @returns The camera object.
-     */
-    getCamera(): Camera {
-        return this.#camera;
+    */
+   getCamera(): Camera {
+       return this.#camera;
     }
 
     /**
@@ -127,13 +132,13 @@ export class Game {
     getParticleManager(): ParticleManager {
         return this.#particleManager;
     }
-
+    
     /**
      * Gets the input handler of the game.
      * @returns The input handler object.
-     */
-    getInputHandler(): InputHandler {
-        return this.#inputHandler;
+    */
+   getInputHandler(): InputHandler {
+       return this.#inputHandler;
     }
 
     /**
@@ -152,9 +157,30 @@ export class Game {
         return this.#assetLoader;
     }
 
+    /**
+     * Retrieves the sequence executor.
+     * @returns The sequence executor.
+     */
     getSequenceExecutor(): SequenceExecutor {
         return this.#sequenceExecutor;
     }
+
+    /**
+     * Retrieves the current mode of the game.
+     * @returns The current mode of the game.
+     */
+    getMode(): Mode {
+        return this.#mode;
+    }
+
+    setMode(mode: Mode) {
+        this.#mode = mode;
+    }
+}
+
+export enum Mode {
+    OpenWorld,
+    Battle
 }
 
 
@@ -166,7 +192,7 @@ export class Pos {
      * Contains information about the position
      * @param x - the x position
      * @param y - the y position
-     */
+    */
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;

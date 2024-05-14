@@ -127,7 +127,7 @@ export class PlayerAnimation {
 /**
  * Represents a NPC talking sprite made up of 4 sprites rendered in a 2x2 grid.
  */
-export class NPCTalkingSprite {
+export class BigSprite {
     topLeft: Sprite;
     topRight: Sprite;
     bottomLeft: Sprite;
@@ -168,7 +168,7 @@ export class NPCTalkingSprite {
  * Represents an animation for displaying NPC text.
  */
 export class NPCTextAnimation extends SequenceCallback {
-    talkingSprite: NPCTalkingSprite;
+    talkingSprite: BigSprite;
     text: string;
     duration: number;
     startTime: number;
@@ -181,13 +181,14 @@ export class NPCTextAnimation extends SequenceCallback {
      * @param duration - The duration of the animation in milliseconds.
      * @param inputHandler - The InputHandler used for handling user input.
      */
-    constructor(talkingSprite: NPCTalkingSprite, text: string, duration: number, inputHandler: InputHandler) {
+    constructor(talkingSprite: BigSprite, text: string, duration: number, inputHandler: InputHandler) {
         super();
         this.talkingSprite = talkingSprite;
         this.text = text;
         this.duration = duration;
         this.startTime = 0;
         this.inputHandler = inputHandler;
+
     }
     /**
      * Renders the NPC text animation.
@@ -201,11 +202,11 @@ export class NPCTextAnimation extends SequenceCallback {
         if(this.startTime == 0) {
             this.startTime = Date.now();
         }
-        if(Date.now() - this.startTime > this.duration) {
-            // pass 
-        }
-        
+
+        // This is a horrible way to do this, but it works for now
         this.inputHandler.onClick("KeyZ", () => {
+            console.log("KeyZ pressed");
+            
             if(Date.now() - this.startTime > this.duration) {
                 this.onFinish();
             }
@@ -213,6 +214,7 @@ export class NPCTextAnimation extends SequenceCallback {
         this.inputHandler.onClick("KeyX", () => {
             this.startTime = Date.now() - this.duration;
         }, true);
+
 
         // render a "modal" that takes up the bottom 1/3 of the screen
         ctx.fillStyle = "black";

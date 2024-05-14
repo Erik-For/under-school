@@ -4,7 +4,7 @@ import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { TextAsset, AudioAsset, AssetLoader} from './assetloader.js';
 import { Pos, Game, AudioManager, ParticleManager, Particle } from './game.js';
-import { NPCTextAnimation, NPCTalkingSprite } from './animate.js';
+import { NPCTextAnimation, BigSprite } from './animate.js';
 import { Sequence, SequenceItem } from './sequence.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
@@ -12,6 +12,7 @@ const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRendering
 
 let dev = false;
 let fade = false;
+let fadeAlpha = 0;
 const zoom = 1;
 
 document.addEventListener('keydown', (event) => {
@@ -156,13 +157,43 @@ function render(game: Game): void {
     game.getPlayer().render(ctx, game);
     game.getScene().onRender(game);
     game.getParticleManager().render(ctx, game);
+    if(fadeAlpha != 0){
+        ctx.globalAlpha = fadeAlpha;
+        ctx.fillRect(0, 0, game.getScreen().width, game.getScreen().height);
+    }
 }
 
-function fadeOut() { //RUBEN FIXA HÄRRRR; FUNKAR INTE SKA FADEA TILL BLACK OCH SEDAN TAGA BORTJA.
-    fade = true;
+export function fadeIn(game: Game): Promise<void>{
+    fadeAlpha = 0;
+    return new Promise((resolve) => {
+        let interval = setInterval(() => {
+            if (fadeAlpha < 1) {
+                ctx.fillStyle = "black";
+                ctx.globalAlpha = fadeAlpha;
+                fadeAlpha += 0.06;
+            } else {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 1000 / 60); // 60 FPS
+    });
 }
 
-fadeOut();
+export function fadeOut(game: Game): Promise<void>{
+    fadeAlpha = 1;
+    return new Promise((resolve) => {
+        let interval = setInterval(() => {
+            if (fadeAlpha > 0) {
+                ctx.fillStyle = "black";
+                fadeAlpha -= 0.06;
+            } else {
+                clearInterval(interval);
+                resolve();
+                fadeAlpha = 0;
+            }
+        }, 1000 / 60); // 60 FPS
+    });
+}
 
 function renderDevOverlay(game: Game) {
     const playerTilePos = Util.convertWorldPosToTileCoordinate(game.getPlayer().getPos(), game.getScreen());

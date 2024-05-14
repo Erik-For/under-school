@@ -11,6 +11,8 @@ export class Player {
     #directionAnimation: Map<String, PlayerAnimation>;
     #game: Game;
     #movmentFrezze: boolean;
+    #health: number;
+    #canCollide: boolean;
 
     constructor(x: number, y: number, game: Game) {
         this.x = x;
@@ -19,6 +21,8 @@ export class Player {
         this.#directionAnimation = new Map();
         this.#game = game;
         this.#movmentFrezze = false;
+        this.#health = 100;
+        this.#canCollide = true;
 
         initAnimations(this.#directionAnimation);
         this.#registerAnimationKeys(); // this handles animation logic, like walking and idleing animations
@@ -44,6 +48,34 @@ export class Player {
 
     getDirection() {
         return this.#direction.replace("idle", "").replace("walk", ""); // returns the direction of the player without the action, this is kinda hacky but it works fine and is probably not prone to errors
+    }
+
+    getHealth() {
+        return this.#health;
+    }
+
+    setHealth(health: number) {
+        this.#health = health;
+    }
+
+    removeHealth(health: number) {
+        this.#health -= health;
+    }   
+
+    addHealth(health: number) {
+        this.#health += health;
+    }
+
+    allowCollisions(){
+        this.#canCollide = true;
+    }
+
+    denyCollisions(){
+        this.#canCollide = false;
+    }
+
+    getCanCollide(){
+        return this.#canCollide;
     }
 
     render(ctx: CanvasRenderingContext2D, game: Game) {                        
@@ -197,6 +229,7 @@ export class Player {
             this.#direction = "idleright";
         });
     }
+
 }
 
 /**
