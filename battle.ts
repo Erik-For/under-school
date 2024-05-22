@@ -4,6 +4,7 @@ import { Player } from "./player.js"
 import { Sprite } from "./sprite.js"
 import { Screen } from "./screen.js"
 import { InputHandler } from "./input.js"
+import Keys from "./keys.js"
 
 export class Battle {
     #heart: PlayerHeart
@@ -86,17 +87,18 @@ export class PlayerHeart {
         this.#player = player
         this.#frozen = false
 
-        inputHandler.onHold("KeyW", () => {
-            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x, this.#pos.y - 1))) this.#pos.y -= 1
+        const movmentSpeed = 1;
+        inputHandler.onHold(Keys.MoveUp, () => {
+            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x, this.#pos.y - movmentSpeed))) this.#pos.y -= inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight) ? movmentSpeed/Math.sqrt(2) : movmentSpeed 
         });
-        inputHandler.onHold("KeyS", () => {
-            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x, this.#pos.y + 1))) this.#pos.y += 1
+        inputHandler.onHold(Keys.MoveDown, () => {
+            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x, this.#pos.y + movmentSpeed))) this.#pos.y += inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight) ? movmentSpeed/Math.sqrt(2) : movmentSpeed
         });
-        inputHandler.onHold("KeyA", () => {
-            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x - 1, this.#pos.y))) this.#pos.x -= 1
+        inputHandler.onHold(Keys.MoveLeft, () => {
+            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x - movmentSpeed, this.#pos.y))) this.#pos.x -= inputHandler.isKeyDown(Keys.MoveDown) || inputHandler.isKeyDown(Keys.MoveUp) ? movmentSpeed/Math.sqrt(2) : movmentSpeed
         });
-        inputHandler.onHold("KeyD", () => {
-            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x + 1, this.#pos.y))) this.#pos.x += 1
+        inputHandler.onHold(Keys.MoveRight, () => {
+            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x + movmentSpeed, this.#pos.y))) this.#pos.x += inputHandler.isKeyDown(Keys.MoveDown) || inputHandler.isKeyDown(Keys.MoveUp) ? movmentSpeed/Math.sqrt(2) : movmentSpeed
         });
     }
 
@@ -148,5 +150,6 @@ export class Enemy {
     }
 
     render(ctx: CanvasRenderingContext2D) {
+        
     }
 }

@@ -46,7 +46,7 @@ const assetLoader = new AssetLoader(
         const game = new Game(scene, new Pos(-5, 2), screen, audioManager, particleManager, assetLoader);
         scene.onLoad(game, scene);
 
-        game.getInputHandler().onClick("KeyK", () => {
+        game.getInputHandler().onClick("KeyI", () => {
             game.setMode(game.getMode() === Mode.OpenWorld ? Mode.Battle : Mode.OpenWorld);
             if(game.getMode() === Mode.Battle){
                 game.getBattle().activate();

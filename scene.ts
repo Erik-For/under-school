@@ -479,7 +479,7 @@ export function deserilizeScene(json: string): Promise<Scene> {
         } = JSON.parse(json);
         let scene = new Scene();
 
-        if(serilizedObject.sceneScriptName && serilizedObject.sceneScriptName != "default" && !window.location.pathname.includes("editor")) {
+        if(serilizedObject.sceneScriptName != "default") {
             const module = await import(`./scene_scripts/${serilizedObject.sceneScriptName}`);
             const script = new module.default();
             scene.setSceneScript(script as SceneScript);

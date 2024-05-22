@@ -5,6 +5,7 @@ import { Sprite } from "../sprite.js";
 export default class Script implements SceneScript {
     name: string = "scene3.js";
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
+        game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/test.mp3")!);
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(4, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/test2.json", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(5, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/test2.json", new Sprite("assets/saker.png", 8, 0, 0)),

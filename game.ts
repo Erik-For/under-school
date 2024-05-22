@@ -6,6 +6,7 @@ import { AssetLoader, AudioAsset } from "./assetloader.js";
 import { SequenceExecutor } from "./sequence.js";
 import * as Util from "./util.js";
 import { Battle } from "./battle.js";
+import Keys from "./keys.js";
 
 /**
  * Represents a game.
@@ -60,7 +61,7 @@ export class Game {
             
             this.#particleManager.update();
         }, Math.round(1000 / 60));
-        this.#inputHandler.onClick("KeyZ", () => {
+        this.#inputHandler.onClick(Keys.Interact, () => {
             // calculate tile in front of player ( 8 pixels in front of player)
             const playerPos = this.getPlayer().getPos();
             const playerDirection = this.getPlayer().getDirection();
