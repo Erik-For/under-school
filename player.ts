@@ -1,4 +1,4 @@
-import { Pos } from "./game.js";
+import { Mode, Pos } from "./game.js";
 import * as Util from "./util.js";
 import { PlayerAnimation, CyclicAnimation } from "./animate.js";
 import { Sprite } from "./sprite.js";
@@ -35,6 +35,7 @@ export class Player {
     }
     unfreezeMovment() {
         this.#movmentFrezze = false;
+        this.#direction = "idle" + this.getDirection();
     }
 
     setPos(pos: Pos) {
@@ -97,7 +98,7 @@ export class Player {
      */
     #registerMovmentKeys() {
         let inputHandler = this.#game.getInputHandler();
-
+        
         let movmentSpeed = 1;
         inputHandler.onHold("KeyW", () => {
             if (this.#canMove(this.x, this.y - movmentSpeed)) {
@@ -156,23 +157,26 @@ export class Player {
         // the player has 2 hitpoints one at the left side and one at the right side
         // if you press p in game you can see the hitboxes if you besides the player, (they are very small so you have to look closely)
         const leftCollisionPoint = new Pos(x - (screen.tileSize / 2 - 3), y);
+        const middleCollisionPoint = new Pos(x, y);
         const rightCollisionPoint = new Pos(x + (screen.tileSize / 2 - 3), y);
 
         // get tile that the player is trying to move to
         const leftCollisionPointTile = scene.getTile(Util.convertWorldPosToTileCoordinate(leftCollisionPoint, this.#game.getScreen()));
+        const middleCollisionPointTile = scene.getTile(Util.convertWorldPosToTileCoordinate(middleCollisionPoint, this.#game.getScreen()));
         const rightCollisionPointTile = scene.getTile(Util.convertWorldPosToTileCoordinate(rightCollisionPoint, this.#game.getScreen()));
 
         // if either of the tiles are undefined then the player is trying to move outside the map
-        if(leftCollisionPointTile == undefined || rightCollisionPointTile == undefined) {
+        if(leftCollisionPointTile == undefined || rightCollisionPointTile == undefined || middleCollisionPointTile == undefined) {
             return false;
         }
 
         // get position inside the tile
         const leftSubPos = Util.getSubTileCoordinate(leftCollisionPoint, screen);
+        const middleSubPos = Util.getSubTileCoordinate(middleCollisionPoint, screen);
         const rightSubPos = Util.getSubTileCoordinate(rightCollisionPoint, screen);
         
         // if one of points is colliding with a collision box then the move is prevented
-        if(isColliding(leftSubPos, leftCollisionPointTile.getCollisonRule()) || isColliding(rightSubPos, rightCollisionPointTile.getCollisonRule())) {
+        if(isColliding(leftSubPos, leftCollisionPointTile.getCollisonRule()) || isColliding(rightSubPos, rightCollisionPointTile.getCollisonRule()) || isColliding(middleSubPos, middleCollisionPointTile.getCollisonRule())) {
             return false;
         }
 

@@ -47,21 +47,6 @@
             margin: 0 auto;
             border: 1px solid #000;
         }
-        #object-modal {
-            position: fixed;
-            overflow-y: scroll;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50vw;
-            height: 50vh;
-            background-color: #ecf0f1;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-        #object-data {
-            display: block;
-        }
     </style>
     <title>UnderSchool - Editor</title>
     <script type="module"src="editor.js" defer></script>
@@ -73,18 +58,6 @@
     <canvas style="display: none" id="game"></canvas>
     <!-- <canvas height="1000" width="1000" class="tilemap" style="display: none;"></canvas>-->
     <div style="display: none" id="sprite-modal">
-    </div>
-    <div style="display: none" id="object-modal">
-        <select id="object-type">
-            <option value="ChangeScene">ChangeScene</option>
-            <option value="NPC">NPC</option>
-            <option value="Sign">Sign</option>
-            <option value="Chest">Chest</option>
-            <option value="Movable">Moveable</option>
-            <option value="ConveyorBelt">ConveyorBelt</option>
-        </select>
-        <input id="object-data" type="text" placeholder="data">
-        <button id="object-save">Save</button>
     </div>
 </body>
 </html>

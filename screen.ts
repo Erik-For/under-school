@@ -69,15 +69,18 @@ export class Screen {
     height: number;
     tileSize: number;
     renderScale: number;
+    ctx: CanvasRenderingContext2D;
+    fadeAlpha = 0;
 
     /**
      * Contains information about the screen
      * It is used to calculate rendering
      */
-    constructor(width: number, height: number, tileSize: number) {
+    constructor(width: number, height: number, tileSize: number, ctx: CanvasRenderingContext2D) {
         this.width = width;
         this.height = height;
         this.tileSize = tileSize;
         this.renderScale = 1;
+        this.ctx = ctx;
     }
 }

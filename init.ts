@@ -3,16 +3,15 @@ import { deserilizeScene, executeBehaviour, ObjectBehaviour, SceneAsset, TileCoo
 import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { TextAsset, AudioAsset, AssetLoader} from './assetloader.js';
-import { Pos, Game, AudioManager, ParticleManager, Particle } from './game.js';
+import { Pos, Game, AudioManager, ParticleManager, Particle, Mode } from './game.js';
 import { NPCTextAnimation, BigSprite } from './animate.js';
 import { Sequence, SequenceItem } from './sequence.js';
+import { InputHandler } from './input.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 let dev = false;
-let fade = false;
-let fadeAlpha = 0;
 const zoom = 1;
 
 document.addEventListener('keydown', (event) => {
@@ -40,31 +39,21 @@ const assetLoader = new AssetLoader(
         canvas.style.display = 'block';
         // start the game
 
-        const screen = new Screen(window.innerWidth, window.innerHeight, 16);
+        const screen = new Screen(window.innerWidth, window.innerHeight, 16, ctx);
         let scene = await deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);
         let audioManager = new AudioManager();
         let particleManager = new ParticleManager();
         const game = new Game(scene, new Pos(-5, 2), screen, audioManager, particleManager, assetLoader);
         scene.onLoad(game, scene);
 
-        //testcase! ta bort vid senare tillfälle
-        document.addEventListener("keydown", (event) =>{
-            if(event.key === "l"){
-                game.getCamera().cameraShake(2500, 1.75);
+        game.getInputHandler().onClick("KeyK", () => {
+            game.setMode(game.getMode() === Mode.OpenWorld ? Mode.Battle : Mode.OpenWorld);
+            if(game.getMode() === Mode.Battle){
+                game.getBattle().activate();
+            } else {
+                game.getBattle().deactivate();
             }
-
-            if(event.key === "r"){
-                game.getCamera().toggleRippleEffect();
-            }
-        });
-
-        //Ännu ett test case TAG BORT SENARE TACKAR!
-        for(let i = 0; i < 1_000; i++){
-            let velocity = new Pos(2 * (Math.random()-0.5), 2 * (Math.random()-0.5)).normalize().multiply(Math.random()); // Randomize velocity
-            let lifetime = 120 * Math.random(); // Randomize lifetime
-            let particle = new Particle(new Pos(-5, 2).multiply(16), velocity, lifetime, game.getAssetLoader().getSpriteSheet("assets/goli.png")!.getSprite(13, 14), true);
-            game.getParticleManager().addParticle(particle);
-        }
+        }, true);
 
         //game.getSequenceExecutor().setSequence(sequence);
         requestAnimationFrame(function gameLoop() {
@@ -76,10 +65,14 @@ const assetLoader = new AssetLoader(
             ctx.imageSmoothingEnabled = false;
             ctx.font = "underschool";
 
-            render(game);
-            if (dev) {
-                renderDevOverlay(game);
-                renderDevPlayerHitbox(game);
+            if(game.getMode() === Mode.OpenWorld){
+                render(game);
+                if (dev) {
+                    renderDevOverlay(game);
+                    renderDevPlayerHitbox(game);
+                }
+            } else if(game.getMode() === Mode.Battle){
+                game.getBattle().render(ctx);
             }
             game.getSequenceExecutor().execute(ctx);
             requestAnimationFrame(gameLoop);
@@ -89,6 +82,8 @@ const assetLoader = new AssetLoader(
 
 function render(game: Game): void {
     // Camera bounds
+    const screen = game.getScreen();
+
     ctx!.clearRect(0, 0, game.getScreen().width, game.getScreen().height);
 
     let renderBounds = {
@@ -147,7 +142,6 @@ function render(game: Game): void {
         if (tilePos.x < renderBounds.min.x || tilePos.x > renderBounds.max.x || tilePos.y < renderBounds.min.y || tilePos.y > renderBounds.max.y) {
             return;
         }
-        const screen = game.getScreen();
         const sprite = object.sprite;
         const canvasPos = Util.convertWorldPosToCanvasPos(pos, game.getCamera().getPosition(), game.getScreen()).round();
         
@@ -157,42 +151,11 @@ function render(game: Game): void {
     game.getPlayer().render(ctx, game);
     game.getScene().onRender(game);
     game.getParticleManager().render(ctx, game);
-    if(fadeAlpha != 0){
-        ctx.globalAlpha = fadeAlpha;
+
+    if(screen.fadeAlpha != 0){
+        ctx.globalAlpha = screen.fadeAlpha;
         ctx.fillRect(0, 0, game.getScreen().width, game.getScreen().height);
     }
-}
-
-export function fadeIn(game: Game): Promise<void>{
-    fadeAlpha = 0;
-    return new Promise((resolve) => {
-        let interval = setInterval(() => {
-            if (fadeAlpha < 1) {
-                ctx.fillStyle = "black";
-                ctx.globalAlpha = fadeAlpha;
-                fadeAlpha += 0.06;
-            } else {
-                clearInterval(interval);
-                resolve();
-            }
-        }, 1000 / 60); // 60 FPS
-    });
-}
-
-export function fadeOut(game: Game): Promise<void>{
-    fadeAlpha = 1;
-    return new Promise((resolve) => {
-        let interval = setInterval(() => {
-            if (fadeAlpha > 0) {
-                ctx.fillStyle = "black";
-                fadeAlpha -= 0.06;
-            } else {
-                clearInterval(interval);
-                resolve();
-                fadeAlpha = 0;
-            }
-        }, 1000 / 60); // 60 FPS
-    });
 }
 
 function renderDevOverlay(game: Game) {

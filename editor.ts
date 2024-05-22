@@ -11,13 +11,8 @@ const tileSize = 16; // size of tile and sprite
 const renderScale = 4;
 
 const spriteModal = document.getElementById('sprite-modal') as HTMLDivElement;
-const objectModal = document.getElementById('object-modal') as HTMLDivElement;
-
-let objectType = "ChangeScene";
-let objectData = "";
 
 let selectSpriteModalActive = false;
-let selectScriptedObjectModalActive = false;
 let selectedSprite: Sprites.Sprite | null = null;
 
 // what collision rule to set when clicking r on a tile or t on a selection
@@ -45,7 +40,7 @@ const spriteSheetManager = new AssetLoader (
         canvas.style.display = 'block';
 
         // load data from session storage, if data is null load an empty object        
-        let scene: Scene = await deserilizeScene(sessionStorage.getItem("data") || '{ "tileData": {}, "objectData": {}, "sceneScriptName": "scene1.js" }');
+        let scene: Scene = await deserilizeScene(sessionStorage.getItem("data") || '{ "tileData": {}, "objectData": {}, "sceneScriptName": "" }');
 
         // selection object
         // allows the user to select an area of the map and prefore actions on it
@@ -95,13 +90,13 @@ const spriteSheetManager = new AssetLoader (
 
         // toggle render collision
         input.onClick('KeyE', () => {
-            if(selectSpriteModalActive || selectScriptedObjectModalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             renderCollision = !renderCollision;
         });
 
         // set collision rule on tile from selectedCollisionRule
         input.onClick('KeyR', () => {
-            if(selectSpriteModalActive || selectScriptedObjectModalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(!renderCollision) { return; }
             let x = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
             let y = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
@@ -114,7 +109,7 @@ const spriteSheetManager = new AssetLoader (
 
         // copy scene to clipboard as json string
         input.onClick('KeyC', () => {
-            if(selectSpriteModalActive || selectScriptedObjectModalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(confirm("Do you want to copy the current scene? as a JSON string")){
                 let serilizedScene = serilizeScene(scene);
                 sessionStorage.setItem("data", serilizedScene);
@@ -124,7 +119,7 @@ const spriteSheetManager = new AssetLoader (
 
         // load scene from clipboard json string
         input.onClick('KeyV', () => {
-            if(selectSpriteModalActive || selectScriptedObjectModalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(confirm("Do you want to paste to the current scene? from a JSON string")){
                 navigator.clipboard.readText().then(async (text) => {
                     scene = await deserilizeScene(text);
@@ -134,7 +129,7 @@ const spriteSheetManager = new AssetLoader (
 
         // clear scene
         input.onClick('KeyX', () => {
-            if(selectSpriteModalActive || selectScriptedObjectModalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(confirm("Do you want to clear the current scene?")){
                 scene = new Scene();
             }
@@ -143,7 +138,7 @@ const spriteSheetManager = new AssetLoader (
 
         // area selection with f, g, h, t
         const handleSelection = (mode : "remove" | "add" | "random" | "col") => {
-            if(selectSpriteModalActive || selectScriptedObjectModalActive){ return; }
+            if(selectSpriteModalActive){ return; }
             if(!selectedSprite && (mode == "random" || mode == "add")){ return; }
             selection.active = !selection.active;
 
@@ -229,13 +224,6 @@ const spriteSheetManager = new AssetLoader (
             scene.removeTile(new TileCoordinate(x, y));
         })
 
-        input.onClick('KeyJ', () => {
-            if(selectSpriteModalActive || selectScriptedObjectModalActive){ return; }
-            selectScriptedObjectModalActive = !selectScriptedObjectModalActive;
-            objectModal.style.display = selectScriptedObjectModalActive ? 'block' : 'none';
-
-
-        });
 
         input.onClick('KeyK', () => {
             let x = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
@@ -244,30 +232,6 @@ const spriteSheetManager = new AssetLoader (
 
         });
 
-        document.getElementById('object-save')!.addEventListener('click', (event) => {
-            event.preventDefault();
-            selectScriptedObjectModalActive = false;
-            objectModal.style.display = selectScriptedObjectModalActive ? 'block' : 'none';
-            objectType = (document.getElementById('object-type') as HTMLInputElement).value;
-            objectData = (document.getElementById('object-data') as HTMLInputElement).value;
-        });
-
-        document.getElementById('object-type')!.addEventListener('change', (event) => {
-            let hasData: Array<string> = [
-                "NPC",
-                "ChangeScene",
-                "Sign",
-                "Chest",
-                "ConveyorBelt"
-            ]
-            let type = (event.target as HTMLInputElement).value;
-            let dataInput = document.getElementById('object-data') as HTMLInputElement;
-            if(hasData.indexOf(type) != -1 ){
-                dataInput.style.display = 'block';
-            } else {
-                dataInput.style.display = 'none';
-            }
-        });
 
         // some methods need this to work
         document.addEventListener('mousemove', (event) => {

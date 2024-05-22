@@ -1,7 +1,6 @@
 import { Asset, TextAsset } from "./assetloader.js";
 import { Game, Pos} from "./game.js";
 import * as Sprites from "./sprite.js";
-import {fadeIn, fadeOut} from "./init.js";
 import { convertWorldPosToCanvasPos, convertWorldPosToTileCoordinate, getSubTileCoordinate } from "./util.js";
 
 /**
@@ -291,10 +290,10 @@ export enum ObjectBehaviour {
 const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScene: Scene, pos: Pos, data: string) => void> = {
     [ObjectBehaviour.ChangeScene]: async (game, scene, pos, data) => {
 
-        let newScene = await deserilizeScene(game.getAssetLoader().getTextAsset(data)!.data!);
         game.getPlayer().denyCollisions();
         game.getPlayer().freezeMovment();
         const fadeToBlack = fadeIn(game);
+        let newScene = await deserilizeScene(game.getAssetLoader().getTextAsset(data)!.data!);
         fadeToBlack.then(() => {
             game.setScene(newScene);
             newScene.onLoad(game, scene);
@@ -479,9 +478,12 @@ export function deserilizeScene(json: string): Promise<Scene> {
             }
         } = JSON.parse(json);
         let scene = new Scene();
-        const module = await import(`./scene_scripts/${serilizedObject.sceneScriptName}`)
-        const script = new module.default();
-        scene.setSceneScript(script as SceneScript);
+
+        if(serilizedObject.sceneScriptName && serilizedObject.sceneScriptName != "default" && !window.location.pathname.includes("editor")) {
+            const module = await import(`./scene_scripts/${serilizedObject.sceneScriptName}`);
+            const script = new module.default();
+            scene.setSceneScript(script as SceneScript);
+        }
        
         // Load tile data
         Object.keys(serilizedObject.tileData).forEach((yString) => {
@@ -497,4 +499,39 @@ export function deserilizeScene(json: string): Promise<Scene> {
         });
         resolve(scene);
     })
+}
+
+export function fadeIn(game: Game): Promise<void>{
+    const ctx = game.getScreen().ctx;
+    const screen = game.getScreen();
+    screen.fadeAlpha = 0;
+    return new Promise((resolve) => {
+        let interval = setInterval(() => {
+            if (screen.fadeAlpha < 1) {
+                ctx.fillStyle = "black";
+                ctx.globalAlpha = screen.fadeAlpha;
+                screen.fadeAlpha > 0.94 ? screen.fadeAlpha = 1 : screen.fadeAlpha += 0.06;
+            } else {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 1000 / 60); // 60 FPS
+    });
+}
+
+export function fadeOut(game: Game): Promise<void>{
+    const ctx = game.getScreen().ctx;
+    const screen = game.getScreen();
+    screen.fadeAlpha = 1;
+    return new Promise((resolve) => {
+        let interval = setInterval(() => {
+            if (screen.fadeAlpha > 0) {
+                ctx.fillStyle = "black";
+                screen.fadeAlpha < 0.06 ? screen.fadeAlpha = 0 : screen.fadeAlpha -= 0.06;
+            } else {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 1000 / 60); // 60 FPS
+    });
 }

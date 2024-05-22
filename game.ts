@@ -5,6 +5,7 @@ import { ObjectBehaviour, Scene, TileCoordinate, executeBehaviour } from "./scen
 import { AssetLoader, AudioAsset } from "./assetloader.js";
 import { SequenceExecutor } from "./sequence.js";
 import * as Util from "./util.js";
+import { Battle } from "./battle.js";
 
 /**
  * Represents a game.
@@ -20,6 +21,7 @@ export class Game {
     #assetLoader: AssetLoader;
     #sequenceExecutor: SequenceExecutor;
     #mode: Mode;
+    #battle: Battle;
     
     /**
      * Creates a new instance of the Game class.
@@ -28,7 +30,7 @@ export class Game {
      * @param screen The screen for rendering the game.
      * @param assetLoader The asset loader of the game.
     */
-    constructor(scene: Scene, startPos: Pos, screen: Screen, audioManager: AudioManager, particleManager: ParticleManager, assetLoader: AssetLoader) {
+   constructor(scene: Scene, startPos: Pos, screen: Screen, audioManager: AudioManager, particleManager: ParticleManager, assetLoader: AssetLoader) {
         this.#screen = screen;
         this.#assetLoader = assetLoader;
         this.#scene = scene;
@@ -39,7 +41,7 @@ export class Game {
         this.#player = new Player(startPos.x, startPos.y, this);
         this.#sequenceExecutor = new SequenceExecutor();
         this.#mode = Mode.OpenWorld;
-        
+        this.#battle = new Battle(this);
         
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
@@ -67,30 +69,30 @@ export class Game {
                 case "up":
                     playerPos.y -= range;
                     break;
-                case "down":
-                    playerPos.y += range;
-                    break;
-                case "left":
-                    playerPos.x -= range;
-                    break;
-                    case "right":
-                        playerPos.x += range;
-                    break;
-            }
-            const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen());
+                    case "down":
+                        playerPos.y += range;
+                        break;
+                        case "left":
+                            playerPos.x -= range;
+                            break;
+                            case "right":
+                                playerPos.x += range;
+                                break;
+                            }
+                            const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen());
             let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTargetPos.toPos(screen.tileSize)));
             if(scriptedObject && scriptedObject.type === ObjectBehaviour.Interactable){
                 executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
             }
         });
     }
-
+    
     /**
      * Gets the player of the game.
      * @returns The player object.
-     */
-    getPlayer(): Player {
-        return this.#player;
+    */
+   getPlayer(): Player {
+       return this.#player;
     }
 
     /**
@@ -98,7 +100,7 @@ export class Game {
      * @returns The scene object.
     */
    getScene(): Scene {
-        return this.#scene;
+       return this.#scene;
     }
     
     /**
@@ -108,7 +110,7 @@ export class Game {
    getCamera(): Camera {
        return this.#camera;
     }
-
+    
     /**
      * Gets the screen of the game.
      * @returns The screen object.
@@ -120,15 +122,15 @@ export class Game {
     /**
      * Gets the audio manager of the game.
      * @returns The audio manager object.
-     */
-    getAudioManager(): AudioManager {
-        return this.#audioManager;
+    */
+   getAudioManager(): AudioManager {
+       return this.#audioManager;
     }
 
     /**
      * Gets the particle manager of the game.
      * @returns The particle manager object.
-     */
+    */
     getParticleManager(): ParticleManager {
         return this.#particleManager;
     }
@@ -140,13 +142,13 @@ export class Game {
    getInputHandler(): InputHandler {
        return this.#inputHandler;
     }
-
+    
     /**
      * Sets the scene of the game.
      * @param scene The new scene object.
-     */
-    setScene(scene: Scene) {
-        this.#scene = scene;
+    */
+   setScene(scene: Scene) {
+       this.#scene = scene;
     }
 
     /**
@@ -164,17 +166,35 @@ export class Game {
     getSequenceExecutor(): SequenceExecutor {
         return this.#sequenceExecutor;
     }
-
+    
     /**
      * Retrieves the current mode of the game.
      * @returns The current mode of the game.
-     */
+    */
     getMode(): Mode {
-        return this.#mode;
+       return this.#mode;
     }
-
+    
     setMode(mode: Mode) {
         this.#mode = mode;
+        switch(mode) {
+            case Mode.OpenWorld:
+                this.#player.unfreezeMovment();
+                this.#inputHandler.allowInteraction();
+                break;
+            case Mode.Battle:
+                this.#player.freezeMovment();
+                this.#inputHandler.preventInteraction();
+                break;
+        }
+    }
+    
+    getBattle() {
+        return this.#battle;
+    }
+
+    newBattle() {
+        this.#battle = new Battle(this);
     }
 }
 

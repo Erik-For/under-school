@@ -22,7 +22,6 @@ export default class Script implements SceneScript {
         //     game.getParticleManager().addParticle(particle);
         // }
 
-
         currentScene.registerBehaviour("test", (object) => {
             let charecter = new BigSprite(
                 new Sprite("assets/goli.png", 13, 14, 0),
@@ -83,10 +82,9 @@ export default class Script implements SceneScript {
             new ScriptedObject(new Pos(-3, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/test3.json", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-2, -1).multiply(16), ObjectBehaviour.Interactable, "test", new Sprite("assets/goli.png", 15, 15, 0)),
             new ScriptedObject(new Pos(-2, -2).multiply(16), ObjectBehaviour.None, "", new Sprite("assets/goli.png", 15, 14, 0)),
-            ...ScriptedObject.constructFamily(2, (i) => new ScriptedObject(new Pos(-5-i,-1).multiply(16), ObjectBehaviour.ConveyorBelt, "l", new Sprite("assets/saker.png", 3, 0, 0))),
-            ...ScriptedObject.constructFamily(2, (i) => new ScriptedObject(new Pos(-7, i-1).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/saker.png", 2, 0, 0))),
-            ...ScriptedObject.constructFamily(2, (i) => new ScriptedObject(new Pos(-7+i, 1).multiply(16), ObjectBehaviour.ConveyorBelt, "r", new Sprite("assets/saker.png", 1, 0, 0))),
-            ...ScriptedObject.constructFamily(2, (i) => new ScriptedObject(new Pos(-5, i).multiply(16), ObjectBehaviour.ConveyorBelt, "u", new Sprite("assets/saker.png", 0, 0, 0))),
+            ...ScriptedObject.constructFamily(3, (i) => new ScriptedObject(new Pos(-5-i,-1).multiply(16), ObjectBehaviour.ConveyorBelt, "l", new Sprite("assets/saker.png", 3, 0, 0))),
+            ...ScriptedObject.constructFamily(3, (i) => new ScriptedObject(new Pos(-8, i-1).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/saker.png", 2, 0, 0))),
+            ...ScriptedObject.constructFamily(3, (i) => new ScriptedObject(new Pos(-5, i).multiply(16), ObjectBehaviour.ConveyorBelt, "u", new Sprite("assets/saker.png", 0, 0, 0))),
         );
     };
     onExit (game: Game, currentScene: Scene) {
