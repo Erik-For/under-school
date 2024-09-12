@@ -1,6 +1,8 @@
 import { Screen } from "./screen.js";
 import { TileCoordinate } from "./scene.js";
 import { Pos } from "./game.js";
+import { AssetLoader } from "./assetloader.js";
+import { render, Sprite } from "./sprite.js";
 
 /**
  * Converts the canvas position to world position.
@@ -52,4 +54,41 @@ export function convertTileCoordinateToWorldPos(tilePos: TileCoordinate, screen:
  */
 export function getSubTileCoordinate(worldPos: Pos, screen: Screen): Pos {
     return worldPos.minus(convertWorldPosToTileCoordinate(worldPos, screen).toPos(screen.tileSize));
+}
+
+export function drawImageRot(ctx: CanvasRenderingContext2D, image: ImageBitmap, pos: Pos , width: number ,height: number, rad: number){
+    // Store the current context state (i.e. rotation, translation etc..)
+    ctx.save()
+    const x = pos.x;
+    const y = pos.y;
+
+    //Set the origin to the center of the image
+    ctx.translate(x + width / 2, y + height / 2);
+
+    //Rotate the canvas around the origin
+    ctx.rotate(rad);
+
+    //draw the image    
+    ctx.drawImage(image ,width / 2 * (-1),height / 2 * (-1),width,height);
+
+    // Restore canvas state as saved from above
+    ctx.restore();
+}
+
+export function drawSprigeRot(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader, sprite: Sprite, x: number, y: number , width: number ,height: number, rad: number){
+    // Store the current context state (i.e. rotation, translation etc..)
+    ctx.save()
+
+    //Set the origin to the center of the image
+    ctx.translate(x + width / 2, y + height / 2);
+
+    //Rotate the canvas around the origin
+    ctx.rotate(rad);
+
+    //draw the image    
+    
+    render(ctx, assetLoader, sprite, width / 2 * (-1), height / 2 * (-1), width, height);
+
+    // Restore canvas state as saved from above
+    ctx.restore();
 }

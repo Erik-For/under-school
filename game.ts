@@ -5,8 +5,10 @@ import { ObjectBehaviour, Scene, TileCoordinate, executeBehaviour } from "./scen
 import { AssetLoader, AudioAsset } from "./assetloader.js";
 import { SequenceExecutor } from "./sequence.js";
 import * as Util from "./util.js";
-import { Battle } from "./battle.js";
+import { Battle, Enemy } from "./battle.js";
 import Keys from "./keys.js";
+import {BigSprite} from "./animate.js";
+import {Sprite} from "./sprite.js";
 
 /**
  * Represents a game.
@@ -42,7 +44,13 @@ export class Game {
         this.#player = new Player(startPos.x, startPos.y, this);
         this.#sequenceExecutor = new SequenceExecutor();
         this.#mode = Mode.OpenWorld;
-        this.#battle = new Battle(this);
+        //TSTKOD FÖR BATTLE FIxa
+        this.#battle = new Battle(this, new Enemy(100, new BigSprite(
+            new Sprite("assets/goli.png", 13, 14, 0),
+            new Sprite("assets/goli.png", 14, 14, 0),
+            new Sprite("assets/goli.png", 13, 15, 0),
+            new Sprite("assets/goli.png", 14, 15, 0)
+        )));
         
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
@@ -58,6 +66,8 @@ export class Game {
                     }
                 }
             }
+
+            this.#battle.tick();
             
             this.#particleManager.update();
         }, Math.round(1000 / 60));
@@ -70,17 +80,17 @@ export class Game {
                 case "up":
                     playerPos.y -= range;
                     break;
-                    case "down":
-                        playerPos.y += range;
-                        break;
-                        case "left":
-                            playerPos.x -= range;
-                            break;
-                            case "right":
-                                playerPos.x += range;
-                                break;
-                            }
-                            const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen());
+                case "down":
+                    playerPos.y += range;
+                    break;
+                case "left":
+                    playerPos.x -= range;
+                    break;
+                case "right":
+                    playerPos.x += range;
+                    break;
+            }
+            const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen());
             let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTargetPos.toPos(screen.tileSize)));
             if(scriptedObject && scriptedObject.type === ObjectBehaviour.Interactable){
                 executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
@@ -194,8 +204,8 @@ export class Game {
         return this.#battle;
     }
 
-    newBattle() {
-        this.#battle = new Battle(this);
+    newBattle(enemy: Enemy) {
+        this.#battle = new Battle(this, enemy);
     }
 }
 

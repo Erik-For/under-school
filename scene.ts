@@ -479,7 +479,7 @@ export function deserilizeScene(json: string): Promise<Scene> {
         } = JSON.parse(json);
         let scene = new Scene();
 
-        if(serilizedObject.sceneScriptName != "default") {
+        if(serilizedObject.sceneScriptName != "default" && serilizedObject.sceneScriptName != "") {
             const module = await import(`./scene_scripts/${serilizedObject.sceneScriptName}`);
             const script = new module.default();
             scene.setSceneScript(script as SceneScript);

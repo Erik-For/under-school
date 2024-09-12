@@ -198,6 +198,8 @@ export class NPCTextAnimation extends SequenceCallback {
      * @param screen - The Screen object representing the game screen.
      */
     render(ctx: CanvasRenderingContext2D, game: Game) {
+        const textPadding = 16;
+
         let screen = game.getScreen()
         // Make text print out according to time
         if(this.startTime == 0) {
@@ -221,7 +223,7 @@ export class NPCTextAnimation extends SequenceCallback {
         ctx.fillRect(0, screen.height - screen.height / 3, screen.width, screen.height / 3);
         ctx.globalAlpha = 1;
         
-        let textAreaWidth = screen.width * 3/4;
+        let textAreaWidth = screen.width * 3/4 - textPadding;
         let NPCSpriteAreaWidth = screen.width * 1/4;
         let NPCSpriteSide = Math.min(NPCSpriteAreaWidth * 3/4, screen.height / 3);
 
@@ -245,7 +247,7 @@ export class NPCTextAnimation extends SequenceCallback {
         
         lines.push(line);
         for(let i = 0; i < lines.length; i++) {
-            ctx.fillText(lines[i], 8 + NPCSpriteAreaWidth, screen.height - screen.height / 3 + 30 + 30 * i);
+            ctx.fillText(lines[i], 8 + NPCSpriteAreaWidth, screen.height - screen.height / 3 + 30 + 30 * i + textPadding * (i + 1));
         }
     }
 }

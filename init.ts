@@ -1,12 +1,9 @@
 import * as Sprites from './sprite.js';
-import { deserilizeScene, executeBehaviour, ObjectBehaviour, SceneAsset, TileCoordinate } from './scene.js';
+import { deserilizeScene, TileCoordinate } from './scene.js';
 import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { TextAsset, AudioAsset, AssetLoader} from './assetloader.js';
-import { Pos, Game, AudioManager, ParticleManager, Particle, Mode } from './game.js';
-import { NPCTextAnimation, BigSprite } from './animate.js';
-import { Sequence, SequenceItem } from './sequence.js';
-import { InputHandler } from './input.js';
+import { Pos, Game, AudioManager, ParticleManager, Mode } from './game.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -22,12 +19,14 @@ document.addEventListener('keydown', (event) => {
 
 const assetLoader = new AssetLoader(
     [
-        new Sprites.SpriteSheet("assets/tilemap.png", 16),
         new Sprites.SpriteSheet("assets/mcwalk.png", 16),
         new Sprites.SpriteSheet("assets/collision_boxes.png", 16),
         new Sprites.SpriteSheet("assets/goli.png", 16),
         new Sprites.SpriteSheet("assets/teknik.png", 16),
         new Sprites.SpriteSheet("assets/saker.png", 16),
+        new Sprites.SpriteSheet("assets/heart.png", 16),
+        new Sprites.SpriteSheet("assets/proj1.png", 16),
+        new Sprites.SpriteSheet("assets/rootSpike.png", 16),
         new TextAsset("assets/test2.json"),
         new TextAsset("assets/test3.json"),
         new AudioAsset("assets/test.mp3"),
@@ -55,7 +54,6 @@ const assetLoader = new AssetLoader(
             }
         }, true);
 
-        //game.getSequenceExecutor().setSequence(sequence);
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;
             game.getScreen().height = window.innerHeight;
@@ -72,7 +70,7 @@ const assetLoader = new AssetLoader(
                     renderDevPlayerHitbox(game);
                 }
             } else if(game.getMode() === Mode.Battle){
-                game.getBattle().render(ctx);
+                game.getBattle().render(ctx, assetLoader);
             }
             game.getSequenceExecutor().execute(ctx);
             requestAnimationFrame(gameLoop);
