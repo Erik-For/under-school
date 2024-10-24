@@ -1,5 +1,7 @@
+import { TextAnimation } from "./animate.js";
 import { Asset, TextAsset } from "./assetloader.js";
 import { Game, Pos} from "./game.js";
+import { CodeSequenceItem, Sequence, SequenceItem } from "./sequence.js";
 import * as Sprites from "./sprite.js";
 import { convertWorldPosToCanvasPos, convertWorldPosToTileCoordinate, getSubTileCoordinate } from "./util.js";
 
@@ -285,6 +287,7 @@ export enum ObjectBehaviour {
     Interactable, // when the player is facing that tile and presses the interact key (z) they will open the chest
     Movable, // when waling into this object the player will be able to push it
     ConveyorBelt, // when the player is standing on this tile they will be moved in the direction of the arrow
+    Sign,
 }
 
 const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScene: Scene, pos: Pos, data: string) => void> = {
@@ -306,6 +309,35 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
     },
     [ObjectBehaviour.Interactable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         currentScene.getBehaviour(data)?.(game, currentScene, pos, data);
+    },
+    [ObjectBehaviour.Sign]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+        let sequence = new Sequence([
+            new SequenceItem(
+                new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }),
+                (item, ctx) => {
+                    (item as CodeSequenceItem).run();
+                }    
+            ),
+            new SequenceItem(
+                new TextAnimation(data, 3000, game.getInputHandler()),
+                (item, ctx) => {
+                    (item as TextAnimation).render(ctx, game);
+                }),
+                new SequenceItem(
+                    new CodeSequenceItem(() => {
+                        game.getPlayer().unfreezeMovment();
+                        game.getInputHandler().allowInteraction();
+                    }),
+                    (item, ctx) => {
+                        (item as CodeSequenceItem).run();
+                    }    
+                )
+        ]);
+        game.getSequenceExecutor().setSequence(sequence);
+        
     },
     [ObjectBehaviour.Movable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         throw new Error("Function not implemented.");

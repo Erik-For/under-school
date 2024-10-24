@@ -86,6 +86,8 @@ export default class Script implements SceneScript {
             ...ScriptedObject.constructFamily(3, (i) => new ScriptedObject(new Pos(-8, i-1).multiply(16), ObjectBehaviour.ConveyorBelt, "d", new Sprite("assets/saker.png", 2, 0, 0))),
             ...ScriptedObject.constructFamily(3, (i) => new ScriptedObject(new Pos(-5, i).multiply(16), ObjectBehaviour.ConveyorBelt, "u", new Sprite("assets/saker.png", 0, 0, 0))),
         );
+
+        currentScene.addScriptedObject(new ScriptedObject(new Pos(-1, -2).multiply(16), ObjectBehaviour.Sign, "test", new Sprite("assets/goli.png", 11, 0, 0)));
     };
     onExit (game: Game, currentScene: Scene) {
 

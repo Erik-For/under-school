@@ -23,14 +23,15 @@ export class Battle {
     constructor(game: Game, enemy: Enemy) {
         this.#heart = new PlayerHeart(game.getPlayer(), game.getInputHandler());
         this.#enemy = enemy;
-        this.#game = game
-        this.#projectiles = []
-        this.#active = false
+        this.#game = game;
+        this.#projectiles = [];
+        this.#active = false;
+
         for (let i = 0; i < 10; i++) {
             let projectile = new LoopingHomingProjectile(new Pos(10*i, 10*i), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75 ,this.#heart);
             let projectile2 = new StraightProjectile(new Pos(10*i, 10*i), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75 ,this.#heart);
             this.#projectiles.push(projectile)
-            //this.#projectiles.push(projectile2)
+            this.#projectiles.push(projectile2)
         }
 
     }
@@ -50,8 +51,12 @@ export class Battle {
     tick() {
         if (this.#active) {
             this.#projectiles.forEach(projectile => {
-                projectile.update()
-            })
+                projectile.update();
+                if(projectile.getPos().distance(this.#heart.getPos()) < 2.5) {
+                    this.#heart.health -= projectile.damage
+                    projectile.lifeTime = 0
+                }
+            });
             this.#projectiles = this.#projectiles.filter(projectile => projectile.getLifeTime() > 0)
         }
     }
@@ -111,16 +116,16 @@ export interface PosProvider {
 export class PlayerHeart implements PosProvider {
     #pos: Pos
     #size: number;
-    #lastHit: number
+    health: number
     #player: Player
     #frozen: boolean
 
     constructor(player: Player, inputHandler: InputHandler) {
         this.#pos = new Pos(0, 0);
         this.#size = 24;
-        this.#lastHit = 0
         this.#player = player
         this.#frozen = false
+        this.health = 100
 
         const movmentSpeed = 1;
 
@@ -168,8 +173,9 @@ export abstract class Projectile {
     speed: number;
     height: number;
     width: number;
-
-    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24) {
+    damage: number
+    
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24, damage: number = 10) {
         this.pos = pos;
         this.lifeTime = lifeTime;
         this.sprite = sprite;
@@ -177,17 +183,18 @@ export abstract class Projectile {
         this.speed = speed;
         this.height = height;
         this.width = width;
+        this.damage = damage;
     }
-
+    
     render(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader, screen: Screen): void {
         //ctx, assetLoader, boxTopLeftCornerX + boxWidth * this.#heart.getPos().x / 100, boxTopLeftCornerY + boxWidth * this.#heart.getPos().y / 100 - marginY
-
+        
         const boxWidth = screen.width / 5;
         
         // caculate top left corner
         const boxTopLeftCornerX = (screen.width - boxWidth) / 2;
         const boxTopLeftCornerY = screen.height - boxWidth;
-
+        
         // padding downwards
         const marginY = screen.height / 20;
         const padding = 15;
@@ -196,6 +203,9 @@ export abstract class Projectile {
     }
     getLifeTime(): number {
         return this.lifeTime;
+    }
+    getPos() {
+        return this.pos;
     }
     abstract update(): void;
 }
@@ -267,12 +277,14 @@ export class StraightProjectile extends Projectile {
         super(pos, lifeTime, sprite, speed, height, width);
         this.#target = target;
         this.rotation = Math.atan2(this.#target.getPos().y - this.pos.y, this.#target.getPos().x - this.pos.x);
-
-        this.#velocity = new Pos(0, 0);
+        this.speed = 10;
+        this.#velocity = new Pos(Math.tan(this.rotation) * this.speed, Math.tan(this.rotation) * this.speed);
     }
-    
+     
     update(): void {
         this.pos.add(this.#velocity);
+
+        this.lifeTime--;
     }
     
 }

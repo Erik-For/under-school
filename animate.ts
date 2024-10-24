@@ -251,3 +251,75 @@ export class NPCTextAnimation extends SequenceCallback {
         }
     }
 }
+
+
+export class TextAnimation extends SequenceCallback {
+    text: string;
+    duration: number;
+    startTime: number;
+    inputHandler: InputHandler;
+
+    constructor(text: string, duration: number, inputHandler: InputHandler) {
+        super();
+        this.text = text;
+        this.duration = duration;
+        this.startTime = 0;
+        this.inputHandler = inputHandler;
+    }
+
+ /**
+     * Renders the NPC text animation.
+     * @param ctx - The CanvasRenderingContext2D used for rendering.
+     * @param game - The Game object representing the game.
+     * @param screen - The Screen object representing the game screen.
+     */
+ render(ctx: CanvasRenderingContext2D, game: Game) {
+    const textPadding = 16;
+
+    let screen = game.getScreen()
+    // Make text print out according to time
+    if(this.startTime == 0) {
+        this.startTime = Date.now();
+    }
+
+    // This is a horrible way to do this, but it works for now
+    this.inputHandler.onClick(Keys.Interact, () => {
+        if(Date.now() - this.startTime > this.duration) {
+            this.onFinish();
+        }
+    }, true);
+    this.inputHandler.onClick(Keys.SkipText, () => {
+        this.startTime = Date.now() - this.duration;
+    }, true);
+
+
+    // render a "modal" that takes up the bottom 1/3 of the screen
+    ctx.fillStyle = "black";
+    ctx.globalAlpha = 0.7;
+    ctx.fillRect(0, screen.height - screen.height / 3, screen.width, screen.height / 3);
+    ctx.globalAlpha = 1;
+    
+    let textAreaWidth = screen.width * 3/4 - textPadding;
+    // render the NPC sprite
+    // render the text with wrapping if the text is too long and padding
+    ctx.fillStyle = "white";
+    ctx.font = "30px underschool";
+    let words = this.text.substring(0, Math.floor((Date.now() - this.startTime) / this.duration * this.text.length)).split(" ");
+    let lines = [];
+    let line = "";
+    for(let word of words) {
+        if(ctx.measureText(line + word).width < textAreaWidth - 16) {
+            line += word + " ";
+        } else {
+            lines.push(line);
+            line = word + " ";
+        }
+    }
+    
+    lines.push(line);
+    for(let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], 8, screen.height - screen.height / 3 + 30 + 30 * i + textPadding * (i + 1));
+    }
+}
+
+}

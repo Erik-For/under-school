@@ -96,8 +96,8 @@ export class Game {
                     break;
             }
             const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen());
-            let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTargetPos.toPos(screen.tileSize)));
-            if(scriptedObject && scriptedObject.type === ObjectBehaviour.Interactable){
+            let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTargetPos.toPos(screen.tileSize)))!;
+            if((scriptedObject && (scriptedObject.type === ObjectBehaviour.Interactable) || scriptedObject.type === ObjectBehaviour.Sign)){
                 executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
             }
         });
@@ -223,92 +223,101 @@ export enum Mode {
 export class Pos {
     x: number;
     y: number;
-
+    
     /**
      * Contains information about the position
      * @param x - the x position
      * @param y - the y position
     */
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
+   constructor(x: number, y: number) {
+       this.x = x;
+       this.y = y;
     }
-
+    
     /**
      * Adds the given position to this position
      * @param pos - the position to add
      * @returns the new position
-     */
-    add(pos: Pos): Pos {
-        return new Pos(this.x + pos.x, this.y + pos.y);
+    */
+   add(pos: Pos): Pos {
+       return new Pos(this.x + pos.x, this.y + pos.y);
     }
-
+    
     /**
      * Subtracts the given position from this position
      * @param pos - the position to subtract
      * @returns the new position
-     */
-    minus(pos: Pos): Pos {
-        return new Pos(this.x - pos.x, this.y - pos.y);
+    */
+   minus(pos: Pos): Pos {
+       return new Pos(this.x - pos.x, this.y - pos.y);
     }
-
+    
     /**
      * Multiplies this position by the given scalar value
      * @param scalar - the scalar value to multiply by
      * @returns the new position
-     */
-    multiply(scalar: number): Pos {
-        return new Pos(this.x * scalar, this.y * scalar);
+    */
+   multiply(scalar: number): Pos {
+       return new Pos(this.x * scalar, this.y * scalar);
     }
-
+    
     /**
      * Divides this position by the given scalar value
      * @param scalar - the scalar value to divide by
      * @returns the new position
-     */
-    divide(scalar: number): Pos {
-        return new Pos(this.x / scalar, this.y / scalar);
+    */
+   divide(scalar: number): Pos {
+       return new Pos(this.x / scalar, this.y / scalar);
     }
-
+    
     /**
      * Converts this position to a TileCoordinate
      * @returns the new TileCoordinate
-     */
-    toTileCoordinate(): TileCoordinate {
-        return new TileCoordinate(this.x, this.y);
+    */
+   toTileCoordinate(): TileCoordinate {
+       return new TileCoordinate(this.x, this.y);
     }
-
+    
     /**
      * Rounds the x and y values of this position to the nearest integer
      * @returns the new position
-     */
-    round(): Pos {
-        return new Pos(Math.round(this.x), Math.round(this.y));
+    */
+   round(): Pos {
+       return new Pos(Math.round(this.x), Math.round(this.y));
     }
-
+    
     /**
      * Returns a new position with the absolute values of the x and y values of this position
      * @returns the new position
-     */
-    abs(): Pos {
-        return new Pos(Math.abs(this.x), Math.abs(this.y));
+    */
+   abs(): Pos {
+       return new Pos(Math.abs(this.x), Math.abs(this.y));
     }
-
+    
     /**
      * Returns the length of this position
      * @returns the length
-     */
-    equals(pos: Pos): boolean {
-        return this.x == pos.x && this.y == pos.y;
+    */
+   equals(pos: Pos): boolean {
+       return this.x == pos.x && this.y == pos.y;
     }
-
+    
     /**
      * Returns the normalized version of this position
      * @returns the normalized position
-     */
-    normalize(): Pos {
-        let length = Math.sqrt(this.x * this.x + this.y * this.y);
-        return new Pos(this.x / length, this.y / length);
+    */
+   normalize(): Pos {
+       let length = Math.sqrt(this.x * this.x + this.y * this.y);
+       return new Pos(this.x / length, this.y / length);
+    }
+
+    /**
+     * Returns the distance between this position and another position
+     * @param pos - the other position
+     * @returns the distance
+    */
+    distance(arg0: Pos) {
+        return Math.sqrt((this.x - arg0.x) ** 2 + (this.y - arg0.y) ** 2);
     }
 }
 

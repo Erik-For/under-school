@@ -143,7 +143,7 @@ function render(game: Game): void {
         const sprite = object.sprite;
         const canvasPos = Util.convertWorldPosToCanvasPos(pos, game.getCamera().getPosition(), game.getScreen()).round();
         
-        Sprites.render(ctx, assetLoader, sprite, canvasPos.x, canvasPos.y, screen.tileSize * screen.renderScale, screen.tileSize * screen.renderScale);
+        Sprites.render(ctx, assetLoader, sprite!, canvasPos.x, canvasPos.y, screen.tileSize * screen.renderScale, screen.tileSize * screen.renderScale);
     });
 
     game.getPlayer().render(ctx, game);
