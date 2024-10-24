@@ -75,7 +75,7 @@ export function drawImageRot(ctx: CanvasRenderingContext2D, image: ImageBitmap, 
     ctx.restore();
 }
 
-export function drawSprigeRot(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader, sprite: Sprite, x: number, y: number , width: number ,height: number, rad: number){
+export function drawSpriteRot(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader, sprite: Sprite, x: number, y: number , width: number ,height: number, rad: number){
     // Store the current context state (i.e. rotation, translation etc..)
     ctx.save()
 

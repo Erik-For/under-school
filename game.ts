@@ -44,8 +44,13 @@ export class Game {
         this.#player = new Player(startPos.x, startPos.y, this);
         this.#sequenceExecutor = new SequenceExecutor();
         this.#mode = Mode.OpenWorld;
-        //TSTKOD FÖR BATTLE FIxa
+        //TSTKOD FÖR BATTLE FIxa Notera Att en bild ska ha munnen öppen för att prata
         this.#battle = new Battle(this, new Enemy(100, new BigSprite(
+            new Sprite("assets/goli.png", 13, 14, 0),
+            new Sprite("assets/goli.png", 14, 14, 0),
+            new Sprite("assets/goli.png", 13, 15, 0),
+            new Sprite("assets/goli.png", 14, 15, 0)
+        ), new BigSprite(
             new Sprite("assets/goli.png", 13, 14, 0),
             new Sprite("assets/goli.png", 14, 14, 0),
             new Sprite("assets/goli.png", 13, 15, 0),

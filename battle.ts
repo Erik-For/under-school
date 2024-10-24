@@ -6,7 +6,7 @@ import { InputHandler } from "./input.js"
 import Keys from "./keys.js"
 import { AssetLoader } from "./assetloader.js"
 import { Screen } from "./screen.js"
-import { drawImageRot, drawSprigeRot } from "./util.js"
+import { drawImageRot, drawSpriteRot } from "./util.js"
 
 /*
 Vi måste passera in audioManager så att varje boss börjar spela sin låt. 
@@ -27,8 +27,10 @@ export class Battle {
         this.#projectiles = []
         this.#active = false
         for (let i = 0; i < 10; i++) {
-            let projectile = new HomingProjectile(new Pos(10*i, 10*i), 5*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 10 ,this.#heart);
+            let projectile = new LoopingHomingProjectile(new Pos(10*i, 10*i), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75 ,this.#heart);
+            let projectile2 = new StraightProjectile(new Pos(10*i, 10*i), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75 ,this.#heart);
             this.#projectiles.push(projectile)
+            //this.#projectiles.push(projectile2)
         }
 
     }
@@ -164,13 +166,17 @@ export abstract class Projectile {
     lifeTime: number;
     rotation: number;
     speed: number;
+    height: number;
+    width: number;
 
-    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number) {
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24) {
         this.pos = pos;
         this.lifeTime = lifeTime;
         this.sprite = sprite;
         this.rotation = 0;
         this.speed = speed;
+        this.height = height;
+        this.width = width;
     }
 
     render(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader, screen: Screen): void {
@@ -185,9 +191,8 @@ export abstract class Projectile {
         // padding downwards
         const marginY = screen.height / 20;
         const padding = 15;
-        drawSprigeRot(ctx, assetLoader, this.sprite, boxTopLeftCornerX + boxWidth * this.pos.x / 100, boxTopLeftCornerY + boxWidth * this.pos.y / 100 - marginY, 24, 24, this.rotation);
+        drawSpriteRot(ctx, assetLoader, this.sprite, boxTopLeftCornerX + boxWidth * this.pos.x / 100, boxTopLeftCornerY + boxWidth * this.pos.y / 100 - marginY, this.width, this.height, this.rotation);
         //render(ctx, assetLoader, this.sprite, boxTopLeftCornerX + boxWidth * this.pos.x / 100, boxTopLeftCornerY + boxWidth * this.pos.y / 100 - marginY, 24, 24);
-
     }
     getLifeTime(): number {
         return this.lifeTime;
@@ -195,35 +200,93 @@ export abstract class Projectile {
     abstract update(): void;
 }
 
-export class HomingProjectile extends Projectile{
+export class LoopingHomingProjectile extends Projectile {
     #target: PosProvider;
     #acceleration: Pos;
     
-    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, target: PosProvider) {
-        super(pos, lifeTime, sprite, speed);
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, target: PosProvider, height: number = 24, width: number = 24) {
+        super(pos, lifeTime, sprite, speed, height, width);
         this.#target = target;
         this.#acceleration = new Pos(0, 0);
     }
     
     update(): void {
-        this.rotation = Math.atan2(this.#target.getPos().y - this.pos.y, this.#target.getPos().x - this.pos.x) + Math.PI/2;
-        this.#acceleration.x += (this.#target.getPos().x - this.pos.x) / 100;
-        this.#acceleration.y += (this.#target.getPos().y - this.pos.y) / 100;
-        this.pos.x += this.#acceleration.x;
-        this.pos.y += this.#acceleration.y;
+        const turnRate = 0.1;
+        const turnDirection = Math.sign((Math.atan2(this.#target.getPos().y - this.pos.y, this.#target.getPos().x - this.pos.x) + Math.PI/2) - this.rotation);
+        this.rotation += turnRate * turnDirection;
+        
+        // Move towards target
+        this.pos.x += Math.cos(this.rotation - Math.PI/2) * this.speed;
+        this.pos.y += Math.sin(this.rotation - Math.PI/2) * this.speed;
 
         this.lifeTime--;
     }
 }
 
+export class HomingProjectile extends Projectile {
+    #target: PosProvider;
+    #acceleration: Pos;
+    #lastDirection: number;
+    
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, target: PosProvider, height: number = 24, width: number = 24) {
+        super(pos, lifeTime, sprite, speed, height, width);
+        this.#target = target;
+        this.#acceleration = new Pos(0, 0);
+        this.#lastDirection = 0;
+    }
+    
+    update(): void {
+        const turnRate: number = 0.5;
+        const alpha = (Math.atan2(this.#target.getPos().y - this.pos.y, this.#target.getPos().x - this.pos.x));
+        console.log(alpha);
+        
+        let turnDirection: number = Math.sign((alpha + Math.PI/2) - this.rotation);
+        
+        this.rotation += turnRate * turnDirection;
+        console.log(Math.abs(alpha));
+        
+        if(Math.abs(alpha) > Math.PI/2 * 0.6) {
+            turnDirection = this.#lastDirection;
+        } else {
+            this.#lastDirection = turnDirection;
+        }
+        
+        // Move towards target
+        this.pos.x += Math.cos(this.rotation - Math.PI/2) * this.speed;
+        this.pos.y += Math.sin(this.rotation - Math.PI/2) * this.speed;
+
+        this.lifeTime--;
+    }
+}
+
+export class StraightProjectile extends Projectile {
+    #target: PosProvider;
+    #velocity: Pos;
+    
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, target: PosProvider, height: number = 24, width: number = 24) {
+        super(pos, lifeTime, sprite, speed, height, width);
+        this.#target = target;
+        this.rotation = Math.atan2(this.#target.getPos().y - this.pos.y, this.#target.getPos().x - this.pos.x);
+
+        this.#velocity = new Pos(0, 0);
+    }
+    
+    update(): void {
+        this.pos.add(this.#velocity);
+    }
+    
+}
+
 export class Enemy {
     #health: number
     #sprite: BigSprite
+    #spriteMouthOpen: BigSprite
     
     
-    constructor(health: number, sprite: BigSprite) {
+    constructor(health: number, sprite: BigSprite, mouthOpenSprite: BigSprite) {
         this.#health = health
         this.#sprite = sprite
+        this.#spriteMouthOpen = mouthOpenSprite;
     }
 
     render(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader, enemyBoxTopLeftCornerX: number, enemyBoxTopLeftCornerY: number, enemyBoxWidth: number) {
