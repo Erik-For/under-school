@@ -27,6 +27,8 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/heart.png", 16),
         new Sprites.SpriteSheet("assets/proj1.png", 16),
         new Sprites.SpriteSheet("assets/rootSpike.png", 16),
+        new Sprites.SpriteSheet("assets/ingang.png", 16),
+        new TextAsset("assets/intro.json"),
         new TextAsset("assets/test2.json"),
         new TextAsset("assets/test3.json"),
         new AudioAsset("assets/test.mp3"),
@@ -39,7 +41,7 @@ const assetLoader = new AssetLoader(
         // start the game
 
         const screen = new Screen(window.innerWidth, window.innerHeight, 16, ctx);
-        let scene = await deserilizeScene(assetLoader.getTextAsset("assets/test2.json")!.data!);
+        let scene = await deserilizeScene(assetLoader.getTextAsset("assets/intro.json")!.data!);
         let audioManager = new AudioManager();
         let particleManager = new ParticleManager();
         const game = new Game(scene, new Pos(-5, 2), screen, audioManager, particleManager, assetLoader);
