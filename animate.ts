@@ -274,7 +274,8 @@ export class TextAnimation extends SequenceCallback {
      * @param screen - The Screen object representing the game screen.
      */
  render(ctx: CanvasRenderingContext2D, game: Game) {
-    const textPadding = 16;
+    const textPaddingY = 16;
+    const textPaddingX = 16;
 
     let screen = game.getScreen()
     // Make text print out according to time
@@ -299,7 +300,7 @@ export class TextAnimation extends SequenceCallback {
     ctx.fillRect(0, screen.height - screen.height / 3, screen.width, screen.height / 3);
     ctx.globalAlpha = 1;
     
-    let textAreaWidth = screen.width * 3/4 - textPadding;
+    let textAreaWidth = screen.width * 3/4 - textPaddingX;
     // render the NPC sprite
     // render the text with wrapping if the text is too long and padding
     ctx.fillStyle = "white";
@@ -318,7 +319,7 @@ export class TextAnimation extends SequenceCallback {
     
     lines.push(line);
     for(let i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], 8, screen.height - screen.height / 3 + 30 + 30 * i + textPadding * (i + 1));
+        ctx.fillText(lines[i], (screen.width - textAreaWidth) / 2, screen.height - screen.height / 3 + 30 + 30 * i + textPaddingY * (i + 1));
     }
 }
 

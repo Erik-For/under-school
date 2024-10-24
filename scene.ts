@@ -322,7 +322,7 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
                 }    
             ),
             new SequenceItem(
-                new TextAnimation(data, 3000, game.getInputHandler()),
+                new TextAnimation(data, data.length*25, game.getInputHandler()),
                 (item, ctx) => {
                     (item as TextAnimation).render(ctx, game);
                 }),

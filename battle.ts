@@ -225,7 +225,8 @@ export class LoopingHomingProjectile extends Projectile {
         const turnDirection = Math.sign((Math.atan2(this.#target.getPos().y - this.pos.y, this.#target.getPos().x - this.pos.x) + Math.PI/2) - this.rotation);
         this.rotation += turnRate * turnDirection;
         
-        // Move towards target
+        // Move towards target                
+        
         this.pos.x += Math.cos(this.rotation - Math.PI/2) * this.speed;
         this.pos.y += Math.sin(this.rotation - Math.PI/2) * this.speed;
 
@@ -270,23 +271,21 @@ export class HomingProjectile extends Projectile {
 }
 
 export class StraightProjectile extends Projectile {
-    #target: PosProvider;
+    #initialTargetPos: Pos;
     #velocity: Pos;
     
     constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, target: PosProvider, height: number = 24, width: number = 24) {
         super(pos, lifeTime, sprite, speed, height, width);
-        this.#target = target;
-        this.rotation = Math.atan2(this.#target.getPos().y - this.pos.y, this.#target.getPos().x - this.pos.x);
-        this.speed = 10;
-        this.#velocity = new Pos(Math.tan(this.rotation) * this.speed, Math.tan(this.rotation) * this.speed);
+        this.#initialTargetPos = target.getPos();
+        this.rotation = Math.atan2(this.#initialTargetPos.y - this.pos.y, this.#initialTargetPos.x - this.pos.x);
+        this.#velocity = new Pos(Math.cos(this.rotation) * speed, Math.sin(this.rotation) * speed);
     }
      
     update(): void {
-        this.pos.add(this.#velocity);
-
+        this.pos.x += this.#velocity.x;
+        this.pos.y += this.#velocity.y;
         this.lifeTime--;
     }
-    
 }
 
 export class Enemy {

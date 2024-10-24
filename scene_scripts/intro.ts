@@ -5,9 +5,10 @@ import { CodeSequenceItem, Sequence, SequenceItem } from "../sequence.js";
 import { Sprite } from "../sprite.js";
 
 export default class Script implements SceneScript {
-    name: string = "scene2.js";
+    name: string = "intro.js";
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
-        
+        currentScene.addScriptedObject(new ScriptedObject(new Pos(-2, -7).multiply(16), ObjectBehaviour.Sign, "GOLI WAS HERE!!!!!!!!!!!!!!", new Sprite("assets/goli.png", 11, 0, 0)));
+
     };
     onExit (game: Game, currentScene: Scene) {
 
