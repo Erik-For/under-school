@@ -17,12 +17,15 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+
+
 const assetLoader = new AssetLoader(
     [
         new Sprites.SpriteSheet("assets/mcwalk.png", 16),
         new Sprites.SpriteSheet("assets/collision_boxes.png", 16),
-        new Sprites.SpriteSheet("assets/goli.png", 16),
         new Sprites.SpriteSheet("assets/teknik.png", 16),
+        new Sprites.SpriteSheet("assets/people.png", 16),
+        new Sprites.SpriteSheet("assets/faces.png", 16),
         new Sprites.SpriteSheet("assets/saker.png", 16),
         new Sprites.SpriteSheet("assets/heart.png", 16),
         new Sprites.SpriteSheet("assets/proj1.png", 16),
@@ -30,7 +33,7 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/ingang.png", 16),
         new TextAsset("assets/intro.json"),
         new TextAsset("assets/test2.json"),
-        new TextAsset("assets/test3.json"),
+        new TextAsset("assets/teknik.json"),
         new AudioAsset("assets/test.mp3"),
     ],
     async () => {
@@ -39,6 +42,7 @@ const assetLoader = new AssetLoader(
         // show the canvas
         canvas.style.display = 'block';
         // start the game
+
 
         const screen = new Screen(window.innerWidth, window.innerHeight, 16, ctx);
         let scene = await deserilizeScene(assetLoader.getTextAsset("assets/intro.json")!.data!);
@@ -55,6 +59,17 @@ const assetLoader = new AssetLoader(
                 game.getBattle().deactivate();
             }
         }, true);
+
+        game.getInputHandler().onClick("KeyO", async () => {
+            if(dev){
+                let sceneName = prompt("Enter scene name");
+                if(sceneName){
+                    scene = await deserilizeScene(assetLoader.getTextAsset("assets/" + sceneName + ".json")!.data!);
+                    game.setScene(scene);
+                    scene.onLoad(game, scene);
+                }
+            }
+        })
 
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;
@@ -166,6 +181,7 @@ function renderDevOverlay(game: Game) {
     ctx.font = "lighter 20px Arial";
     ctx.fillText(`Standing on tile: ${playerTilePos.x}, ${playerTilePos.y}`, 10, 30);
     ctx.fillText(`Mouse on tile: ${mouseTilePos.x}, ${mouseTilePos.y}`, 10, 60);
+    ctx.fillText(`Scene: ${game.getScene().getScriptName()}`, 10, 90);
 }
 
 function renderDevPlayerHitbox(game: Game) {

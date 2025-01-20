@@ -7,33 +7,50 @@ import Keys from "./keys.js"
 import { AssetLoader } from "./assetloader.js"
 import { Screen } from "./screen.js"
 import { drawImageRot, drawSpriteRot } from "./util.js"
+import { CodeSequenceItem, Sequence, SequenceCallback, SequenceItem } from "./sequence.js"
 
 /*
 Vi måste passera in audioManager så att varje boss börjar spela sin låt. 
-Gör klart projektiles och enemy.
+Gör klart projektiles och enemy.https://erik-for.github.io/under-school/editor.html
 */
 
+export class Round {
+    animation: Sequence
+    projectiles: Projectile[]
+
+    constructor(sequence: Sequence, projectiles: Projectile[]) {
+        this.projectiles = projectiles
+        this.animation = sequence
+    }
+}
+
+/*
+for (let i = 0; i < 10; i++) {
+    let projectile = new LoopingHomingProjectile(new Pos(10*i, 10*i), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1 ,this.#heart);
+    let projectile2 = new StraightProjectile(new Pos(10*i, 10*i), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75 ,this.#heart);
+    this.#projectiles.push(projectile)
+    this.#projectiles.push(projectile2)
+}
+*/
 export class Battle {
     #heart: PlayerHeart
     #enemy: Enemy
     #projectiles: Projectile[]
     #game: Game
+    #rounds: Round[]
+    #currentRound: number
     #active: boolean
     
-    constructor(game: Game, enemy: Enemy) {
+
+    // TODO lägg till en array av projectiles som skjuts ut i olika stader av spelet
+    constructor(game: Game, enemy: Enemy, rounds: Round[]) {
         this.#heart = new PlayerHeart(game.getPlayer(), game.getInputHandler());
         this.#enemy = enemy;
         this.#game = game;
         this.#projectiles = [];
+        this.#rounds = rounds;
+        this.#currentRound = 0;
         this.#active = false;
-
-        for (let i = 0; i < 10; i++) {
-            let projectile = new LoopingHomingProjectile(new Pos(10*i, 10*i), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75 ,this.#heart);
-            let projectile2 = new StraightProjectile(new Pos(10*i, 10*i), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75 ,this.#heart);
-            this.#projectiles.push(projectile)
-            this.#projectiles.push(projectile2)
-        }
-
     }
 
     getHeart() {
@@ -48,16 +65,45 @@ export class Battle {
         return this.#projectiles
     }
 
+    nextRound() {
+        if(this.#currentRound < this.#rounds.length) {
+            let sequence = this.#rounds[this.#currentRound].animation
+
+            sequence.items.push(new SequenceItem(
+                new CodeSequenceItem(() => {
+                    this.activate()
+                }),
+                (item, ctx) => {
+                    (item as CodeSequenceItem).run();
+                }
+            ))
+
+            this.deactivate()
+            this.#game.getSequenceExecutor().setSequence(sequence);
+            
+            this.#projectiles = this.#projectiles.concat(this.#rounds[this.#currentRound].projectiles)
+            this.#currentRound++
+        }
+    }
+
     tick() {
         if (this.#active) {
             this.#projectiles.forEach(projectile => {
-                projectile.update();
+                projectile.update(this);
                 if(projectile.getPos().distance(this.#heart.getPos()) < 2.5) {
                     this.#heart.health -= projectile.damage
+                    if(this.#heart.health <= 0) {
+                        this.#heart.health = 0
+                        this.#active = false
+                        this.#heart.freezeMovment()
+                    }
                     projectile.lifeTime = 0
                 }
             });
             this.#projectiles = this.#projectiles.filter(projectile => projectile.getLifeTime() > 0)
+        }
+        if(this.#projectiles.length === 0 && this.#active) {
+            this.nextRound()
         }
     }
 
@@ -74,6 +120,7 @@ export class Battle {
         const marginY = screen.height / 20;
         const padding = 15;
 
+        const healthBarWidth = 200;
         ctx.beginPath();
         ctx.strokeStyle = "white";
         ctx.lineWidth = 5;
@@ -93,9 +140,25 @@ export class Battle {
 
         this.#enemy.render(ctx, this.#game.getAssetLoader(), enemyBoxTopLeftCornerX, enemyBoxTopLeftCornerY, enemyBoxWidth)
 
-        this.#projectiles.forEach(projectile => {
-            projectile.render(ctx, assetLoader, screen);
-        })
+        if(this.#active) {
+            this.#projectiles.forEach(projectile => {
+                projectile.render(ctx, assetLoader, screen);
+            });
+        }
+
+        // render health bar (red green bar inbetween the box and the enemy box)
+        
+        ctx.fillStyle = "red";
+        ctx.fillRect(boxTopLeftCornerX + boxWidth / 2 - healthBarWidth / 2, boxTopLeftCornerY - marginY - padding - 40, healthBarWidth, 20);
+        ctx.fillStyle = "green";
+        ctx.fillRect(boxTopLeftCornerX + boxWidth / 2 - healthBarWidth / 2, boxTopLeftCornerY - marginY - padding - 40, healthBarWidth * (this.#heart.health / 100), 20);
+        
+        // Centered HP text render
+        ctx.fillStyle = "white";
+        ctx.font = "20px underschool";
+        const hpText = "HP: " + this.#heart.health;
+        const textWidth = ctx.measureText(hpText).width;
+        ctx.fillText(hpText, boxTopLeftCornerX + boxWidth / 2 - textWidth / 2, boxTopLeftCornerY - marginY - padding - 45);
     }
 
     deactivate() {
@@ -106,6 +169,9 @@ export class Battle {
     activate() {
         this.#active = true
         this.#heart.unfreezeMovment()
+        if(this.#currentRound === 0) {
+            this.nextRound()
+        }
     }
 }
 
@@ -207,22 +273,20 @@ export abstract class Projectile {
     getPos() {
         return this.pos;
     }
-    abstract update(): void;
+    abstract update(battle: Battle): void;
 }
 
 export class LoopingHomingProjectile extends Projectile {
-    #target: PosProvider;
     #acceleration: Pos;
     
-    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, target: PosProvider, height: number = 24, width: number = 24) {
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24) {
         super(pos, lifeTime, sprite, speed, height, width);
-        this.#target = target;
         this.#acceleration = new Pos(0, 0);
     }
     
-    update(): void {
+    update(battle: Battle): void {
         const turnRate = 0.1;
-        const turnDirection = Math.sign((Math.atan2(this.#target.getPos().y - this.pos.y, this.#target.getPos().x - this.pos.x) + Math.PI/2) - this.rotation);
+        const turnDirection = Math.sign((Math.atan2(battle.getHeart().getPos().y - this.pos.y, battle.getHeart().getPos().x - this.pos.x) + Math.PI/2) - this.rotation);
         this.rotation += turnRate * turnDirection;
         
         // Move towards target                
@@ -235,20 +299,18 @@ export class LoopingHomingProjectile extends Projectile {
 }
 
 export class HomingProjectile extends Projectile {
-    #target: PosProvider;
     #acceleration: Pos;
     #lastDirection: number;
     
-    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, target: PosProvider, height: number = 24, width: number = 24) {
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24) {
         super(pos, lifeTime, sprite, speed, height, width);
-        this.#target = target;
         this.#acceleration = new Pos(0, 0);
         this.#lastDirection = 0;
     }
     
-    update(): void {
+    update(battle: Battle): void {
         const turnRate: number = 0.5;
-        const alpha = (Math.atan2(this.#target.getPos().y - this.pos.y, this.#target.getPos().x - this.pos.x));
+        const alpha = (Math.atan2(battle.getHeart().getPos().y - this.pos.y, battle.getHeart().getPos().x - this.pos.x));
         console.log(alpha);
         
         let turnDirection: number = Math.sign((alpha + Math.PI/2) - this.rotation);
@@ -271,17 +333,20 @@ export class HomingProjectile extends Projectile {
 }
 
 export class StraightProjectile extends Projectile {
-    #initialTargetPos: Pos;
+    #initialTargetPos: Pos | undefined;
     #velocity: Pos;
     
-    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, target: PosProvider, height: number = 24, width: number = 24) {
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24) {
         super(pos, lifeTime, sprite, speed, height, width);
-        this.#initialTargetPos = target.getPos();
-        this.rotation = Math.atan2(this.#initialTargetPos.y - this.pos.y, this.#initialTargetPos.x - this.pos.x);
         this.#velocity = new Pos(Math.cos(this.rotation) * speed, Math.sin(this.rotation) * speed);
     }
      
-    update(): void {
+    update(battle: Battle): void {
+        if (!this.#initialTargetPos) {
+            this.#initialTargetPos = battle.getHeart().getPos();
+            this.rotation = Math.atan2(this.#initialTargetPos.y - this.pos.y, this.#initialTargetPos.x - this.pos.x);
+            this.#velocity = new Pos(Math.cos(this.rotation) * this.speed, Math.sin(this.rotation) * this.speed);
+        }
         this.pos.x += this.#velocity.x;
         this.pos.y += this.#velocity.y;
         this.lifeTime--;

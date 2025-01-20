@@ -324,3 +324,61 @@ export class TextAnimation extends SequenceCallback {
 }
 
 }
+
+export class TextAnimationNoInteract extends SequenceCallback {
+    text: string;
+    duration: number;
+    startTime: number;
+    pause: number;
+
+    constructor(text: string, duration: number, pause: number) {
+        super();
+        this.text = text;
+        this.duration = duration;
+        this.pause = pause;
+        this.startTime = 0;
+    }
+
+    render(ctx: CanvasRenderingContext2D, game: Game) {
+        const textPaddingY = 16;
+        const textPaddingX = 16;
+
+        let screen = game.getScreen()
+        // Make text print out according to time
+        if(this.startTime == 0) {
+            this.startTime = Date.now();
+        }
+
+        if(Date.now() - this.startTime > this.duration + this.pause) {
+            this.onFinish();
+        }
+
+        // render a "modal" that takes up the bottom 1/3 of the screen
+        ctx.fillStyle = "black";
+        ctx.globalAlpha = 0.7;
+        ctx.fillRect(0, screen.height - screen.height / 3, screen.width, screen.height / 3);
+        ctx.globalAlpha = 1;
+        
+        let textAreaWidth = screen.width * 3/4 - textPaddingX;
+        // render the NPC sprite
+        // render the text with wrapping if the text is too long and padding
+        ctx.fillStyle = "white";
+        ctx.font = "30px underschool";
+        let words = this.text.substring(0, Math.floor((Date.now() - this.startTime) / this.duration * this.text.length)).split(" ");
+        let lines = [];
+        let line = "";
+        for(let word of words) {
+            if(ctx.measureText(line + word).width < textAreaWidth - 16) {
+                line += word + " ";
+            } else {
+                lines.push(line);
+                line = word + " ";
+            }
+        }
+        
+        lines.push(line);
+        for(let i = 0; i < lines.length; i++) {
+            ctx.fillText(lines[i], (screen.width - textAreaWidth) / 2, screen.height - screen.height / 3 + 30 + 30 * i + textPaddingY * (i + 1));
+        }
+    }
+}

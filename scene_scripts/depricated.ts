@@ -7,13 +7,7 @@ import { Sprite } from "../sprite.js";
 export default class Script implements SceneScript {
     name: string = "scene1.js";
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
-        let tileSize = game.getScreen().tileSize;
-        if(prevScene?.getScriptName() === "scene3.js") {
-            game.getPlayer().setPos(new TileCoordinate(-4, -1).toPos(tileSize).add(new Pos(tileSize/2, tileSize/2)));
-        } else {
-            game.getPlayer().setPos(new TileCoordinate(-4, 2).toPos(tileSize).add(new Pos(tileSize/2, tileSize/2)));
-        }
-        
+    
         //Ännu ett test case TAG BORT SENARE TACKAR!
         // for(let i = 0; i < 1_000; i++){
         //     let velocity = new Pos(2 * (Math.random()-0.5), 2 * (Math.random()-0.5)).normalize().multiply(Math.random()); // Randomize velocity
@@ -24,10 +18,10 @@ export default class Script implements SceneScript {
 
         currentScene.registerBehaviour("test", (object) => {
             let charecter = new BigSprite(
-                new Sprite("assets/goli.png", 13, 14, 0),
-                new Sprite("assets/goli.png", 14, 14, 0),
-                new Sprite("assets/goli.png", 13, 15, 0),
-                new Sprite("assets/goli.png", 14, 15, 0)
+                new Sprite("assets/faces.png", 8, 0, 0),
+                new Sprite("assets/faces.png", 9, 0, 0),
+                new Sprite("assets/faces.png", 8, 1, 0),
+                new Sprite("assets/faces.png", 9, 1, 0)
             );
     
             let sequence = new Sequence([
@@ -78,8 +72,8 @@ export default class Script implements SceneScript {
             game.getSequenceExecutor().setSequence(sequence);
         });
         currentScene.addManyScriptedObjects(
-            new ScriptedObject(new Pos(-4, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/test3.json", new Sprite("assets/saker.png", 8, 0, 0)),
-            new ScriptedObject(new Pos(-3, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/test3.json", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(-4, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(-3, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-2, -1).multiply(16), ObjectBehaviour.Interactable, "test", new Sprite("assets/goli.png", 15, 15, 0)),
             new ScriptedObject(new Pos(-2, -2).multiply(16), ObjectBehaviour.None, "", new Sprite("assets/goli.png", 15, 14, 0)),
             ...ScriptedObject.constructFamily(3, (i) => new ScriptedObject(new Pos(-5-i,-1).multiply(16), ObjectBehaviour.ConveyorBelt, "l", new Sprite("assets/saker.png", 3, 0, 0))),
@@ -98,7 +92,7 @@ export default class Script implements SceneScript {
 
     getStartTile(): Map<String, TileCoordinate> {
         return new Map([
-            ["scene3.js", new TileCoordinate(-3, -0.5)],
+            ["teknik.js", new TileCoordinate(-3, -0.5)],
             ["default", new TileCoordinate(-3, 3)]
         ]);
     };

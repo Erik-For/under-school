@@ -3,11 +3,11 @@ import { InputHandler } from "./input.js";
 import { Player } from "./player.js";
 import { ObjectBehaviour, Scene, TileCoordinate, executeBehaviour } from "./scene.js";
 import { AssetLoader, AudioAsset } from "./assetloader.js";
-import { SequenceExecutor } from "./sequence.js";
+import { Sequence, SequenceExecutor, SequenceItem } from "./sequence.js";
 import * as Util from "./util.js";
-import { Battle, Enemy } from "./battle.js";
+import { Battle, Enemy, HomingProjectile, LoopingHomingProjectile, Round, StraightProjectile } from "./battle.js";
 import Keys from "./keys.js";
-import {BigSprite} from "./animate.js";
+import {BigSprite, TextAnimation, TextAnimationNoInteract} from "./animate.js";
 import {Sprite} from "./sprite.js";
 
 /**
@@ -46,16 +46,23 @@ export class Game {
         this.#mode = Mode.OpenWorld;
         //TSTKOD FÖR BATTLE FIxa Notera Att en bild ska ha munnen öppen för att prata
         this.#battle = new Battle(this, new Enemy(100, new BigSprite(
-            new Sprite("assets/goli.png", 13, 14, 0),
-            new Sprite("assets/goli.png", 14, 14, 0),
-            new Sprite("assets/goli.png", 13, 15, 0),
-            new Sprite("assets/goli.png", 14, 15, 0)
+            new Sprite("assets/faces.png", 8, 0, 0),
+            new Sprite("assets/faces.png", 9, 0, 0),
+            new Sprite("assets/faces.png", 8, 1, 0),
+            new Sprite("assets/faces.png", 9, 1, 0)
         ), new BigSprite(
-            new Sprite("assets/goli.png", 13, 14, 0),
-            new Sprite("assets/goli.png", 14, 14, 0),
-            new Sprite("assets/goli.png", 13, 15, 0),
-            new Sprite("assets/goli.png", 14, 15, 0)
-        )));
+            new Sprite("assets/faces.png", 10, 0, 0),
+            new Sprite("assets/faces.png", 11, 0, 0),
+            new Sprite("assets/faces.png", 10, 1, 0),
+            new Sprite("assets/faces.png", 11, 1, 0)
+        )), [new Round(new Sequence([]), [new LoopingHomingProjectile(new Pos(50, 50), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1)]), new Round(new Sequence([
+            new SequenceItem(
+                new TextAnimationNoInteract("Ajdå du överlevde", 1000*1, 1000*2),
+                (item, ctx) => {
+                    (item as TextAnimation).render(ctx, this);
+                }
+            )
+        ]),[new LoopingHomingProjectile(new Pos(50, 50), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1)])]);
         
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
@@ -209,8 +216,8 @@ export class Game {
         return this.#battle;
     }
 
-    newBattle(enemy: Enemy) {
-        this.#battle = new Battle(this, enemy);
+    newBattle(enemy: Enemy, rounds: Round[]) {
+        this.#battle = new Battle(this, enemy, rounds);
     }
 }
 

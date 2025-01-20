@@ -18,7 +18,7 @@ export class Player {
     constructor(x: number, y: number, game: Game) {
         this.x = x;
         this.y = y;
-        this.#direction = "idledown";
+        this.#direction = "idleup";
         this.#directionAnimation = new Map();
         this.#game = game;
         this.#movmentFrezze = false;
