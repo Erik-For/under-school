@@ -5,7 +5,7 @@ import { CodeSequenceItem, Sequence, SequenceItem } from "../sequence.js";
 import { Sprite } from "../sprite.js";
 
 export default class Script implements SceneScript {
-    name: string = "scene1.js";
+    name: string = "test1.js";
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
     
     };
