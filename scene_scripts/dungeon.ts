@@ -48,22 +48,21 @@ export default class Script implements SceneScript {
                 game.getCamera().cameraShake(500, 2);
                 currentScene.getTile(new TileCoordinate(40, -38))?.setCollisonRule(CollisionRule.None);
                 currentScene.getTile(new TileCoordinate(40, -38))?.getSprites().pop();
-                currentScene.getTile(new TileCoordinate(40, -38))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
+                //currentScene.getTile(new TileCoordinate(40, -38))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
                 
                 currentScene.getTile(new TileCoordinate(41, -38))?.setCollisonRule(CollisionRule.None);
                 currentScene.getTile(new TileCoordinate(41, -38))?.getSprites().pop();
-                currentScene.getTile(new TileCoordinate(41, -38))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
+                //currentScene.getTile(new TileCoordinate(41, -38))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
             
                 currentScene.getTile(new TileCoordinate(40, -37))?.setCollisonRule(CollisionRule.None);
                 currentScene.getTile(new TileCoordinate(40, -37))?.getSprites().pop();
-                currentScene.getTile(new TileCoordinate(40, -37))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
+                //currentScene.getTile(new TileCoordinate(40, -37))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
                 
                 currentScene.getTile(new TileCoordinate(41, -37))?.setCollisonRule(CollisionRule.None);
                 currentScene.getTile(new TileCoordinate(41, -37))?.getSprites().pop();
-                currentScene.getTile(new TileCoordinate(41, -37))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
+                //currentScene.getTile(new TileCoordinate(41, -37))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
             }
         })
-
         currentScene.addManyScriptedObjects(...this.#buttons)
         
     };
@@ -77,9 +76,9 @@ export default class Script implements SceneScript {
         
     };
 
-    getStartTile(): Map<String, TileCoordinate> {
+    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
         return new Map([
-            ["default", new TileCoordinate(30, -30)]
+            ["default", [new TileCoordinate(30, -30), (game: Game) => true]]
         ]);
     };
 }

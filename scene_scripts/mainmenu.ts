@@ -110,7 +110,7 @@ export default class Script implements SceneScript {
         }
     }
 
-    getStartTile(): Map<String, TileCoordinate> {
+    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
         return new Map();
     }
 } 

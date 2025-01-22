@@ -18,6 +18,7 @@ export class Game {
     #player: Player;
     #camera: Camera;
     #screen: Screen;
+    #gameState: GameState = new GameState();
     #audioManager: AudioManager;
     #particleManager: ParticleManager;
     #inputHandler: InputHandler;
@@ -133,6 +134,10 @@ export class Game {
         });
     }
     
+    getGameState() {
+        return this.#gameState;
+    }
+
     /**
      * Gets the player of the game.
      * @returns The player object.
@@ -518,4 +523,12 @@ function calculateNewPosition(currentPos: Pos, direction: string, range: number)
     }
     
     return newPos;
+}
+
+export class GameState {
+    hasPlayedJohannesLektionCutScene: boolean;
+
+    constructor(){
+        this.hasPlayedJohannesLektionCutScene = false;
+    }
 }
