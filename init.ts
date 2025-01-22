@@ -75,7 +75,7 @@ const assetLoader = new AssetLoader(
                     scene.onLoad(game, scene);
                 }
             }
-        })
+        }, true)
 
         requestAnimationFrame(function gameLoop() {
             game.getScreen().width = window.innerWidth;

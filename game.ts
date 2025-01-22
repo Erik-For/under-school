@@ -82,19 +82,26 @@ export class Game {
 
             const isIce = (tile: Tile) => tile.getSprites().find(sprite => sprite.spriteSheetSrc === "assets/snowset.png" && 2 <= sprite.xOffset && sprite.xOffset <= 5 && 4 <= sprite.yOffset && sprite.yOffset <= 6)
 
-            console.log(scene.getTile(playerTilePos));
+            // console.log(scene.getTile(playerTilePos));            
             
-            if(scene.getTile(playerTilePos) && isIce(scene.getTile(playerTilePos)!)){
-                this.#player.freezeMovment();
-                this.#inputHandler.preventInteraction();                
+            if(this.#scene.getTile(playerTilePos) && isIce(this.#scene.getTile(playerTilePos)!)){
+                this.getInputHandler().preventInteraction();
+                this.getPlayer().freezeMovment();
                 
-                const range = 1;
+                const range = 2;
                 const newPos = calculateNewPosition(this.getPlayer().getPos(), this.getPlayer().getDirection(), range);
-                if(!isIce(scene.getTile(newPos.toTileCoordinate())!)){
-                    this.#player.unfreezeMovment();
-                    this.#inputHandler.allowInteraction();
+                
+                const newTileCoordinate = newPos.divide(16).floor().toTileCoordinate();
+
+                if(!isIce(this.getScene().getTile(newTileCoordinate)!)){
+                    this.getPlayer().unfreezeMovment();
+                    this.getInputHandler().allowInteraction();
+
+                    this.getPlayer().setPos(calculateNewPosition(this.getPlayer().getPos(), this.getPlayer().getDirection(), 3));
+                } else {
+                    this.getPlayer().setPos(newPos);
                 }
-                this.#player.setPos(newPos);
+                
             }
             this.#battle?.tick();
             this.#particleManager.update();
@@ -217,7 +224,8 @@ export class Game {
     setMode(mode: Mode) {
         this.#mode = mode;
         switch(mode) {
-            case Mode.OpenWorld:                this.#player.unfreezeMovment();
+            case Mode.OpenWorld:                
+                this.#player.unfreezeMovment();
                 this.#inputHandler.allowInteraction();
                 break;
             case Mode.Battle:
@@ -305,9 +313,17 @@ export class Pos {
      * @returns the new position
     */
    round(): Pos {
-       return new Pos(Math.round(this.x), Math.round(this.y));
+       const roundAwayFromZero = (value: number) => {
+           return value < 0 ? Math.floor(value) : Math.ceil(value);
+        };
+        //return new Pos(Math.round(this.x), Math.round(this.y));
+       // round normaly please
+        return new Pos(roundAwayFromZero(this.x), roundAwayFromZero(this.y));
     }
     
+    floor(): Pos {
+        return new Pos(Math.floor(this.x), Math.floor(this.y));
+    }
     /**
      * Returns a new position with the absolute values of the x and y values of this position
      * @returns the new position
@@ -491,6 +507,7 @@ function calculateNewPosition(currentPos: Pos, direction: string, range: number)
     const newPos = new Pos(currentPos.x, currentPos.y);
     
     switch (direction) {
+        
         case "up":
             newPos.y -= range;
             break;

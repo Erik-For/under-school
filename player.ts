@@ -198,39 +198,38 @@ export class Player {
 
         // animation keys
         inputHandler.onHold(Keys.MoveUp, () => {       
-            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight)){ return; }
-    
+            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight) || this.#movmentFrezze){ return; }
             this.#direction = "walkup";
         });
         inputHandler.onRelease(Keys.MoveUp, () => {
-            if(isOtherKeyHeld()){ return; }
+            if(isOtherKeyHeld() || this.#movmentFrezze){ return; }
             this.#direction = "idleup";
         });
     
         inputHandler.onHold(Keys.MoveDown, () => {
-            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight)){ return; }
+            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight) || this.#movmentFrezze){ return; }
             this.#direction = "walkdown";
         });
         inputHandler.onRelease(Keys.MoveDown, () => {
-            if(isOtherKeyHeld()){ return; }
+            if(isOtherKeyHeld() || this.#movmentFrezze){ return; }
             this.#direction = "idledown";
         });
     
         inputHandler.onHold(Keys.MoveLeft, () => {
-            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown)){ return; }
+            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown) || this.#movmentFrezze){ return; }
             this.#direction = "walkleft";
         });
         inputHandler.onRelease(Keys.MoveLeft, () => {
-            if(isOtherKeyHeld()){ return; }
+            if(isOtherKeyHeld() || this.#movmentFrezze){ return; }
             this.#direction = "idleleft";
         });
     
         inputHandler.onHold(Keys.MoveRight, () => {
-            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown)){ return; }
+            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown) || this.#movmentFrezze){ return; }
             this.#direction = "walkright";
         });
         inputHandler.onRelease(Keys.MoveRight, () => {
-            if(isOtherKeyHeld()){ return; }
+            if(isOtherKeyHeld() || this.#movmentFrezze){ return; }
             this.#direction = "idleright";
         });
     }
