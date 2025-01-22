@@ -7,6 +7,9 @@ import { Sprite } from "../sprite.js";
 
 export default class Script implements SceneScript {
     name: string = "snow2.js";
+    #buttons: ScriptedObject[] = [
+
+    ]
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(6, -10).multiply(16), ObjectBehaviour.Sign, "^ Norra Bergstoppen ^", new Sprite("assets/saker.png", 6, 0, 0)),
@@ -31,9 +34,9 @@ export default class Script implements SceneScript {
         }
     };
 
-    getStartTile(): Map<String, TileCoordinate> {
+    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
         return new Map([
-            ["default", new TileCoordinate(-1, -2)]
+            ["default", [new TileCoordinate(-1, -2), (game: Game) => true]]
         ]);
     };
 }

@@ -30,10 +30,10 @@ export default class Script implements SceneScript {
 
     };
 
-    getStartTile(): Map<String, TileCoordinate> {
+    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
         return new Map([
-            ["teknik.js", new TileCoordinate(26.5, -3)],
-            ["default", new TileCoordinate(-1, 6.5)]
+            ["teknik.js", [new TileCoordinate(26.5, -3), (game: Game) => true]],
+            ["default", [new TileCoordinate(-1, 6.5), (game: Game) => true]]
         ]);
     };
 }

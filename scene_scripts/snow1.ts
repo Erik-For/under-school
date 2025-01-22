@@ -28,9 +28,9 @@ export default class Script implements SceneScript {
         }
     };
 
-    getStartTile(): Map<String, TileCoordinate> {
+    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
         return new Map([
-            ["snow1.js", new TileCoordinate(3, 5)]
+            ["snow1.js", [new TileCoordinate(3, 5), (game: Game) => true]]
         ]);
     };
 }

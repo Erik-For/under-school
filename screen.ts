@@ -4,8 +4,10 @@ import { Pos } from "./game.js";
 export class Camera {
     #x: number;
     #y: number;
-    #offsetX: number = 0;
-    #offsetY: number = 0;
+    #shakeOffsetX: number = 0;
+    #shakeOffsetY: number = 0;
+    #cameraOffsetX: number = 0;
+    #cameraOffsetY: number = 0;
     #amplitude = 1;
     #rippleEffect: boolean = false;
 
@@ -15,8 +17,33 @@ export class Camera {
     constructor(x: number, y: number) {
         this.#x = x;
         this.#y = y;
+        this.#shakeOffsetX = 0;
+        this.#shakeOffsetY = 0; 
     }
 
+    getCameraOffset(): Pos {
+        return new Pos(this.#cameraOffsetX, this.#cameraOffsetY);
+    }
+
+    setCameraOffset(offset: Pos) {
+        this.#cameraOffsetX = offset.x;
+        this.#cameraOffsetY = offset.y;
+    }
+
+    setCameraOffsetSmooth(offset: Pos, duration: number) {
+        const startOffset = this.getCameraOffset();
+        const endOffset = offset;
+        const startTime = performance.now();
+        const endTime = startTime + duration;
+        const interval = setInterval(() => {
+        const currentTime = performance.now();
+            const progress = (currentTime - startTime) / duration;
+            this.setCameraOffset(new Pos(startOffset.x + (endOffset.x - startOffset.x) * progress, startOffset.y + (endOffset.y - startOffset.y) * progress));
+        }, 1000 / 60);
+        setTimeout(() => {
+            clearInterval(interval);
+        }, duration);
+    }
 
     /** m
      * @returns the camera position
@@ -24,10 +51,10 @@ export class Camera {
     getPosition(): Pos {
         if (this.#rippleEffect) {
             const angle = 2 * Math.PI * Math.random();
-            this.#offsetX = this.#amplitude * Math.cos(angle);
-            this.#offsetY = this.#amplitude * Math.sin(angle);
+            this.#shakeOffsetX = this.#amplitude * Math.cos(angle);
+            this.#shakeOffsetY = this.#amplitude * Math.sin(angle);
         }
-        return new Pos(this.#x + this.#offsetX, this.#y + this.#offsetY);
+        return new Pos(this.#x + this.#shakeOffsetX + this.#cameraOffsetX, this.#y + this.#shakeOffsetY + this.#cameraOffsetY);
     }
 
     /** 
@@ -48,8 +75,8 @@ export class Camera {
     cameraShake(duration: number, amplitude: number): void {
         let shakeInterval = setInterval(() => {
             const angle = 2 * Math.PI * Math.random();
-            this.#offsetX = amplitude * Math.cos(angle);
-            this.#offsetY = amplitude * Math.sin(angle);
+            this.#shakeOffsetX = amplitude * Math.cos(angle);
+            this.#shakeOffsetY = amplitude * Math.sin(angle);
         }, 1000 / 60);
 
         setTimeout(() => {

@@ -51,6 +51,9 @@ export class Player {
     getDirection() {
         return this.#direction.replace("idle", "").replace("walk", ""); // returns the direction of the player without the action, this is kinda hacky but it works fine and is probably not prone to errors
     }
+    setDirection(direction: string) {
+        this.#direction = "idle" + direction;
+    }
 
     getHealth() {
         return this.#health;
