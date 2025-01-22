@@ -75,10 +75,4 @@ export default class Script implements SceneScript {
     render(game: Game, currentScene: Scene) {
         
     };
-
-    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
-        return new Map([
-            ["default", [new TileCoordinate(30, -30), (game: Game) => true]]
-        ]);
-    };
 }

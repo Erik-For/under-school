@@ -89,13 +89,6 @@ export default class Script implements SceneScript {
     render(game: Game, currentScene: Scene) {
         
     };
-
-    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
-        return new Map([
-            ["teknik.js", [new TileCoordinate(-3, -0.5), (game: Game) => true]],
-            ["default", [new TileCoordinate(-3, 3), (game: Game) => true]]
-        ]);
-    };
 }
 
 /*

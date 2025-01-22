@@ -33,10 +33,4 @@ export default class Script implements SceneScript {
             game.getParticleManager().addParticle(new Snow(position, 2000, game.getAssetLoader().getSpriteSheet("assets/snowset.png")!.getSprite(2, 3)));
         }
     };
-
-    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
-        return new Map([
-            ["default", [new TileCoordinate(-1, -2), (game: Game) => true]]
-        ]);
-    };
 }

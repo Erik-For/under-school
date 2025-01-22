@@ -22,7 +22,6 @@ export class Scene {
             onEnter: (prevScene: Scene, game: Game, currentScene: Scene) => {},
             onExit: (game: Game, currentScene: Scene) => {},
             render: (game: Game, currentScene: Scene) => {},
-            getStartTile: () => new Map<String, [TileCoordinate, (game: Game) => boolean]>()
         }
         this.#scriptedBehaviour = new Map();        
     }
@@ -96,21 +95,6 @@ export class Scene {
         const tileSize = game.getScreen().tileSize;
         prevScene.onExit(game, this);
         this.#sceneScript.onEnter(prevScene, game, this)
-        let startPos = this.#sceneScript.getStartTile().get(prevScene.getScriptName());
-        let defaultPos = this.#sceneScript.getStartTile().get("default");
-
-
-        if (startPos && !startPos[1](game)) {
-            return;
-        } else if (!startPos && defaultPos && !defaultPos[1](game)) {
-            return;
-        }
-
-        game.getPlayer().setPos(
-            startPos ? startPos[0].toPos(tileSize) : 
-            defaultPos ? defaultPos[0].toPos(tileSize) : 
-            new Pos(0, 0)
-        );
     }
 
     onExit(game: Game, prevScene: Scene) {
@@ -295,7 +279,6 @@ export interface SceneScript {
     onEnter: (prevScene: Scene ,game: Game, currentScene: Scene) => void;
     onExit: (game: Game, currentScene: Scene) => void;
     render: (game: Game, currentScene: Scene) => void;
-    getStartTile: () => Map<String, [TileCoordinate, (game: Game) => boolean]>;
 }
 
 export enum ObjectBehaviour {

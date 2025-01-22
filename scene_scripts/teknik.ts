@@ -38,7 +38,7 @@ export default class Script implements SceneScript {
             )
         }
 
-        
+
 
         if(true){ // möjlighet för att ändra lite vad man göra beroende på vart man är i spelet
             currentScene.addManyScriptedObjects(
@@ -97,21 +97,26 @@ export default class Script implements SceneScript {
                 game.getSequenceExecutor().setSequence(sequence);	
             });
         }
-
+        console.log(game.getGameState().hasPlayedJohannesLektionCutScene);
+        
         if(!game.getGameState().hasPlayedJohannesLektionCutScene){ 
             game.getGameState().hasPlayedJohannesLektionCutScene = true;
             game.getPlayer().freezeMovment();
             game.getPlayer().setDirection("right");
             game.getInputHandler().preventInteraction();
-            
             game.getPlayer().setPos(new Pos(4.5, -6.5).multiply(16));
             game.getCamera().setCameraOffset(new Pos(3*16, -4*16));
-            currentScene.addManyScriptedObjects(
-                new ScriptedObject(new Pos(4, -7.5).multiply(16), ObjectBehaviour.ChangeScene, "assets/intro.json", new Sprite("assets/saker.png", 8, 0, 0)),
-            );
             
             await fadeOut(game, 4000);
             let sequence = new Sequence([
+                new SequenceItem(new WaitSequenceItem(10), (item, ctx) => { (item as WaitSequenceItem).run(); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getPlayer().setDirection("right");
+                    game.getInputHandler().preventInteraction();
+                    game.getPlayer().setPos(new Pos(4.5, -6.5).multiply(16));
+                    game.getPlayer().setDirection("right");
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                 new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Hej allihopa, för er som är nya så heter jag Johannes.", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Idag ska vi prata lite om kedjeregeln.", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
@@ -141,12 +146,5 @@ export default class Script implements SceneScript {
     };
     render(game: Game, currentScene: Scene) {
 
-    };
-    
-    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
-        return new Map([
-            ["intro.js", [new TileCoordinate(5, 4.5), (game: Game) => !game.getGameState().hasPlayedJohannesLektionCutScene]],
-            ["default", [new TileCoordinate(5, 4.5), (game: Game) => !game.getGameState().hasPlayedJohannesLektionCutScene]]
-        ]);
     };
 }

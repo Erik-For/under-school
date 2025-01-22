@@ -8,7 +8,15 @@ export default class Script implements SceneScript {
     name: string = "intro.js";
     
     async onEnter(prevScene: Scene, game: Game, currentScene: Scene){
-        
+        switch(prevScene.getScriptName()){
+            case "mainmenu.js":
+                game.getPlayer().setPos(new Pos(-1, 6.5).multiply(16));
+                goliCutScene(game, currentScene);
+                break;
+            case "teknik.js":
+                game.getPlayer().setPos(new Pos(26.5, -3).multiply(16));
+                break;
+        }
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(-2, -7).multiply(16), ObjectBehaviour.Sign, "GOLI WAS HERE!!!!!!!!!!!!!!", new Sprite("assets/saker.png", 6, 0, 0)),
             new ScriptedObject(new Pos(27, -3).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/teknik.png", 0, 0, 0)),
@@ -28,13 +36,6 @@ export default class Script implements SceneScript {
     };
     render(game: Game, currentScene: Scene) {
 
-    };
-
-    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
-        return new Map([
-            ["teknik.js", [new TileCoordinate(26.5, -3), (game: Game) => true]],
-            ["default", [new TileCoordinate(-1, 6.5), (game: Game) => true]]
-        ]);
     };
 }
 

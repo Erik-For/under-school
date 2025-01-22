@@ -7,6 +7,11 @@ import { Sprite } from "../sprite.js";
 export default class Script implements SceneScript {
     name: string = "snow1.js";
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
+        switch(prevScene.getScriptName()){
+            case "dungeon.js":
+                game.getPlayer().setPos(new Pos(-1, -6).multiply(16)); // byt ut kordinaterna
+                break;
+        }
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(-2, -6).multiply(16), ObjectBehaviour.Sign, "Dörren är låst...", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-1, -6).multiply(16), ObjectBehaviour.Sign, "Dörren är låst...", new Sprite("assets/saker.png", 8, 0, 0)),
@@ -28,9 +33,4 @@ export default class Script implements SceneScript {
         }
     };
 
-    getStartTile(): Map<String, [TileCoordinate, (game: Game) => boolean]> {
-        return new Map([
-            ["snow1.js", [new TileCoordinate(3, 5), (game: Game) => true]]
-        ]);
-    };
 }
