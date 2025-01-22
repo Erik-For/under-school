@@ -7,6 +7,14 @@ import { Sprite } from "../sprite.js";
 export default class Script implements SceneScript {
     name: string = "teknik.js";
     async onEnter(prevScene: Scene, game: Game, currentScene: Scene){
+        switch(prevScene.getScriptName()){
+            case "intro.js":
+                if(game.getGameState().hasPlayedJohannesLektionCutScene) break;
+                game.getPlayer().setPos(new Pos(-1, -6).multiply(16)); // byt ut kordinaterna
+                break;
+            
+        }
+
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(4, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/intro.json", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(5, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/intro.json", new Sprite("assets/saker.png", 8, 0, 0)),
