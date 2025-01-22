@@ -5,7 +5,7 @@ import { CodeSequenceItem, Sequence, SequenceItem } from "../sequence.js";
 import { Sprite } from "../sprite.js";
 
 export default class Script implements SceneScript {
-    name: string = "dungeon.js";
+    name: string = "snow1.js";
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(4, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/dungeon.json", new Sprite("assets/saker.png", 8, 0, 0)),
@@ -21,8 +21,8 @@ export default class Script implements SceneScript {
     render(game: Game, currentScene: Scene) {
         if (Date.now() % 2 == 0) {
             const screenWidth = window.innerWidth;
-            const randomX = Math.floor(Math.random() * screenWidth);
-            const position = new Pos(randomX, -200);
+            const randomX = Math.floor((Math.random() - 0.5) * screenWidth);
+            const position = new Pos(randomX, -225);
         
             game.getParticleManager().addParticle(new Snow(position, 2000, game.getAssetLoader().getSpriteSheet("assets/snowset.png")!.getSprite(2, 3)));
         }
