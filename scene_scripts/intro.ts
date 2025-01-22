@@ -7,9 +7,9 @@ import { Sprite } from "../sprite.js";
 export default class Script implements SceneScript {
     name: string = "intro.js";
 
-    onEnter(prevScene: Scene, game: Game, currentScene: Scene){
+    async onEnter(prevScene: Scene, game: Game, currentScene: Scene){
 
-        
+
         currentScene.addScriptedObject(new ScriptedObject(new Pos(-2, -7).multiply(16), ObjectBehaviour.Sign, "GOLI WAS HERE!!!!!!!!!!!!!!", new Sprite("assets/saker.png", 6, 0, 0)));
         currentScene.addScriptedObject(new ScriptedObject(new Pos(27, -3).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/teknik.png", 0, 0, 0)));
         currentScene.addScriptedObject(new ScriptedObject(new Pos(27, -4).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/teknik.png", 0, 0, 0)));
@@ -24,6 +24,8 @@ export default class Script implements SceneScript {
         new Sequence([
             
         ])
+
+        await fadeOut(game);
     };
 
     // 27, -3; 27, -4

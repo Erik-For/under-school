@@ -1,5 +1,5 @@
 import { Game, Mode, Pos } from "../game.js";
-import { deserilizeScene, fadeOut, fadeOut, ObjectBehaviour, Scene, SceneScript, ScriptedObject, TileCoordinate } from "../scene.js";
+import { deserilizeScene, ObjectBehaviour, Scene, SceneScript, ScriptedObject, TileCoordinate } from "../scene.js";
 import { Sprite } from "../sprite.js";
 
 export default class Script implements SceneScript {
