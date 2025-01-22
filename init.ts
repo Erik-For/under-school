@@ -1,5 +1,5 @@
 import * as Sprites from './sprite.js';
-import { deserilizeScene, TileCoordinate } from './scene.js';
+import { deserilizeScene, fadeIn, fadeOut, TileCoordinate } from './scene.js';
 import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { TextAsset, AudioAsset, AssetLoader} from './assetloader.js';
@@ -17,8 +17,6 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-
-
 const assetLoader = new AssetLoader(
     [
         new Sprites.SpriteSheet("assets/mcwalk.png", 16),
@@ -32,9 +30,9 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/rootSpike.png", 16),
         new Sprites.SpriteSheet("assets/ingang.png", 16),
         new TextAsset("assets/intro.json"),
-        new TextAsset("assets/test2.json"),
         new TextAsset("assets/teknik.json"),
-        new AudioAsset("assets/test.mp3"),
+        new AudioAsset("assets/bg.mp3"),
+        new AudioAsset("assets/beep.wav"),
     ],
     async () => {
         // remove loading screen
@@ -45,12 +43,15 @@ const assetLoader = new AssetLoader(
 
 
         const screen = new Screen(window.innerWidth, window.innerHeight, 16, ctx);
-        let scene = await deserilizeScene(assetLoader.getTextAsset("assets/intro.json")!.data!);
+        let startScene = await deserilizeScene(assetLoader.getTextAsset("assets/intro.json")!.data!);
+        let menuScene = await deserilizeScene('{ "tileData": {}, "objectData": {}, "sceneScriptName": "mainmenu.js" }');
         let audioManager = new AudioManager();
         let particleManager = new ParticleManager();
-        const game = new Game(scene, new Pos(-5, 2), screen, audioManager, particleManager, assetLoader);
-        scene.onLoad(game, scene);
+        const game = new Game(startScene, new Pos(-5, 2), screen, audioManager, particleManager, assetLoader);
+        game.setScene(menuScene);
+        menuScene.onLoad(game, menuScene);
 
+        // --- Start dev code ---
         game.getInputHandler().onClick("KeyI", () => {
             game.setMode(game.getMode() === Mode.OpenWorld ? Mode.Battle : Mode.OpenWorld);
             if(game.getMode() === Mode.Battle){
@@ -64,7 +65,7 @@ const assetLoader = new AssetLoader(
             if(dev){
                 let sceneName = prompt("Enter scene name");
                 if(sceneName){
-                    scene = await deserilizeScene(assetLoader.getTextAsset("assets/" + sceneName + ".json")!.data!);
+                    let scene = await deserilizeScene(assetLoader.getTextAsset("assets/" + sceneName + ".json")!.data!);
                     game.setScene(scene);
                     scene.onLoad(game, scene);
                 }

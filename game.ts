@@ -1,7 +1,7 @@
 import { Camera, Screen } from "./screen.js";
 import { InputHandler } from "./input.js";
 import { Player } from "./player.js";
-import { ObjectBehaviour, Scene, TileCoordinate, executeBehaviour } from "./scene.js";
+import { ObjectBehaviour, Scene, TileCoordinate, executeBehaviour, fadeOut } from "./scene.js";
 import { AssetLoader, AudioAsset } from "./assetloader.js";
 import { Sequence, SequenceExecutor, SequenceItem } from "./sequence.js";
 import * as Util from "./util.js";
@@ -44,6 +44,7 @@ export class Game {
         this.#player = new Player(startPos.x, startPos.y, this);
         this.#sequenceExecutor = new SequenceExecutor();
         this.#mode = Mode.OpenWorld;
+
         //TSTKOD FÖR BATTLE FIxa Notera Att en bild ska ha munnen öppen för att prata
         this.#battle = new Battle(this, new Enemy(100, new BigSprite(
             new Sprite("assets/faces.png", 8, 0, 0),
@@ -201,8 +202,7 @@ export class Game {
     setMode(mode: Mode) {
         this.#mode = mode;
         switch(mode) {
-            case Mode.OpenWorld:
-                this.#player.unfreezeMovment();
+            case Mode.OpenWorld:                this.#player.unfreezeMovment();
                 this.#inputHandler.allowInteraction();
                 break;
             case Mode.Battle:
@@ -223,7 +223,7 @@ export class Game {
 
 export enum Mode {
     OpenWorld,
-    Battle
+    Battle,
 }
 
 

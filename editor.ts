@@ -34,6 +34,8 @@ const spriteSheetManager = new AssetLoader (
         new Sprites.SpriteSheet("assets/people.png", tileSize),
         new Sprites.SpriteSheet("assets/faces.png", tileSize),
         new Sprites.SpriteSheet("assets/ingang.png", tileSize),
+        new Sprites.SpriteSheet("assets/snowset.png", tileSize),
+        new Sprites.SpriteSheet("assets/dungeon.png", tileSize),
     ], async () => { 
         // callback when all assets are loaded
 

@@ -301,11 +301,14 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
             game.setScene(newScene);
             newScene.onLoad(game, scene);
             const fade = fadeOut(game);
+            
             fade.then(() => {
                 game.getPlayer().allowCollisions();
                 game.getPlayer().unfreezeMovment();
             });
         });
+
+        
     },
     [ObjectBehaviour.Interactable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         currentScene.getBehaviour(data)?.(game, currentScene, pos, data);

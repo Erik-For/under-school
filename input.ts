@@ -29,6 +29,7 @@ export class InputHandler {
     keyRelease: Map<string, InputCallback[]>;
     #preventInteraction: boolean = false;
     #mousePos: Pos;
+    mouseClicked: boolean = false;
 
     /**
      * Creates an instance of InputHandler.
@@ -65,6 +66,12 @@ export class InputHandler {
         window.addEventListener('mousemove', (event) => {
             this.#mousePos = new Pos(event.clientX, event.clientY);
         });
+        window.addEventListener('mousedown', () => {
+            this.mouseClicked = true;
+        });
+        window.addEventListener('mouseup', () => {
+            this.mouseClicked = false;
+        });
     }
 
     /**
@@ -82,6 +89,12 @@ export class InputHandler {
      */
     getMousePos(): Pos {
         return this.#mousePos;
+    }
+
+    isMouseClicked() {
+        let clicked = this.mouseClicked;
+        this.mouseClicked = false;
+        return clicked;
     }
 
     /**
