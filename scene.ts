@@ -288,7 +288,9 @@ export enum ObjectBehaviour {
     Movable, // when waling into this object the player will be able to push it
     ConveyorBelt, // when the player is standing on this tile they will be moved in the direction of the arrow
     Sign,
+    Button
 }
+
 
 const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScene: Scene, pos: Pos, data: string) => void> = {
     [ObjectBehaviour.ChangeScene]: async (game, scene, pos, data) => {
@@ -301,14 +303,14 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
             game.setScene(newScene);
             newScene.onLoad(game, scene);
             const fade = fadeOut(game);
-            
+
             fade.then(() => {
                 game.getPlayer().allowCollisions();
                 game.getPlayer().unfreezeMovment();
             });
         });
 
-        
+
     },
     [ObjectBehaviour.Interactable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         currentScene.getBehaviour(data)?.(game, currentScene, pos, data);
@@ -322,25 +324,25 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
                 }),
                 (item, ctx) => {
                     (item as CodeSequenceItem).run();
-                }    
+                }
             ),
             new SequenceItem(
-                new TextAnimation(data, data.length*25, game.getInputHandler()),
+                new TextAnimation(data, data.length * 25, game.getInputHandler()),
                 (item, ctx) => {
                     (item as TextAnimation).render(ctx, game);
                 }),
-                new SequenceItem(
-                    new CodeSequenceItem(() => {
-                        game.getPlayer().unfreezeMovment();
-                        game.getInputHandler().allowInteraction();
-                    }),
-                    (item, ctx) => {
-                        (item as CodeSequenceItem).run();
-                    }    
-                )
+            new SequenceItem(
+                new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                }),
+                (item, ctx) => {
+                    (item as CodeSequenceItem).run();
+                }
+            )
         ]);
         game.getSequenceExecutor().setSequence(sequence);
-        
+
     },
     [ObjectBehaviour.Movable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
         throw new Error("Function not implemented.");
@@ -394,6 +396,30 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
         game.getPlayer().setPos(playerPos);
     },
     [ObjectBehaviour.None]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+    },
+    [ObjectBehaviour.Button]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+        // Get the tile at the button's position
+        let tilePos = pos.divide(16).round().toTileCoordinate();
+        let tile = currentScene.getTile(tilePos);
+        
+        if (tile) {
+            // Find the button sprite in the tile's sprites
+            let buttonObject = currentScene.getScriptedObjects().find(obj => 
+                obj.sprite.spriteSheetSrc === "assets/dungeon.png" && 
+                obj.sprite.yOffset === 1 && 
+                (obj.sprite.xOffset === 0 || obj.sprite.xOffset === 2)
+            );
+
+            if (buttonObject) {
+                if (buttonObject.sprite.xOffset === 0) {
+                    buttonObject.sprite.xOffset = 2;
+                    currentScene.getBehaviour(data)?.(game, currentScene, pos, "on");
+                } else {
+                    buttonObject.sprite.xOffset = 0;
+                    currentScene.getBehaviour(data)?.(game, currentScene, pos, "off");
+                }
+            }
+        }
     }
 };
 
@@ -536,7 +562,7 @@ export function deserilizeScene(json: string): Promise<Scene> {
     })
 }
 
-export function fadeIn(game: Game): Promise<void>{
+export function fadeIn(game: Game, duration: number = 1000): Promise<void>{
     const ctx = game.getScreen().ctx;
     const screen = game.getScreen();
     screen.fadeAlpha = 0;
@@ -550,11 +576,11 @@ export function fadeIn(game: Game): Promise<void>{
                 clearInterval(interval);
                 resolve();
             }
-        }, 1000 / 60); // 60 FPS
+        }, duration / 60); // 60 FPS
     });
 }
 
-export function fadeOut(game: Game): Promise<void>{
+export function fadeOut(game: Game, duration: number = 1000): Promise<void>{
     const ctx = game.getScreen().ctx;
     const screen = game.getScreen();
     screen.fadeAlpha = 1;
@@ -567,6 +593,6 @@ export function fadeOut(game: Game): Promise<void>{
                 clearInterval(interval);
                 resolve();
             }
-        }, 1000 / 60); // 60 FPS
+        }, duration / 60); // 60 FPS
     });
 }

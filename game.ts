@@ -1,14 +1,14 @@
 import { Camera, Screen } from "./screen.js";
 import { InputHandler } from "./input.js";
 import { Player } from "./player.js";
-import { ObjectBehaviour, Scene, TileCoordinate, executeBehaviour, fadeOut } from "./scene.js";
+import { ObjectBehaviour, Scene, Tile, TileCoordinate, executeBehaviour, fadeOut } from "./scene.js";
 import { AssetLoader, AudioAsset } from "./assetloader.js";
 import { Sequence, SequenceExecutor, SequenceItem } from "./sequence.js";
 import * as Util from "./util.js";
 import { Battle, Enemy, HomingProjectile, LoopingHomingProjectile, Round, StraightProjectile } from "./battle.js";
 import Keys from "./keys.js";
 import {BigSprite, TextAnimation, TextAnimationNoInteract} from "./animate.js";
-import {Sprite} from "./sprite.js";
+import {Sprite, SpriteSheet} from "./sprite.js";
 
 /**
  * Represents a game.
@@ -24,7 +24,7 @@ export class Game {
     #assetLoader: AssetLoader;
     #sequenceExecutor: SequenceExecutor;
     #mode: Mode;
-    #battle: Battle;
+    #battle: Battle | undefined;
     
     /**
      * Creates a new instance of the Game class.
@@ -80,8 +80,23 @@ export class Game {
                 }
             }
 
-            this.#battle.tick();
+            const isIce = (tile: Tile) => tile.getSprites().find(sprite => sprite.spriteSheetSrc === "assets/snowset.png" && 2 <= sprite.xOffset && sprite.xOffset <= 5 && 4 <= sprite.yOffset && sprite.yOffset <= 6)
+
+            console.log(scene.getTile(playerTilePos));
             
+            if(scene.getTile(playerTilePos) && isIce(scene.getTile(playerTilePos)!)){
+                this.#player.freezeMovment();
+                this.#inputHandler.preventInteraction();                
+                
+                const range = 1;
+                const newPos = calculateNewPosition(this.getPlayer().getPos(), this.getPlayer().getDirection(), range);
+                if(!isIce(scene.getTile(newPos.toTileCoordinate())!)){
+                    this.#player.unfreezeMovment();
+                    this.#inputHandler.allowInteraction();
+                }
+                this.#player.setPos(newPos);
+            }
+            this.#battle?.tick();
             this.#particleManager.update();
         }, Math.round(1000 / 60));
         this.#inputHandler.onClick(Keys.Interact, () => {
@@ -105,7 +120,7 @@ export class Game {
             }
             const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen());
             let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTargetPos.toPos(screen.tileSize)))!;
-            if((scriptedObject && (scriptedObject.type === ObjectBehaviour.Interactable) || scriptedObject.type === ObjectBehaviour.Sign)){
+            if((scriptedObject && (scriptedObject.type === ObjectBehaviour.Interactable) || scriptedObject.type === ObjectBehaviour.Sign) || scriptedObject.type === ObjectBehaviour.Button){
                 executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
             }
         });
@@ -423,6 +438,30 @@ export class Particle {
     }
 }
 
+export class Snow extends Particle {
+    #rot: number;
+    #initialX: number;
+    #jitterFrequency: number;
+
+    constructor(pos: Pos, lifeTime: number, image: ImageBitmap) {
+        super(pos, new Pos(0, 0.25), lifeTime, image, false); // Constant downward velocity
+        this.#initialX = pos.x;
+        this.#rot = Math.random() * Math.PI * 2;
+        this.#jitterFrequency = Math.random() * 0.05 + 0.05; // Random frequency for jitter
+    }
+
+    update() {
+        this.pos.y += this.velocity.y;
+        this.pos.x = this.#initialX + Math.sin(this.lifeTime * this.#jitterFrequency) * 3; // Jitter left and right
+        this.lifeTime--;
+    }
+
+    render(ctx: CanvasRenderingContext2D, game: Game) {
+        let canvasPos = Util.convertWorldPosToCanvasPos(this.pos, game.getCamera().getPosition(), game.getScreen());
+        Util.drawImageRot(ctx, this.image, canvasPos, 4, 4, this.#rot);
+    }
+}
+
 export class ParticleManager{
     particles: Particle[];
 
@@ -446,4 +485,25 @@ export class ParticleManager{
             particle.render(ctx, game);
         });
     }
+}
+
+function calculateNewPosition(currentPos: Pos, direction: string, range: number): Pos {
+    const newPos = new Pos(currentPos.x, currentPos.y);
+    
+    switch (direction) {
+        case "up":
+            newPos.y -= range;
+            break;
+        case "down":
+            newPos.y += range;
+            break;
+        case "left":
+            newPos.x -= range;
+            break;
+        case "right":
+            newPos.x += range;
+            break;
+    }
+    
+    return newPos;
 }

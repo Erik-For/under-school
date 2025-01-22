@@ -29,7 +29,12 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/proj1.png", 16),
         new Sprites.SpriteSheet("assets/rootSpike.png", 16),
         new Sprites.SpriteSheet("assets/ingang.png", 16),
+        new Sprites.SpriteSheet("assets/dungeon.png", 16),
+        new Sprites.SpriteSheet("assets/snowset.png", 16),
         new TextAsset("assets/intro.json"),
+        new TextAsset("assets/dungeon.json"),
+        new TextAsset("assets/snow1.json"),
+        new TextAsset("assets/test1.json"),
         new TextAsset("assets/teknik.json"),
         new AudioAsset("assets/bg.mp3"),
         new AudioAsset("assets/beep.wav"),
@@ -55,9 +60,9 @@ const assetLoader = new AssetLoader(
         game.getInputHandler().onClick("KeyI", () => {
             game.setMode(game.getMode() === Mode.OpenWorld ? Mode.Battle : Mode.OpenWorld);
             if(game.getMode() === Mode.Battle){
-                game.getBattle().activate();
+                game.getBattle()?.activate();
             } else {
-                game.getBattle().deactivate();
+                game.getBattle()?.deactivate();
             }
         }, true);
 
@@ -88,7 +93,7 @@ const assetLoader = new AssetLoader(
                     renderDevPlayerHitbox(game);
                 }
             } else if(game.getMode() === Mode.Battle){
-                game.getBattle().render(ctx, assetLoader);
+                game.getBattle()?.render(ctx, assetLoader);
             }
             game.getSequenceExecutor().execute(ctx);
             requestAnimationFrame(gameLoop);

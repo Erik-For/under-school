@@ -97,3 +97,24 @@ export default class Script implements SceneScript {
         ]);
     };
 }
+
+/*
+ this.#battle = new Battle(this, new Enemy(100, new BigSprite(
+            new Sprite("assets/faces.png", 8, 0, 0),
+            new Sprite("assets/faces.png", 9, 0, 0),
+            new Sprite("assets/faces.png", 8, 1, 0),
+            new Sprite("assets/faces.png", 9, 1, 0)
+        ), new BigSprite(
+            new Sprite("assets/faces.png", 10, 0, 0),
+            new Sprite("assets/faces.png", 11, 0, 0),
+            new Sprite("assets/faces.png", 10, 1, 0),
+            new Sprite("assets/faces.png", 11, 1, 0)
+        )), [new Round(new Sequence([]), [new LoopingHomingProjectile(new Pos(50, 50), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1)]), new Round(new Sequence([
+            new SequenceItem(
+                new TextAnimationNoInteract("Ajdå du överlevde", 1000*1, 1000*2),
+                (item, ctx) => {
+                    (item as TextAnimation).render(ctx, this);
+                }
+            )
+        ]),[new LoopingHomingProjectile(new Pos(50, 50), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1)])]);
+*/

@@ -28,6 +28,19 @@ export class SequenceExecutor {
     }
 }
 
+export class WaitSequenceItem extends SequenceCallback {
+    #duration: number;
+    constructor(duration: number) {
+        super();
+        this.#duration = duration;
+    }
+    run() {
+        setTimeout(() => {
+            this.onFinish();
+        }, this.#duration);
+    }
+}
+
 export class CodeSequenceItem extends SequenceCallback {
     #code: () => void;
 
@@ -42,6 +55,16 @@ export class CodeSequenceItem extends SequenceCallback {
     }
 
 
+}
+
+export class AsyncCodeSequenceItem extends CodeSequenceItem {
+    constructor(code: () => Promise<void>) {
+        super(() => {
+            code().then(() => {
+                this.onFinish();
+            });
+        });
+    }
 }
 
 export class Sequence {

@@ -70,9 +70,10 @@ export default class Script implements SceneScript {
                     text: text,
                     action: async () => {
                         if (text === "Start Game") {
+                            let prev = game.getScene();
                             let introScene = await deserilizeScene(game.getAssetLoader().getTextAsset("assets/intro.json")!.data!);
                             game.setScene(introScene);
-                            introScene.onLoad(game, introScene);
+                            introScene.onLoad(game, prev);
                         } else if (text === "Credits") {
                             this.currentMenu = "credits";
                             this.buttons = [];
