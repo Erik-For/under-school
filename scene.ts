@@ -427,6 +427,14 @@ export function executeBehaviour(game: Game, currentScene: Scene, pos: Pos, type
     behaivourImplementations[type](game, currentScene, pos, data);
 }
 
+export function isButton(tile: Tile): boolean {
+    return tile.getSprites().some(sprite => sprite.xOffset === 0 && (sprite.yOffset === 0 || sprite.yOffset === 2));
+}
+
+export function isButtonPressed(tile: Tile): boolean {
+    return tile.getSprites().some(sprite => sprite.xOffset === 2 && sprite.yOffset === 2);
+}
+
 /**
  * Represents a scene object with extended functionality compared to normal tiles
  */

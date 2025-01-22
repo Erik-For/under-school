@@ -80,7 +80,7 @@ export class Game {
                 }
             }
 
-            const isIce = (tile: Tile) => tile.getSprites().find(sprite => sprite.spriteSheetSrc === "assets/snowset.png" && 2 <= sprite.xOffset && sprite.xOffset <= 5 && 4 <= sprite.yOffset && sprite.yOffset <= 6)
+            const isIce = (tile: Tile) => tile.getSprites().find(sprite => sprite.spriteSheetSrc === "assets/snowset.png" && 2 <= sprite.xOffset && sprite.xOffset <= 4 && 4 <= sprite.yOffset && sprite.yOffset <= 6)
 
             // console.log(scene.getTile(playerTilePos));            
             
