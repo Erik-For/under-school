@@ -230,46 +230,52 @@ export enum CollisionRule {
 export class TileCoordinate {
     x: number;
     y: number;
-
+    
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
-
+    
     /**
      * Adds the specified position to the current position.
      * @param pos - The position to add.
      * @returns The new position after addition.
-     */
-    add(pos: TileCoordinate): TileCoordinate {
-        return new TileCoordinate(this.x + pos.x, this.y + pos.y);
+    */
+   add(pos: TileCoordinate): TileCoordinate {
+       return new TileCoordinate(this.x + pos.x, this.y + pos.y);
     }
-
+    
     /**
      * Subtracts the specified position from the current position.
      * @param pos - The position to subtract.
      * @returns The new position after subtraction.
-     */
-    subtract(pos: TileCoordinate): TileCoordinate {
-        return new TileCoordinate(this.x - pos.x, this.y - pos.y);
+    */
+   subtract(pos: TileCoordinate): TileCoordinate {
+       return new TileCoordinate(this.x - pos.x, this.y - pos.y);
     }
-
+    
     /**
      * Multiplies the current position by the specified scalar value.
      * @param scalar - The scalar value to multiply.
      * @returns The new position after multiplication.
-     */
-    multiply(scalar: number): TileCoordinate {
-        return new TileCoordinate(this.x * scalar, this.y * scalar);
+    */
+   multiply(scalar: number): TileCoordinate {
+       return new TileCoordinate(this.x * scalar, this.y * scalar);
     }
-
+    
     /**
      * Converts the tile coordinates to pos type.
      * @param tileSize - The size of a tile.
      * @returns The screen coordinates representing the tile coordinates.
-     */
-    toPos(tileSize: number): Pos {
-        return new Pos(this.x * tileSize, this.y * tileSize);
+    */
+   toPos(tileSize: number): Pos {
+       return new Pos(this.x * tileSize, this.y * tileSize);
+    }
+    divide(scalar: number): TileCoordinate {
+        return new TileCoordinate(this.x / scalar, this.y / scalar);
+    }
+    floor(): TileCoordinate {
+        return new TileCoordinate(Math.floor(this.x), Math.floor(this.y));
     }
 }
 
@@ -404,19 +410,24 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
         
         if (tile) {
             // Find the button sprite in the tile's sprites
-            let buttonObject = currentScene.getScriptedObjects().find(obj => 
-                obj.sprite.spriteSheetSrc === "assets/dungeon.png" && 
+            let buttonObject = currentScene.getScriptedObjects().find(obj => {
+                console.log(obj.pos.divide(16).floor());
+                console.log(pos.divide(16).floor());
+                
+                return obj.sprite.spriteSheetSrc === "assets/dungeon.png" && 
                 obj.sprite.yOffset === 1 && 
-                (obj.sprite.xOffset === 0 || obj.sprite.xOffset === 2)
+                (obj.sprite.xOffset === 0 || obj.sprite.xOffset === 2) &&
+                obj.pos.divide(16).floor().equals(pos.divide(16).floor())
+            }
             );
 
             if (buttonObject) {
-                if (buttonObject.sprite.xOffset === 0) {
-                    buttonObject.sprite.xOffset = 2;
-                    currentScene.getBehaviour(data)?.(game, currentScene, pos, "on");
-                } else {
+                if (buttonObject.sprite.xOffset === 2) {                    
                     buttonObject.sprite.xOffset = 0;
                     currentScene.getBehaviour(data)?.(game, currentScene, pos, "off");
+                } else {
+                    buttonObject.sprite.xOffset = 2;
+                    currentScene.getBehaviour(data)?.(game, currentScene, pos, "on");
                 }
             }
         }
@@ -427,12 +438,11 @@ export function executeBehaviour(game: Game, currentScene: Scene, pos: Pos, type
     behaivourImplementations[type](game, currentScene, pos, data);
 }
 
-export function isButton(tile: Tile): boolean {
-    return tile.getSprites().some(sprite => sprite.xOffset === 0 && (sprite.yOffset === 0 || sprite.yOffset === 2));
-}
 
-export function isButtonPressed(tile: Tile): boolean {
-    return tile.getSprites().some(sprite => sprite.xOffset === 2 && sprite.yOffset === 2);
+export function isButtonPressed(currentScene: Scene, pos: TileCoordinate): boolean {
+    return currentScene.getScriptedObjects().some(obj => { 
+        return obj.pos.divide(16).equals(pos.toPos(1)) && obj.sprite.xOffset === 0 && obj.sprite.yOffset === 1 && obj.sprite.spriteSheetSrc === "assets/dungeon.png";
+    });
 }
 
 /**
