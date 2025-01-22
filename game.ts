@@ -88,7 +88,7 @@ export class Game {
                 this.getInputHandler().preventInteraction();
                 this.getPlayer().freezeMovment();
                 
-                const range = 2;
+                const range = 1;
                 const newPos = calculateNewPosition(this.getPlayer().getPos(), this.getPlayer().getDirection(), range);
                 
                 const newTileCoordinate = newPos.divide(16).floor().toTileCoordinate();

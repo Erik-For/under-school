@@ -35,6 +35,7 @@ const assetLoader = new AssetLoader(
         new TextAsset("assets/intro.json"),
         new TextAsset("assets/dungeon.json"),
         new TextAsset("assets/snow1.json"),
+        new TextAsset("assets/snow2.json"),
         new TextAsset("assets/test1.json"),
         new TextAsset("assets/teknik.json"),
         new AudioAsset("assets/bg.mp3"),
