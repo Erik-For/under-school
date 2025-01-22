@@ -312,13 +312,8 @@ export class Pos {
      * Rounds the x and y values of this position to the nearest integer
      * @returns the new position
     */
-   round(): Pos {
-       const roundAwayFromZero = (value: number) => {
-           return value < 0 ? Math.floor(value) : Math.ceil(value);
-        };
-        //return new Pos(Math.round(this.x), Math.round(this.y));
-       // round normaly please
-        return new Pos(roundAwayFromZero(this.x), roundAwayFromZero(this.y));
+    round(): Pos {
+        return new Pos(Math.round(this.x), Math.round(this.y));
     }
     
     floor(): Pos {

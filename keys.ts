@@ -6,6 +6,8 @@ enum Keys {
     MoveLeft = "KeyA",
     MoveRight = "KeyD",
     Debug = "KeyP",
+    Debug2 = "KeyO",
+    Debug3 = "KeyI",
 }
 
 export default Keys;

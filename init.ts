@@ -4,6 +4,7 @@ import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { TextAsset, AudioAsset, AssetLoader} from './assetloader.js';
 import { Pos, Game, AudioManager, ParticleManager, Mode } from './game.js';
+import Keys from './keys.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -57,7 +58,7 @@ const assetLoader = new AssetLoader(
         menuScene.onLoad(game, menuScene);
 
         // --- Start dev code ---
-        game.getInputHandler().onClick("KeyI", () => {
+        game.getInputHandler().onClick(Keys.Debug3, () => {
             game.setMode(game.getMode() === Mode.OpenWorld ? Mode.Battle : Mode.OpenWorld);
             if(game.getMode() === Mode.Battle){
                 game.getBattle()?.activate();
@@ -66,7 +67,7 @@ const assetLoader = new AssetLoader(
             }
         }, true);
 
-        game.getInputHandler().onClick("KeyO", async () => {
+        game.getInputHandler().onClick(Keys.Debug2, async () => {
             if(dev){
                 let sceneName = prompt("Enter scene name");
                 if(sceneName){
