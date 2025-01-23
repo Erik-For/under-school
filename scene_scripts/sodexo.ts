@@ -20,7 +20,7 @@ export default class Script implements SceneScript {
         }
 
         game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/Unknown.wav")!);
-        game.getCamera().toggleRippleEffect();
+        //game.getCamera().toggleRippleEffect();
 
         if(prevScene.getScriptName() == "snow3.js"){
             let sequence = new Sequence([

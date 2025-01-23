@@ -7,7 +7,7 @@ import { Sprite } from "../sprite.js";
 export default class Script implements SceneScript {
     name: string = "test1.js";
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
-    
+        game.getPlayer().setPos(new Pos(-7, 2).multiply(16));
     };
     onExit (game: Game, currentScene: Scene) {
 

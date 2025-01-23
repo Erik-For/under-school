@@ -39,20 +39,13 @@ export default class Script implements SceneScript {
         game.getInputHandler().allowInteraction();
 
         currentScene.addManyScriptedObjects(
-            new ScriptedObject(new Pos(39, -2).multiply(16), ObjectBehaviour.Sign, "I labyrinten ska du gå, följ stenarna för att målet nå", new Sprite("assets/saker.png", 6, 0, 0)),
+            new ScriptedObject(new Pos(39, -2).multiply(16), ObjectBehaviour.Sign, "I labyrinten ska du gå, följ små stenarna för att målet nå", new Sprite("assets/saker.png", 6, 0, 0)),
             new ScriptedObject(new Pos(-4, -5).multiply(16), ObjectBehaviour.Sign, "I grottan du är, vilket misär", new Sprite("assets/saker.png", 7, 0, 0)),
             new ScriptedObject(new Pos(-2, -5).multiply(16), ObjectBehaviour.Sign, "Dörren är låst, inga nycklar finns att se, med lite list, en uppenbarelse kan ske", new Sprite("assets/saker.png", 7, 0, 0)),
             new ScriptedObject(new Pos(29, -37).multiply(16), ObjectBehaviour.Sign, "V->H/U->N: NER NER UPP NER UPP UPP UPP NER NER UPP", new Sprite("assets/saker.png", 7, 0, 0)),
             new ScriptedObject(new Pos(40, -37).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 0)),
-            new ScriptedObject(new Pos(41, -37).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 0)),
-            //new ScriptedObject(new Pos(38, -2).multiply(16), ObjectBehaviour.Button
-            //, "btn", new Sprite("assets/dungeon.png", 0, 1, 0)),
-            
+            new ScriptedObject(new Pos(41, -37).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 0)),       
         )
-        //currentScene.registerBehaviour("btn", (game: Game, currentScene: Scene, pos: Pos, data: String) => {
-        //    alert("Du tryckte på knappen");
-        //})
-
         currentScene.registerBehaviour("btn", (game: Game, currentScene: Scene, pos: Pos, data: String) => {
             let ans = ""
             
@@ -66,11 +59,17 @@ export default class Script implements SceneScript {
 
             if(ans === "0010111001") {
                 game.getCamera().cameraShake(500, 2, game);
-                currentScene.getScriptedObjects().forEach(obj => {
-                    if(obj.pos.equals(new Pos(40, -37).multiply(16)) || obj.pos.equals(new Pos(41, -37).multiply(16))) {
-                        currentScene.removeScriptedObject(obj);
+                console.log(currentScene.getScriptedObjects().length);
+                
+                const scriptedObjects = currentScene.getScriptedObjects();
+                for (let index = scriptedObjects.length - 1; index >= 0; index--) {
+                    const obj = scriptedObjects[index];
+                    if (obj.pos.equals(new Pos(40, -37).multiply(16)) || obj.pos.equals(new Pos(41, -37).multiply(16))) {
+                        currentScene.removeScriptedObjectAtIndex(index);
                     }
-                });
+                }
+                console.log(currentScene.getScriptedObjects().length);
+
                 currentScene.getTile(new TileCoordinate(40, -38))?.setCollisonRule(CollisionRule.None);
                 currentScene.getTile(new TileCoordinate(40, -38))?.getSprites().pop();
                 currentScene.getTile(new TileCoordinate(40, -38))?.getSprites().push(new Sprite("assets/dungeon.png", 4, 0, 0));

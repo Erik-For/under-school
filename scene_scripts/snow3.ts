@@ -78,10 +78,19 @@ export default class Script implements SceneScript {
             currentScene.getTile(new TileCoordinate(61, - 87))?.getSprites().push(new Sprite("assets/sodexo.png", 6, 2, 0));     
             currentScene.getTile(new TileCoordinate(61, -86))?.setCollisonRule(CollisionRule.None);
             currentScene.getTile(new TileCoordinate(61, - 86))?.getSprites().pop();
-            currentScene.getTile(new TileCoordinate(61, - 86))?.getSprites().push(new Sprite("assets/sodexo.png", 6, 3, 0));        
+            currentScene.getTile(new TileCoordinate(61, - 86))?.getSprites().push(new Sprite("assets/sodexo.png", 6, 3, 0));   
+            
+            const scriptedObjects = currentScene.getScriptedObjects();
+            for (let index = scriptedObjects.length - 1; index >= 0; index--) {
+                const obj = scriptedObjects[index];
+                if (obj.pos.equals(new Pos(60, -86).multiply(16)) || obj.pos.equals(new Pos(61, -86).multiply(16))) {
+                    currentScene.removeScriptedObjectAtIndex(index);
+                }
+            }
+            
             currentScene.addManyScriptedObjects(
-                new ScriptedObject(new Pos(60, -87).multiply(16), ObjectBehaviour.ChangeScene, "assets/sodexo.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
-                new ScriptedObject(new Pos(61, -87).multiply(16), ObjectBehaviour.ChangeScene, "assets/sodexo.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
+                new ScriptedObject(new Pos(60, -86).multiply(16), ObjectBehaviour.ChangeScene, "assets/sodexo.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
+                new ScriptedObject(new Pos(61, -86).multiply(16), ObjectBehaviour.ChangeScene, "assets/sodexo.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
             );
             game.getCamera().cameraShake(500, 2, game);
         });

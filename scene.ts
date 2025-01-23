@@ -91,6 +91,10 @@ export class Scene {
         }
     }
 
+    removeScriptedObjectAtIndex(index: number) {
+        this.#scriptedObjectData.splice(index, 1);
+    }
+
     onLoad(game: Game, prevScene: Scene) {
         const tileSize = game.getScreen().tileSize;
         prevScene.onExit(game, this);

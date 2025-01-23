@@ -24,6 +24,7 @@ export default class Script implements SceneScript {
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(18, -7).multiply(16), ObjectBehaviour.Sign, "Trappor, förbjudet!", new Sprite("assets/saker.png", 7, 0, 10)),
             new ScriptedObject(new Pos(17, -8).multiply(16), ObjectBehaviour.Walkable, "ner", new Sprite("assets/dungeon.png", 0, 0, 10)),
+            new ScriptedObject(new Pos(17, -9).multiply(16), ObjectBehaviour.Walkable, "ner", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(5, -8).multiply(16), ObjectBehaviour.Interactable, "biblotek", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(6, -8).multiply(16), ObjectBehaviour.Interactable, "biblotek", new Sprite("assets/dungeon.png", 0, 0, 10)),
         );
@@ -49,7 +50,7 @@ export default class Script implements SceneScript {
                     return fadeIn(game, 1000);
                 }), (item, ctx) => { (item as AsyncCodeSequenceItem).run(); }),
                 new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
-                new SequenceItem(new TextAnimationNoInteract("*Medans du går ner snubblar du och faller ner för en brunn*", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
+                new SequenceItem(new TextAnimationNoInteract("*Medans du går ner snubblar du och faller ner för ett brunnslock i golvet*", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
                 new SequenceItem(new CodeSequenceItem(() => {
                     changeScene(game, "assets/dungeon.json");
                     fadeOut(game, 1000);
