@@ -30,6 +30,7 @@ export default class Script implements SceneScript {
         currentScene.registerBehaviour("ner", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
             if(hasWalkedDown) return;
             hasWalkedDown = true;
+            game.getAudioManager().pauseBackgroundMusic();
             let sequence = new Sequence([
                 new SequenceItem(new CodeSequenceItem(() => {
                     game.getPlayer().freezeMovment();
@@ -49,6 +50,7 @@ export default class Script implements SceneScript {
         });
 
         if(!game.getGameState().hasTalkedToTeacherRoomMartin){
+            game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/Underschool.wav")!);
             currentScene.getTile(new TileCoordinate(19, -6))?.setCollisonRule(CollisionRule.Solid);
             currentScene.getTile(new TileCoordinate(19, -7))?.getSprites().push(new Sprite("assets/people.png", 2, 0, 10));
             currentScene.getTile(new TileCoordinate(19, -6))?.getSprites().push(new Sprite("assets/people.png", 2, 1, 10));

@@ -86,6 +86,10 @@ export default class Script implements SceneScript {
             })
         })
 
+        this.#buttons.forEach(button => {
+            setButtonPressed(currentScene, button.pos.divide(16).floor().toTileCoordinate(), false);
+        })
+
         if(!game.getGameState().hasSolvedIcePuzzle) {
             currentScene.getTile(new TileCoordinate(91, -2))!.setCollisonRule(CollisionRule.Solid);
             currentScene.getTile(new TileCoordinate(92, -2))!.setCollisonRule(CollisionRule.Solid);
@@ -123,7 +127,7 @@ export default class Script implements SceneScript {
                 }), (item, ctx) => {
                     (item as CodeSequenceItem).run();
                 }),
-                new SequenceItem(new TextAnimationNoInteract("Vid berget där man halka, en öppning börja nalka(s)", 1000, 1000), (item, ctx) => {
+                new SequenceItem(new TextAnimationNoInteract("Vid berget där man halka, en öppning börja nalka(s)", 1000, 2500), (item, ctx) => {
                     (item as TextAnimationNoInteract).render(ctx, game);
                 }),
                 new SequenceItem(new CodeSequenceItem(() => {

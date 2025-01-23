@@ -195,6 +195,8 @@ export class Battle extends SequenceCallback {
         this.#heart.unfreezeMovment()
         if(this.#currentRound === 0) {
             this.nextRound()
+            this.getHeart().getPos().x = 50
+            this.getHeart().getPos().y = 50
         }
     }
 }

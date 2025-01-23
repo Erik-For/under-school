@@ -19,6 +19,9 @@ export default class Script implements SceneScript {
                 break;
         }
 
+        game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/Unknown.wav")!);
+        game.getCamera().toggleRippleEffect();
+
         if(prevScene.getScriptName() == "snow3.js"){
             let sequence = new Sequence([
                 new SequenceItem(
@@ -37,7 +40,7 @@ export default class Script implements SceneScript {
                     }    
                 ),
                 new SequenceItem(
-                    new TextAnimationNoInteract("Det luktar ruttet i hela lokalen...", 1000, 1000),
+                    new TextAnimationNoInteract("Det luktar ruttet i hela lokalen...", 1000, 2000),
                     (item, ctx) => {
                         (item as TextAnimationNoInteract).render(ctx, game);
                     }
@@ -52,9 +55,7 @@ export default class Script implements SceneScript {
                     }
                 )
             ]);
-            
-            await fadeOut(game, 4000);
-            //game.getSequenceExecutor().setSequence(sequence);
+            game.getSequenceExecutor().setSequence(sequence);
         }
         currentScene.addManyScriptedObjects(
             ...ScriptedObject.constructFamily(3, (i) => new ScriptedObject(new Pos(24-i,69).multiply(16), ObjectBehaviour.ConveyorBelt, "l", new Sprite("assets/saker.png", 3, 0, 0))),
@@ -116,7 +117,6 @@ export default class Script implements SceneScript {
     };
 
     onExit(game: Game, currentScene: Scene) {
-
     };
 
 

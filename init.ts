@@ -49,7 +49,13 @@ const assetLoader = new AssetLoader(
         new AudioAsset("assets/DaftPunkalovania.mp3"),
         new AudioAsset("assets/Whispersofsnow.wav"),
         new AudioAsset("assets/clank1.wav"),
-        new AudioAsset("assets/drippin_cave.mp3")
+        new AudioAsset("assets/drippin_cave.wav"),
+        new AudioAsset("assets/Unknown.wav"),
+        new AudioAsset("assets/Underschool.wav"),
+        new AudioAsset("assets/slappin_bass.wav"),
+        new AudioAsset("assets/intro.wav"),
+
+
 
     ],
     async () => {

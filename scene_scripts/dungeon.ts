@@ -94,7 +94,7 @@ export default class Script implements SceneScript {
             }
         })
         currentScene.addManyScriptedObjects(...this.#buttons)
-        game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/drippin_cave.mp3")!);
+        game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/drippin_cave.wav")!);
     };
 
     onExit(game: Game, currentScene: Scene) {
