@@ -96,6 +96,7 @@ export class Battle extends SequenceCallback {
             this.#game.getInputHandler().allowInteraction();
             this.#game.getBattle()?.deactivate();
             this.#game.getSequenceExecutor().setSequence(new Sequence([]));
+            this.#game.getAudioManager().pauseBackgroundMusic();
             this.onFinish();
         }
     }

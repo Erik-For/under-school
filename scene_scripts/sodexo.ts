@@ -101,6 +101,11 @@ export default class Script implements SceneScript {
                 new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => {
                     (item as WaitSequenceItem).run();
                 }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/DaftPunkalovania.mp3")!)
+                }), (item, ctx) => {
+                    (item as CodeSequenceItem).run();
+                }),
                 new SequenceItem(game.getBattle()!, (item, ctx) => {
                     game.setMode(Mode.Battle);
                     (item as Battle).activate();
