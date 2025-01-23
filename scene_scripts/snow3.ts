@@ -67,14 +67,14 @@ export default class Script implements SceneScript {
         }
 
         currentScene.registerBehaviour("tree", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
-            currentScene.getTile(new TileCoordinate(60, -86))?.setCollisonRule(CollisionRule.None);
-            currentScene.getTile(new TileCoordinate(60, - 86))?.getSprites().pop();
+            currentScene.getTile(new TileCoordinate(60, -87))?.setCollisonRule(CollisionRule.None);
+            currentScene.getTile(new TileCoordinate(60, - 87))?.getSprites().pop();
             currentScene.getTile(new TileCoordinate(60, - 87))?.getSprites().push(new Sprite("assets/sodexo.png", 5, 2, 0));     
             currentScene.getTile(new TileCoordinate(60, -86))?.setCollisonRule(CollisionRule.None);
             currentScene.getTile(new TileCoordinate(60, - 86))?.getSprites().pop();
             currentScene.getTile(new TileCoordinate(60, - 86))?.getSprites().push(new Sprite("assets/sodexo.png", 5, 3, 0)); 
-            currentScene.getTile(new TileCoordinate(61, -86))?.setCollisonRule(CollisionRule.None);
-            currentScene.getTile(new TileCoordinate(61, - 86))?.getSprites().pop();
+            currentScene.getTile(new TileCoordinate(61, -87))?.setCollisonRule(CollisionRule.None);
+            currentScene.getTile(new TileCoordinate(61, - 87))?.getSprites().pop();
             currentScene.getTile(new TileCoordinate(61, - 87))?.getSprites().push(new Sprite("assets/sodexo.png", 6, 2, 0));     
             currentScene.getTile(new TileCoordinate(61, -86))?.setCollisonRule(CollisionRule.None);
             currentScene.getTile(new TileCoordinate(61, - 86))?.getSprites().pop();

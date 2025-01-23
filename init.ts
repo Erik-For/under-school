@@ -40,6 +40,7 @@ const assetLoader = new AssetLoader(
         new TextAsset("assets/snow3.json"),
         new TextAsset("assets/test1.json"),
         new TextAsset("assets/teknik.json"),
+        new TextAsset("assets/sodexo.json"),
         new AudioAsset("assets/bg.mp3"),
         new AudioAsset("assets/beep.wav"),
     ],
