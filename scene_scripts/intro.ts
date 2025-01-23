@@ -16,16 +16,15 @@ export default class Script implements SceneScript {
             case "teknik.js":
                 game.getPlayer().setPos(new Pos(26.5, -3).multiply(16));
                 break;
+            default:
+                game.getPlayer().setPos(new Pos(5, -4));
+                break;
         }
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(-2, -7).multiply(16), ObjectBehaviour.Sign, "GOLI WAS HERE!!!!!!!!!!!!!!", new Sprite("assets/saker.png", 6, 0, 0)),
             new ScriptedObject(new Pos(27, -3).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/teknik.png", 0, 0, 0)),
             new ScriptedObject(new Pos(27, -4).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/teknik.png", 0, 0, 0))
         );
-    
-        if(prevScene.getScriptName() === "mainmenu.js"){
-            goliCutScene(game, currentScene);
-        }
 
         await fadeOut(game, 5000);
     };

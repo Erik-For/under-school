@@ -1,51 +1,126 @@
-import { BigSprite, NPCTextAnimation } from "../animate.js";
+const martin = {
+    bigsprite: new BigSprite (
+        new Sprite("assets/faces.png", 4, 0, 0),
+        new Sprite("assets/faces.png", 5, 0, 0),
+        new Sprite("assets/faces.png", 4, 1, 0),
+        new Sprite("assets/faces.png", 5, 1, 0),
+    )
+}
+
+const johannes = {
+    bigsprite: new BigSprite (
+        new Sprite("assets/faces.png", 16, 0, 0),
+        new Sprite("assets/faces.png", 17, 0, 0),
+        new Sprite("assets/faces.png", 16, 1, 0),
+        new Sprite("assets/faces.png", 17, 1, 0),
+    )
+}
+const jens = {
+    bigsprite: new BigSprite (
+        new Sprite("assets/faces.png", 24, 0, 0),
+        new Sprite("assets/faces.png", 25, 0, 0),
+        new Sprite("assets/faces.png", 24, 1, 0),
+        new Sprite("assets/faces.png", 25, 1, 0),
+    )
+}
+
+const tom = {
+    bigsprite: new BigSprite (
+        new Sprite("assets/faces.png", 20, 0, 0),
+        new Sprite("assets/faces.png", 21, 0, 0),
+        new Sprite("assets/faces.png", 20, 1, 0),
+        new Sprite("assets/faces.png", 21, 1, 0),
+    )
+}
+
+import { BigSprite, NPCTextAnimation, TextAnimation } from "../animate.js";
 import { Game, Pos } from "../game.js";
-import { fadeOut, ObjectBehaviour, Scene, SceneScript, ScriptedObject, TileCoordinate } from "../scene.js";
+import { fadeIn, fadeOut, ObjectBehaviour, Scene, SceneScript, ScriptedObject, Tile, TileCoordinate } from "../scene.js";
 import { CodeSequenceItem, Sequence, SequenceItem, WaitSequenceItem } from "../sequence.js";
 import { Sprite } from "../sprite.js";
 
 export default class Script implements SceneScript {
     name: string = "teknik.js";
     async onEnter(prevScene: Scene, game: Game, currentScene: Scene){
+        console.log(prevScene.getScriptName());
+        
         switch(prevScene.getScriptName()){
             case "intro.js":
-                if(game.getGameState().hasPlayedJohannesLektionCutScene) break;
-                game.getPlayer().setPos(new Pos(-1, -6).multiply(16)); // byt ut kordinaterna
+                if(!game.getGameState().hasPlayedJohannesLektionCutScene) break;
+                game.getPlayer().setPos(new Pos(5, 4).multiply(16));
+                game.getPlayer().setDirection("up");
+                console.log(`Player position set to: ${game.getPlayer().getPos().x}, ${game.getPlayer().getPos().y}`);
+                break;
+            default: 
+                game.getPlayer().setPos(new Pos(5, -4).multiply(16));
+                console.log(`Player position set to: ${game.getPlayer().getPos().x}, ${game.getPlayer().getPos().y}`);
                 break;
             
         }
-
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(4, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/intro.json", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(5, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/intro.json", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(-9, -24).multiply(16), ObjectBehaviour.Interactable, "locked", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(-12, -24).multiply(16), ObjectBehaviour.Interactable, "locked", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(-6, -24).multiply(16), ObjectBehaviour.Interactable, "teacher", new Sprite("assets/saker.png", 8, 0, 0)),
         );
 
-        const johannes = {
-            bigsprite: new BigSprite (
-                new Sprite("assets/faces.png", 16, 0, 0),
-                new Sprite("assets/faces.png", 17, 0, 0),
-                new Sprite("assets/faces.png", 16, 1, 0),
-                new Sprite("assets/faces.png", 17, 1, 0),
-            )
-        }
-        const jens = {
-            bigsprite: new BigSprite (
-                new Sprite("assets/faces.png", 24, 0, 0),
-                new Sprite("assets/faces.png", 25, 0, 0),
-                new Sprite("assets/faces.png", 24, 1, 0),
-                new Sprite("assets/faces.png", 25, 1, 0),
-            )
-        }
+        currentScene.registerBehaviour("locked", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new TextAnimation("*Dörren är låst*", 1500, game.getInputHandler()), (item, ctx) => { (item as TextAnimation).render(ctx, game); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+        });
 
-        const tom = {
-            bigsprite: new BigSprite (
-                new Sprite("assets/faces.png", 20, 0, 0),
-                new Sprite("assets/faces.png", 21, 0, 0),
-                new Sprite("assets/faces.png", 20, 1, 0),
-                new Sprite("assets/faces.png", 21, 1, 0),
-            )
-        }
+        currentScene.registerBehaviour("teacher", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            if(!game.getGameState().hasTalkedToTeacherRoomMartin && game.getGameState().hasPlayedJohannesLektionCutScene){
+                let sequence = new Sequence([
+                    new SequenceItem(new CodeSequenceItem(async () => {
+                        game.getPlayer().freezeMovment();
+                        game.getInputHandler().preventInteraction();
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                    new SequenceItem(new CodeSequenceItem(async () => {
+                        let bottom = currentScene.getTile(new TileCoordinate(-6, -24));
+                        let top = currentScene.getTile(new TileCoordinate(-6, -25));
+                        game.getPlayer().setPos(new TileCoordinate(-5.5, -21.5).toPos(16)); 
+                        bottom!.getSprites().length = 0;
+                        top!.getSprites().length = 0;
+                        bottom?.getSprites().push(new Sprite("assets/teknik.png", 1, 4, 0));
+                        top?.getSprites().push(new Sprite("assets/teknik.png", 1, 4, 0));
 
+                        top?.getSprites().push(new Sprite("assets/people.png", 3, 0, 2));
+                        bottom?.getSprites().push(new Sprite("assets/people.png", 3, 1, 2));
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                    new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Hej, jag är din mentor Martin, kom in", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new CodeSequenceItem(() => {
+                        game.getPlayer().unfreezeMovment();
+                        game.getInputHandler().allowInteraction();
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                ]);
+                game.getSequenceExecutor().setSequence(sequence);
+            } else {
+                let sequence = new Sequence([
+                    new SequenceItem(new CodeSequenceItem(() => {
+                        game.getPlayer().freezeMovment();
+                        game.getInputHandler().preventInteraction();
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                    new SequenceItem(new TextAnimation("*Dörren är låst*", 1500, game.getInputHandler()), (item, ctx) => { (item as TextAnimation).render(ctx, game); }),
+                    new SequenceItem(new CodeSequenceItem(() => {
+                        game.getPlayer().unfreezeMovment();
+                        game.getInputHandler().allowInteraction();
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                ]);
+                game.getSequenceExecutor().setSequence(sequence);
+            }
+        });
 
 
         if(true){ // möjlighet för att ändra lite vad man göra beroende på vart man är i spelet
@@ -54,6 +129,15 @@ export default class Script implements SceneScript {
                 new ScriptedObject(new Pos(7, -11).multiply(16), ObjectBehaviour.Interactable, "johannes", new Sprite("assets/saker.png", 8, 0, 0)),
                 new ScriptedObject(new Pos(4, -13).multiply(16), ObjectBehaviour.Interactable, "jens", new Sprite("assets/saker.png", 8, 0, 0)),
                 new ScriptedObject(new Pos(4, -10).multiply(16), ObjectBehaviour.Interactable, "tom", new Sprite("assets/saker.png", 8, 0, 0)),
+                new ScriptedObject(new Pos(2, -13).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
+                new ScriptedObject(new Pos(2, -14).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
+                new ScriptedObject(new Pos(-1, -13).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
+                new ScriptedObject(new Pos(-1, -14).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
+                new ScriptedObject(new Pos(-4, -13).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
+                new ScriptedObject(new Pos(-1, -10).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
+                new ScriptedObject(new Pos(-1, -11).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
+                new ScriptedObject(new Pos(2, -10).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
+                new ScriptedObject(new Pos(2, -11).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
             );
 
             currentScene.registerBehaviour("johannes", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
@@ -62,7 +146,8 @@ export default class Script implements SceneScript {
                         game.getPlayer().freezeMovment();
                         game.getInputHandler().preventInteraction();
                     }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
-                    new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Hej, du är nya elever, vad heter du?", 1500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Hej, din mentor Martin har en skoldator för dig", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Martin är i lärarrummet, det hittar du genom att gå höger ur klassrummet sedan rakt fram en bit och lärarrummet ligger bakom dörren längst till höger", 5000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new CodeSequenceItem(() => {
                         game.getPlayer().unfreezeMovment();
                         game.getInputHandler().allowInteraction();
@@ -105,7 +190,21 @@ export default class Script implements SceneScript {
                 game.getSequenceExecutor().setSequence(sequence);	
             });
         }
-        console.log(game.getGameState().hasPlayedJohannesLektionCutScene);
+
+        currentScene.registerBehaviour("other", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new TextAnimation("Låt mig räkna matte ifred", 1500, game.getInputHandler()), (item, ctx) => { (item as TextAnimation).render(ctx, game); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+        });
         
         if(!game.getGameState().hasPlayedJohannesLektionCutScene){ 
             game.getGameState().hasPlayedJohannesLektionCutScene = true;

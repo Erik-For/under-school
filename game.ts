@@ -527,8 +527,10 @@ function calculateNewPosition(currentPos: Pos, direction: string, range: number)
 
 export class GameState {
     hasPlayedJohannesLektionCutScene: boolean;
+    hasTalkedToTeacherRoomMartin: boolean;
 
     constructor(){
         this.hasPlayedJohannesLektionCutScene = false;
+        this.hasTalkedToTeacherRoomMartin = false;
     }
 }
