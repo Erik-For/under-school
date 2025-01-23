@@ -153,7 +153,7 @@ export default class Script implements SceneScript {
 
 
         if(!game.getGameState().hasPlayedJohannesLektionCutScene){ // möjlighet för att ändra lite vad man göra beroende på vart man är i spelet
-            game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/intro.wav")!);
+            game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/Intro.wav")!);
             game.getGameState().hasPlayedJohannesLektionCutScene = true;
             game.getPlayer().freezeMovment();
             game.getPlayer().setDirection("right");

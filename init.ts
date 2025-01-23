@@ -53,7 +53,7 @@ const assetLoader = new AssetLoader(
         new AudioAsset("assets/Unknown.wav"),
         new AudioAsset("assets/Underschool.wav"),
         new AudioAsset("assets/slappin_bass.wav"),
-        new AudioAsset("assets/intro.wav"),
+        new AudioAsset("assets/Intro.wav"),
 
 
 
