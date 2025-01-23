@@ -3,7 +3,7 @@ import { InputHandler } from "./input.js";
 import { Player } from "./player.js";
 import { ObjectBehaviour, Scene, Tile, TileCoordinate, executeBehaviour, fadeOut } from "./scene.js";
 import { AssetLoader, AudioAsset } from "./assetloader.js";
-import { Sequence, SequenceExecutor, SequenceItem } from "./sequence.js";
+import { Sequence, SequenceExecutor, SequenceItem, WaitSequenceItem } from "./sequence.js";
 import * as Util from "./util.js";
 import { Battle, Enemy, HomingProjectile, LoopingHomingProjectile, Round, StraightProjectile } from "./battle.js";
 import Keys from "./keys.js";
@@ -70,14 +70,25 @@ export class Game {
             new Sprite("assets/faces.png", 27, 0, 0),
             new Sprite("assets/faces.png", 26, 1, 0),
             new Sprite("assets/faces.png", 27, 1, 0)
-        )), [new Round(new Sequence([]), projectiles), new Round(new Sequence([
-            new SequenceItem(
-                new TextAnimationNoInteract("Du kommer bli mat för min köttfärssås hahahahhahaha", 1000*1, 1000*2),
-                (item, ctx) => {
-                    (item as TextAnimation).render(ctx, this);
-                }
-            )
-        ]),[new LoopingHomingProjectile(new Pos(50, 50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.25)]), new Round(new Sequence([]), projectiles2), new Round(new Sequence([]), projectiles3), new Round(new Sequence([]), projectiles4), new Round(new Sequence([]), projectiles5), new Round(new Sequence([]), projectiles6)]);
+        )), [new Round(new Sequence([
+            new SequenceItem(new TextAnimationNoInteract( "Du kommer bli mat för min köttfärssås hahahahhahaha", 1000, 1000), (item, ctx) => {
+                (item as TextAnimation).render(ctx, this);
+            })
+        ]), projectiles), new Round(new Sequence([
+            new SequenceItem(new TextAnimationNoInteract("Varför försöker du ens?", 1000*1, 1000*2), (item, ctx) => {
+                (item as TextAnimation).render(ctx, this);
+            }),
+            new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => {
+                (item as WaitSequenceItem).run();
+            })
+        ]),[new LoopingHomingProjectile(new Pos(50, 50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.25)]), new Round(new Sequence([]), projectiles2), new Round(new Sequence([]), projectiles3), new Round(new Sequence([]), projectiles4), new Round(new Sequence([]), projectiles5), new Round(new Sequence([
+            new SequenceItem(new TextAnimationNoInteract("Hur kunde du överleva min köttfärssås?", 1500, 1000*2), (item, ctx) => {
+                (item as TextAnimation).render(ctx, this);
+            }),
+            new SequenceItem(new TextAnimationNoInteract("Nej!!!!!!!!!!!!!!!!!", 1500, 1000*2), (item, ctx) => {
+                (item as TextAnimation).render(ctx, this);
+            }),
+        ]), projectiles6)]);
         
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
@@ -543,11 +554,13 @@ export class GameState {
     hasTalkedToTeacherRoomMartin: boolean;
     hasSolvedIcePuzzle: boolean;
     hasReadExplosiveSign: boolean;
+    hasStartedBattle: boolean;
 
     constructor(){
         this.hasPlayedJohannesLektionCutScene = false;
         this.hasTalkedToTeacherRoomMartin = false;
         this.hasSolvedIcePuzzle = false;
         this.hasReadExplosiveSign = false;
+        this.hasStartedBattle = false;
     }
 }
