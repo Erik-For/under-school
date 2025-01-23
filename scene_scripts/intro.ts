@@ -23,8 +23,17 @@ export default class Script implements SceneScript {
 
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(18, -7).multiply(16), ObjectBehaviour.Sign, "Trappor, förbjudet!", new Sprite("assets/saker.png", 7, 0, 10)),
-            new ScriptedObject(new Pos(17, -8).multiply(16), ObjectBehaviour.Walkable, "ner", new Sprite("assets/dungeon.png", 0, 0, 10))
+            new ScriptedObject(new Pos(17, -8).multiply(16), ObjectBehaviour.Walkable, "ner", new Sprite("assets/dungeon.png", 0, 0, 10)),
+            new ScriptedObject(new Pos(5, -8).multiply(16), ObjectBehaviour.Interactable, "biblotek", new Sprite("assets/dungeon.png", 0, 0, 10)),
+            new ScriptedObject(new Pos(6, -8).multiply(16), ObjectBehaviour.Interactable, "biblotek", new Sprite("assets/dungeon.png", 0, 0, 10)),
         );
+
+        currentScene.registerBehaviour("biblotek", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            let sequence = new Sequence([
+                new SequenceItem(new TextAnimationNoInteract("Bibloteket är stängt, kom tillbaka senare!", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+        });
 
         let hasWalkedDown = false;
         currentScene.registerBehaviour("ner", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {

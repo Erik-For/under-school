@@ -114,6 +114,7 @@ export default class Script implements SceneScript {
                     new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Hej, välkommen till teknikhallen, jag heter Martin och jag är din mentor.", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Jag har en skoldator för dig, om du har några problem med att logga in så kan du fråga Göran", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Klassen borde ha gått på lunch nu, gå ut ur teknikhallen där borde du hitta Tom och Jens, de kan hjälpa dig hitta till lunchen", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Gå inte under några omständigheter ner för trappoorna utanför teknikhallen, det är förbjudet!", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new CodeSequenceItem(() => {
                         removePeople(game, currentScene);
                         game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/slappin_bass.wav")!);
