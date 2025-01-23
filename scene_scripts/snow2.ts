@@ -47,9 +47,9 @@ export default class Script implements SceneScript {
             let ans = ""
             this.#buttons.forEach(button => {
                 if(isButtonPressed(currentScene, button.pos.divide(16).floor().toTileCoordinate())) {
-                    ans += "1"
-                } else {
                     ans += "0"
+                } else {
+                    ans += "1"
                 }
             })
             console.log(ans);
