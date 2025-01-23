@@ -32,6 +32,7 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/ingang.png", 16),
         new Sprites.SpriteSheet("assets/dungeon.png", 16),
         new Sprites.SpriteSheet("assets/snowset.png", 16),
+        new Sprites.SpriteSheet("assets/sodexo.png", 16),
         new TextAsset("assets/intro.json"),
         new TextAsset("assets/dungeon.json"),
         new TextAsset("assets/snow1.json"),
