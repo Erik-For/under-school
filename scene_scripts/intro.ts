@@ -39,7 +39,7 @@ export default class Script implements SceneScript {
                     return fadeIn(game, 1000);
                 }), (item, ctx) => { (item as AsyncCodeSequenceItem).run(); }),
                 new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
-                new SequenceItem(new TextAnimationNoInteract("*Medans du går ner snubblar du och faller ner i en golvbrun*", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
+                new SequenceItem(new TextAnimationNoInteract("*Medans du går ner snubblar du och faller ner för en brunn*", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
                 new SequenceItem(new CodeSequenceItem(() => {
                     changeScene(game, "assets/dungeon.json");
                     fadeOut(game, 1000);

@@ -1,5 +1,5 @@
 import { TileCoordinate } from "./scene.js";
-import { Pos } from "./game.js";
+import { Game, Pos } from "./game.js";
 
 export class Camera {
     #x: number;
@@ -72,7 +72,7 @@ export class Camera {
      * Shakes the camera in a random pattern along the unit circle multiplied with the specified amplitude for the specified duration measured in ms.
      * 
      */
-    cameraShake(duration: number, amplitude: number): void {
+    cameraShake(duration: number, amplitude: number, game:Game): void {
         let shakeInterval = setInterval(() => {
             const angle = 2 * Math.PI * Math.random();
             this.#shakeOffsetX = amplitude * Math.cos(angle);
@@ -82,6 +82,8 @@ export class Camera {
         setTimeout(() => {
             clearInterval(shakeInterval);
         }, duration)
+
+        game.getAudioManager().playSoundEffect(game.getAssetLoader().getAudioAsset("assets/rumble.wav")!);
     }
 
     toggleRippleEffect(): void {

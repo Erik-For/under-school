@@ -44,6 +44,8 @@ const assetLoader = new AssetLoader(
         new TextAsset("assets/cred.json"),
         new AudioAsset("assets/bg.mp3"),
         new AudioAsset("assets/beep.wav"),
+        new AudioAsset("assets/rumble.wav"),
+        new AudioAsset("assets/textblip.mp3"),
     ],
     async () => {
         // remove loading screen
