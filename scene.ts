@@ -405,9 +405,6 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
         if (tile) {
             // Find the button sprite in the tile's sprites
             let buttonObject = currentScene.getScriptedObjects().find(obj => {
-                console.log(obj.pos.divide(16).floor());
-                console.log(pos.divide(16).floor());
-                
                 return obj.sprite.spriteSheetSrc === "assets/dungeon.png" && 
                 obj.sprite.yOffset === 1 && 
                 (obj.sprite.xOffset === 0 || obj.sprite.xOffset === 2) &&
@@ -437,6 +434,12 @@ export function isButtonPressed(currentScene: Scene, pos: TileCoordinate): boole
     return currentScene.getScriptedObjects().some(obj => { 
         return obj.pos.divide(16).equals(pos.toPos(1)) && obj.sprite.xOffset === 0 && obj.sprite.yOffset === 1 && obj.sprite.spriteSheetSrc === "assets/dungeon.png";
     });
+}
+
+export function setButtonPressed(currentScene: Scene, pos: TileCoordinate, pressed: boolean): void {
+    currentScene.getScriptedObjects().find(obj => {        
+        return obj.pos.divide(16).equals(pos.toPos(1)) && (obj.sprite.xOffset === 0 || obj.sprite.xOffset === 2) && obj.sprite.yOffset === 1 && obj.sprite.spriteSheetSrc === "assets/dungeon.png";
+    })!.sprite.xOffset = pressed ? 2 : 0;
 }
 
 /**

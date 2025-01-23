@@ -42,18 +42,15 @@ import { Sprite } from "../sprite.js";
 export default class Script implements SceneScript {
     name: string = "teknik.js";
     async onEnter(prevScene: Scene, game: Game, currentScene: Scene){
-        console.log(prevScene.getScriptName());
         
         switch(prevScene.getScriptName()){
             case "intro.js":
                 if(!game.getGameState().hasPlayedJohannesLektionCutScene) break;
                 game.getPlayer().setPos(new Pos(5, 4).multiply(16));
                 game.getPlayer().setDirection("up");
-                console.log(`Player position set to: ${game.getPlayer().getPos().x}, ${game.getPlayer().getPos().y}`);
                 break;
             default: 
                 game.getPlayer().setPos(new Pos(5, -4).multiply(16));
-                console.log(`Player position set to: ${game.getPlayer().getPos().x}, ${game.getPlayer().getPos().y}`);
                 break;
             
         }

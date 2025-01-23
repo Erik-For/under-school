@@ -311,12 +311,10 @@ export class HomingProjectile extends Projectile {
     update(battle: Battle): void {
         const turnRate: number = 0.5;
         const alpha = (Math.atan2(battle.getHeart().getPos().y - this.pos.y, battle.getHeart().getPos().x - this.pos.x));
-        console.log(alpha);
         
         let turnDirection: number = Math.sign((alpha + Math.PI/2) - this.rotation);
         
         this.rotation += turnRate * turnDirection;
-        console.log(Math.abs(alpha));
         
         if(Math.abs(alpha) > Math.PI/2 * 0.6) {
             turnDirection = this.#lastDirection;

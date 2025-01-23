@@ -9,11 +9,19 @@ export default class Script implements SceneScript {
     name: string = "snow3.js";
 
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
+
+        switch(prevScene.getScriptName()){
+            default:
+            case "snow2.js":
+                game.getPlayer().setPos(new Pos(34, -30).multiply(16));
+                game.getPlayer().setDirection("down");
+                break;
+        }
+
         currentScene.addManyScriptedObjects(
             //man ska kunna prata med kim på berget nere, samma pos som i snow2 fast nu npc med dialog
         );
 
-        game.getPlayer().setPos(new Pos(34, -30).multiply(16));
     };
 
     onExit(game: Game, currentScene: Scene) {

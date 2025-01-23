@@ -84,7 +84,6 @@ export class Animation extends SequenceCallback {
 
 
         const frameIndex = Math.floor((Date.now() - this.#startTime) / this.#duration * this.#frames.length);
-        console.log(frameIndex);
         
         let sprite = this.#frames[frameIndex];
         ctx.drawImage(assetLoader.getSpriteSheet(sprite.spriteSheetSrc)!.getSprite(sprite.xOffset, sprite.yOffset), x, y, width, height);
