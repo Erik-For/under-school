@@ -20,6 +20,17 @@ export default class Script implements SceneScript {
     ]
     
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
+        switch(prevScene.getScriptName()){
+            case "snow1.js":
+                game.getPlayer().setPos(new Pos(40.5, -36).multiply(16)); // byt ut kordinaterna
+                game.getPlayer().setDirection("down");
+                break;
+            default:
+                game.getPlayer().setPos(new Pos(40, -34).multiply(16));
+                break;
+            
+        }
+
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(39, -2).multiply(16), ObjectBehaviour.Sign, "I labyrinten ska du gå, följ stenarna för att målet nå", new Sprite("assets/saker.png", 6, 0, 0)),
             new ScriptedObject(new Pos(-4, -5).multiply(16), ObjectBehaviour.Sign, "I grottan du är, vilket misär", new Sprite("assets/saker.png", 7, 0, 0)),
@@ -36,7 +47,6 @@ export default class Script implements SceneScript {
             let ans = ""
             
             this.#buttons.forEach(button => {
-                console.log(button.pos.toTileCoordinate().x, button.pos.divide(16).floor().toTileCoordinate().y);
                 if(isButtonPressed(currentScene, button.pos.divide(16).floor().toTileCoordinate())) {
                     ans += "1"
                 } else {
@@ -44,23 +54,28 @@ export default class Script implements SceneScript {
                 }
             })
 
-            if(ans === "1011111111") {
+            if(ans === "1111011111") {
                 game.getCamera().cameraShake(500, 2);
                 currentScene.getTile(new TileCoordinate(40, -38))?.setCollisonRule(CollisionRule.None);
                 currentScene.getTile(new TileCoordinate(40, -38))?.getSprites().pop();
-                //currentScene.getTile(new TileCoordinate(40, -38))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
+                currentScene.getTile(new TileCoordinate(40, -38))?.getSprites().push(new Sprite("assets/dungeon.png", 4, 0, 0));
                 
                 currentScene.getTile(new TileCoordinate(41, -38))?.setCollisonRule(CollisionRule.None);
                 currentScene.getTile(new TileCoordinate(41, -38))?.getSprites().pop();
-                //currentScene.getTile(new TileCoordinate(41, -38))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
+                currentScene.getTile(new TileCoordinate(41, -38))?.getSprites().push(new Sprite("assets/dungeon.png", 4, 2, 0));
             
                 currentScene.getTile(new TileCoordinate(40, -37))?.setCollisonRule(CollisionRule.None);
                 currentScene.getTile(new TileCoordinate(40, -37))?.getSprites().pop();
-                //currentScene.getTile(new TileCoordinate(40, -37))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
+                currentScene.getTile(new TileCoordinate(40, -37))?.getSprites().push(new Sprite("assets/dungeon.png", 4, 1, 0));
                 
                 currentScene.getTile(new TileCoordinate(41, -37))?.setCollisonRule(CollisionRule.None);
                 currentScene.getTile(new TileCoordinate(41, -37))?.getSprites().pop();
-                //currentScene.getTile(new TileCoordinate(41, -37))?.getSprites().push(new Sprite("assets/dungeon.png", 0, 0, 0));
+                currentScene.getTile(new TileCoordinate(41, -37))?.getSprites().push(new Sprite("assets/dungeon.png", 4, 3, 0));
+
+                currentScene.addManyScriptedObjects(
+                    new ScriptedObject(new Pos(40, -37).multiply(16), ObjectBehaviour.ChangeScene, "assets/snow1.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
+                    new ScriptedObject(new Pos(41, -37).multiply(16), ObjectBehaviour.ChangeScene, "assets/snow1.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
+                )
             }
         })
         currentScene.addManyScriptedObjects(...this.#buttons)

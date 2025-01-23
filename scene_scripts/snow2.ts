@@ -11,11 +11,20 @@ export default class Script implements SceneScript {
 
     ]
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
+        switch(prevScene.getScriptName()){
+            default:
+            case "snow1.js":
+                game.getPlayer().setPos(new Pos(-3.5, -1.5).multiply(16));
+                game.getPlayer().setDirection("right");
+                break;
+        }
+
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(6, -10).multiply(16), ObjectBehaviour.Sign, "^ Norra Bergstoppen ^", new Sprite("assets/saker.png", 6, 0, 0)),
             new ScriptedObject(new Pos(30, -6).multiply(16), ObjectBehaviour.Sign, "Varning för halka", new Sprite("assets/saker.png", 7, 0, 0)),
             new ScriptedObject(new Pos(88, -5).multiply(16), ObjectBehaviour.Sign, "Börja här: Ö Ö N V N V S Ö S", new Sprite("assets/saker.png", 6, 0, 0)),
             new ScriptedObject(new Pos(92, 25).multiply(16), ObjectBehaviour.Sign, "Vid berget där man halka, en öppning börja nalka(s)", new Sprite("assets/saker.png", 6, 0, 0)),
+            new ScriptedObject(new Pos(9, -38).multiply(16), ObjectBehaviour.Sign, "Utkiksplats ", new Sprite("assets/saker.png", 6, 0, 0)),
         );
     };
 

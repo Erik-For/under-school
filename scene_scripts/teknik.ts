@@ -222,7 +222,6 @@ export default class Script implements SceneScript {
                     game.getPlayer().setDirection("right");
                     game.getInputHandler().preventInteraction();
                     game.getPlayer().setPos(new Pos(4.5, -6.5).multiply(16));
-                    game.getPlayer().setDirection("right");
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                 new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Hej allihopa, för er som är nya så heter jag Johannes.", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
