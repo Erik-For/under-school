@@ -414,6 +414,7 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
             );
 
             if (buttonObject) {
+                game.getAudioManager().playSoundEffect(game.getAssetLoader().getAudioAsset("assets/clank1.wav")!);
                 if (buttonObject.sprite.xOffset === 2) {
                     buttonObject.sprite.xOffset = 0;
                     currentScene.getBehaviour(data)?.(game, currentScene, pos, "off");

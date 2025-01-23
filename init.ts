@@ -47,6 +47,8 @@ const assetLoader = new AssetLoader(
         new AudioAsset("assets/rumble.wav"),
         new AudioAsset("assets/textblip.mp3"),
         new AudioAsset("assets/DaftPunkalovania.mp3"),
+        new AudioAsset("assets/clank1.wav"),
+
     ],
     async () => {
         // remove loading screen
