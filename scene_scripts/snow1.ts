@@ -61,6 +61,8 @@ export default class Script implements SceneScript {
             new ScriptedObject(new Pos(-1, -6).multiply(16), ObjectBehaviour.Sign, "Dörren är låst...", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-2, 7).multiply(16), ObjectBehaviour.ChangeScene, "assets/snow2.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
         );
+
+        game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/Whispersofsnow.wav")!);
     };
 
     onExit(game: Game, currentScene: Scene) {
