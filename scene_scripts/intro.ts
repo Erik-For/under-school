@@ -1,6 +1,6 @@
-import { BigSprite, NPCTextAnimation } from "../animate.js";
+import { BigSprite, NPCTextAnimation, TextAnimation, TextAnimationNoInteract } from "../animate.js";
 import { Game, Particle, Pos } from "../game.js";
-import { CollisionRule, fadeIn, fadeOut, ObjectBehaviour, Scene, SceneScript, ScriptedObject, TileCoordinate } from "../scene.js";
+import { changeScene, CollisionRule, fadeIn, fadeOut, ObjectBehaviour, Scene, SceneScript, ScriptedObject, TileCoordinate } from "../scene.js";
 import { AsyncCodeSequenceItem, CodeSequenceItem, Sequence, SequenceItem, WaitSequenceItem } from "../sequence.js";
 import { Sprite } from "../sprite.js";
 
@@ -17,8 +17,94 @@ export default class Script implements SceneScript {
                 game.getPlayer().setPos(new Pos(26.5, -3).multiply(16));
                 break;
             default:
-                game.getPlayer().setPos(new Pos(5, -4));
+                game.getPlayer().setPos(new Pos(14, -3));
                 break;
+        }
+
+        currentScene.addManyScriptedObjects(
+            new ScriptedObject(new Pos(18, -7).multiply(16), ObjectBehaviour.Sign, "Trappor, förbjudet!", new Sprite("assets/saker.png", 7, 0, 10)),
+            new ScriptedObject(new Pos(17, -8).multiply(16), ObjectBehaviour.Walkable, "ner", new Sprite("assets/dungeon.png", 0, 0, 10))
+        );
+
+        let hasWalkedDown = false;
+        currentScene.registerBehaviour("ner", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            if(hasWalkedDown) return;
+            hasWalkedDown = true;
+            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new AsyncCodeSequenceItem(() => {
+                    return fadeIn(game, 1000);
+                }), (item, ctx) => { (item as AsyncCodeSequenceItem).run(); }),
+                new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
+                new SequenceItem(new TextAnimationNoInteract("*Medans du går ner snubblar du och faller ner i en golvbrun*", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    changeScene(game, "assets/dungeon.json");
+                    fadeOut(game, 1000);
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+        });
+
+        if(!game.getGameState().hasTalkedToTeacherRoomMartin){
+            currentScene.getTile(new TileCoordinate(19, -6))?.setCollisonRule(CollisionRule.Solid);
+            currentScene.getTile(new TileCoordinate(19, -7))?.getSprites().push(new Sprite("assets/people.png", 2, 0, 10));
+            currentScene.getTile(new TileCoordinate(19, -6))?.getSprites().push(new Sprite("assets/people.png", 2, 1, 10));
+         
+            currentScene.addScriptedObject(new ScriptedObject(new Pos(19, -6).multiply(16), ObjectBehaviour.Interactable, "holgros", new Sprite("assets/dungeon.png", 0, 0, 10)));
+
+            let holger = {
+                bigsprite: new BigSprite(
+                    new Sprite("assets/faces.png", 14, 0, 0),
+                    new Sprite("assets/faces.png", 13, 0, 0),
+                    new Sprite("assets/faces.png", 14, 1, 0),
+                    new Sprite("assets/faces.png", 13, 1, 0),
+                )
+            }
+
+            currentScene.registerBehaviour("holgros", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+                let sequence = new Sequence([
+                    new SequenceItem(new CodeSequenceItem(() => {
+                        game.getPlayer().freezeMovment();
+                        game.getInputHandler().preventInteraction();
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                    new SequenceItem(new NPCTextAnimation(holger.bigsprite, "Hej, jag heter Holger jag är lärare på teknikprogrammet", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(holger.bigsprite, "Ingen får gå ned för dessa trappor, det är förbjudet!", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new CodeSequenceItem(() => {
+                        game.getPlayer().unfreezeMovment();
+                        game.getInputHandler().allowInteraction();
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                ]);
+                game.getSequenceExecutor().setSequence(sequence);
+            });
+        } else {
+            // -24, -11, -12
+            currentScene.getTile(new TileCoordinate(24, -12))?.getSprites().push(new Sprite("assets/people.png", 6, 0, 10));
+            currentScene.getTile(new TileCoordinate(24, -11))?.getSprites().push(new Sprite("assets/people.png", 6, 1, 10));
+            currentScene.getTile(new TileCoordinate(25, -12))?.getSprites().push(new Sprite("assets/people.png", 5, 0, 10));
+            currentScene.getTile(new TileCoordinate(25, -11))?.getSprites().push(new Sprite("assets/people.png", 5, 1, 10));
+
+            currentScene.addManyScriptedObjects(
+                new ScriptedObject(new Pos(24, -11).multiply(16), ObjectBehaviour.Interactable, "prat", new Sprite("assets/dungeon.png", 0, 0, 10)),
+                new ScriptedObject(new Pos(25, -11).multiply(16), ObjectBehaviour.Interactable, "prat", new Sprite("assets/dungeon.png", 0, 0, 10))
+            );
+
+            currentScene.registerBehaviour("prat", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+                let sequence = new Sequence([
+                    new SequenceItem(new CodeSequenceItem(() => {
+                        game.getPlayer().freezeMovment();
+                        game.getInputHandler().preventInteraction();
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                    new SequenceItem(new TextAnimationNoInteract("*Oavbruttet prat*", 500, 1000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
+                    new SequenceItem(new CodeSequenceItem(() => {
+                        game.getPlayer().unfreezeMovment();
+                        game.getInputHandler().allowInteraction();
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                ]);
+                game.getSequenceExecutor().setSequence(sequence);
+            });
         }
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(-2, -7).multiply(16), ObjectBehaviour.Sign, "GOLI WAS HERE!!!!!!!!!!!!!!", new Sprite("assets/saker.png", 6, 0, 0)),
@@ -89,7 +175,7 @@ function goliCutScene(game: Game, currentScene: Scene) {
             }
         ),
         new SequenceItem(
-            new NPCTextAnimation(charecter, "Men jag ska inte störa dig mer, jag hörde att du var på väg till teknikhallen, den ligger till höger rakt fram.", 5000, game.getInputHandler()),
+            new NPCTextAnimation(charecter, "Men jag ska inte störa dig mer, jag hörde att du var på väg till teknikhallen, den ligger till höger rakt fram, gå inte ner för trappan under några omständigheter.", 6500, game.getInputHandler()),
             (item, ctx) => {
                 (item as NPCTextAnimation).render(ctx, game);
             }

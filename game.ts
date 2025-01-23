@@ -75,7 +75,7 @@ export class Game {
             if(this.#player.getCanCollide()){
                 let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTilePos.toPos(16)));            
                 if(scriptedObject){
-                    if (scriptedObject.type === ObjectBehaviour.ConveyorBelt || scriptedObject.type === ObjectBehaviour.ChangeScene) {
+                    if (scriptedObject.type === ObjectBehaviour.ConveyorBelt || scriptedObject.type === ObjectBehaviour.ChangeScene || scriptedObject.type === ObjectBehaviour.Walkable) {
                         executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
                     }
                 }
@@ -533,7 +533,7 @@ export class GameState {
 
     constructor(){
         this.hasPlayedJohannesLektionCutScene = false;
-        this.hasTalkedToTeacherRoomMartin = false;
+        this.hasTalkedToTeacherRoomMartin = true;
         this.hasSolvedIcePuzzle = false;
         this.hasReadExplosiveSign = true;
     }

@@ -288,7 +288,8 @@ export enum ObjectBehaviour {
     Movable, // when waling into this object the player will be able to push it
     ConveyorBelt, // when the player is standing on this tile they will be moved in the direction of the arrow
     Sign,
-    Button
+    Button,
+    Walkable
 }
 
 
@@ -401,19 +402,19 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
         // Get the tile at the button's position
         let tilePos = pos.divide(16).round().toTileCoordinate();
         let tile = currentScene.getTile(tilePos);
-        
+
         if (tile) {
             // Find the button sprite in the tile's sprites
             let buttonObject = currentScene.getScriptedObjects().find(obj => {
-                return obj.sprite.spriteSheetSrc === "assets/dungeon.png" && 
-                obj.sprite.yOffset === 1 && 
-                (obj.sprite.xOffset === 0 || obj.sprite.xOffset === 2) &&
-                obj.pos.divide(16).floor().equals(pos.divide(16).floor())
+                return obj.sprite.spriteSheetSrc === "assets/dungeon.png" &&
+                    obj.sprite.yOffset === 1 &&
+                    (obj.sprite.xOffset === 0 || obj.sprite.xOffset === 2) &&
+                    obj.pos.divide(16).floor().equals(pos.divide(16).floor());
             }
             );
 
             if (buttonObject) {
-                if (buttonObject.sprite.xOffset === 2) {                    
+                if (buttonObject.sprite.xOffset === 2) {
                     buttonObject.sprite.xOffset = 0;
                     currentScene.getBehaviour(data)?.(game, currentScene, pos, "off");
                 } else {
@@ -422,6 +423,10 @@ const behaivourImplementations: Record<ObjectBehaviour, (game: Game, currentScen
                 }
             }
         }
+    },
+    [ObjectBehaviour.Walkable]: function (game: Game, currentScene: Scene, pos: Pos, data: string): void {
+        // runs code of behaviour when player walks into this object
+        currentScene.getBehaviour(data)?.(game, currentScene, pos, data);
     }
 };
 
@@ -565,7 +570,7 @@ export function deserilizeScene(json: string): Promise<Scene> {
         Object.keys(serilizedObject.tileData).forEach((yString) => {
             Object.keys(serilizedObject.tileData[yString]).forEach((xString) => {
                 // get the pos based on the keys of the dicts inside of each other
-                const pos = new TileCoordinate(Number(xString), Number(yString));
+                    const pos = new TileCoordinate(Number(xString), Number(yString));
                 const collisonRule = serilizedObject.tileData[yString][xString].col;
                 const sprites: Array<Sprites.Sprite> = serilizedObject.tileData[yString][xString].spr.map((spriteData, index) => {
                     return new Sprites.Sprite(spriteData.src, spriteData.xO, spriteData.yO, spriteData.zi);
@@ -575,6 +580,13 @@ export function deserilizeScene(json: string): Promise<Scene> {
         });
         resolve(scene);
     })
+}
+
+export async function changeScene(game: Game, sceneSrc: string){
+    let scene = await deserilizeScene(game.getAssetLoader().getTextAsset(sceneSrc)!.data!);
+    let prevScene = game.getScene();
+    game.setScene(scene);
+    scene.onLoad(game, prevScene);
 }
 
 export function fadeIn(game: Game, duration: number = 1000): Promise<void>{
