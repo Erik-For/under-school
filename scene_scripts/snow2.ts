@@ -60,7 +60,7 @@ export default class Script implements SceneScript {
 
                 let sequence = new Sequence([
                     new SequenceItem(new CodeSequenceItem(() => {
-                        game.getCamera().cameraShake(500, 2);
+                        game.getCamera().cameraShake(500, 2, game);
                     }), (item, ctx) => {
                         (item as CodeSequenceItem).run();
                     }),
@@ -127,7 +127,7 @@ export default class Script implements SceneScript {
                     (item as TextAnimationNoInteract).render(ctx, game);
                 }),
                 new SequenceItem(new CodeSequenceItem(() => {
-                    game.getCamera().cameraShake(500, 2);
+                    game.getCamera().cameraShake(500, 2, game);
                 }), (item, ctx) => {
                     (item as CodeSequenceItem).run();
                 }),

@@ -65,7 +65,7 @@ export default class Script implements SceneScript {
             })
 
             if(ans === "0010111001") {
-                game.getCamera().cameraShake(500, 2);
+                game.getCamera().cameraShake(500, 2, game);
                 currentScene.getScriptedObjects().forEach(obj => {
                     if(obj.pos.equals(new Pos(40, -37).multiply(16)) || obj.pos.equals(new Pos(41, -37).multiply(16))) {
                         currentScene.removeScriptedObject(obj);

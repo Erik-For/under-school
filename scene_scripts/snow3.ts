@@ -58,7 +58,7 @@ export default class Script implements SceneScript {
                                         currentScene.getTile(new TileCoordinate(41, - 32 - i))?.getSprites().push(new Sprite("assets/snowset.png", 6, 4, 1));
                                   
                                     }
-                                    game.getCamera().cameraShake(500, 2);
+                                    game.getCamera().cameraShake(500, 2, game);
                                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                             ]);
             
@@ -84,7 +84,7 @@ export default class Script implements SceneScript {
                 new ScriptedObject(new Pos(60, -86).multiply(16), ObjectBehaviour.ChangeScene, "assets/sodexo.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
 
             );
-            game.getCamera().cameraShake(500, 2);
+            game.getCamera().cameraShake(500, 2, game);
         });
 
         game.getPlayer().setPos(new Pos(34, -30).multiply(16));
