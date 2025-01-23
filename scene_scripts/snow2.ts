@@ -27,14 +27,20 @@ export default class Script implements SceneScript {
                 game.getPlayer().setDirection("right");
                 break;
             case "snow1.js":
-                game.getPlayer().setPos(new Pos(-3.5, -1.5).multiply(16));
+                game.getPlayer().setPos(new Pos(-1, -1.5).multiply(16));
                 game.getPlayer().setDirection("right");
+                break;
+            case "snow3.js":
+                game.getPlayer().setPos(new Pos(35, -5).multiply(16));
+                game.getPlayer().setDirection("down");
                 break;
         }
 
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(35, -6).multiply(16), ObjectBehaviour.ChangeScene, "assets/snow3.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
             new ScriptedObject(new Pos(34, -6).multiply(16), ObjectBehaviour.ChangeScene, "assets/snow3.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
+            new ScriptedObject(new Pos(-3, -2).multiply(16), ObjectBehaviour.ChangeScene, "assets/snow1.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
+
         )
         currentScene.addManyScriptedObjects(...this.#buttons);
         currentScene.registerBehaviour("bra", (game: Game, currentScene: Scene, pos: Pos, data: String) => {

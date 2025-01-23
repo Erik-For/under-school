@@ -28,6 +28,12 @@ export default class Script implements SceneScript {
                 new ScriptedObject(new Pos(35, -11).multiply(16), ObjectBehaviour.Interactable, "kim", new Sprite("assets/people.png", 4, 1, 0)),
                 new ScriptedObject(new Pos(33, -31).multiply(16), ObjectBehaviour.ChangeScene, "assets/snow2.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
                 new ScriptedObject(new Pos(34, -31).multiply(16), ObjectBehaviour.ChangeScene, "assets/snow2.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
+                new ScriptedObject(new Pos(59, -86).multiply(16), ObjectBehaviour.Sign, "Julpynt", new Sprite("assets/saker.png", 7, 0, 0)),
+                new ScriptedObject(new Pos(60, -86).multiply(16), ObjectBehaviour.Sign, "Nyckeln till dörren som du vill nå, genom julefrid, du kan få...", new Sprite("assets/dungeon.png", 0, 0, 0)),
+                new ScriptedObject(new Pos(61, -86).multiply(16), ObjectBehaviour.Sign, "Nyckeln till dörren som du vill nå, genom julefrid, du kan få...", new Sprite("assets/dungeon.png", 0, 0, 0)),
+                new ScriptedObject(new Pos(58, -86).multiply(16), ObjectBehaviour.Sign, "Du är inte sugen på att pynta just nu...", new Sprite("assets/snowset.png", 6, 5, 0)),
+                new ScriptedObject(new Pos(25, -86).multiply(16), ObjectBehaviour.Interactable, "tree", new Sprite("assets/snowset.png", 7, 5, 0)),
+                new ScriptedObject(new Pos(25, -87).multiply(16), ObjectBehaviour.Interactable, "tree", new Sprite("assets/snowset.png", 7, 4, 0)),
             );
 
             currentScene.registerBehaviour("kim", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
@@ -60,6 +66,24 @@ export default class Script implements SceneScript {
                         });
         }
 
+        currentScene.registerBehaviour("tree", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            currentScene.getTile(new TileCoordinate(60, -86))?.setCollisonRule(CollisionRule.None);
+            currentScene.getTile(new TileCoordinate(60, - 86))?.getSprites().pop();
+            currentScene.getTile(new TileCoordinate(60, - 87))?.getSprites().push(new Sprite("assets/sodexo.png", 5, 2, 0));     
+            currentScene.getTile(new TileCoordinate(60, -86))?.setCollisonRule(CollisionRule.None);
+            currentScene.getTile(new TileCoordinate(60, - 86))?.getSprites().pop();
+            currentScene.getTile(new TileCoordinate(60, - 86))?.getSprites().push(new Sprite("assets/sodexo.png", 5, 3, 0)); 
+            currentScene.getTile(new TileCoordinate(61, -86))?.setCollisonRule(CollisionRule.None);
+            currentScene.getTile(new TileCoordinate(61, - 86))?.getSprites().pop();
+            currentScene.getTile(new TileCoordinate(61, - 87))?.getSprites().push(new Sprite("assets/sodexo.png", 6, 2, 0));     
+            currentScene.getTile(new TileCoordinate(61, -86))?.setCollisonRule(CollisionRule.None);
+            currentScene.getTile(new TileCoordinate(61, - 86))?.getSprites().pop();
+            currentScene.getTile(new TileCoordinate(61, - 86))?.getSprites().push(new Sprite("assets/sodexo.png", 6, 3, 0));        
+
+            game.getCamera().cameraShake(500, 2);
+        });
+
+        game.getPlayer().setPos(new Pos(34, -30).multiply(16));
     };
 
     onExit(game: Game, currentScene: Scene) {

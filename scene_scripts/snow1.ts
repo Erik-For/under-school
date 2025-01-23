@@ -13,6 +13,10 @@ export default class Script implements SceneScript {
                 game.getPlayer().setPos(new Pos(-1, -4).multiply(16)); // byt ut kordinaterna
                 game.getPlayer().setDirection("down");
                 break;
+            case "snow2.js":
+                game.getPlayer().setPos(new Pos(-1.5, 5.5).multiply(16));
+                game.getPlayer().setDirection("up");
+                break;
         }
 
         if(prevScene.getScriptName() == "dungeon.js"){
