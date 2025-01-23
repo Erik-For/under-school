@@ -1,5 +1,5 @@
 import { BigSprite } from "./animate.js"
-import { Game, Pos } from "./game.js"
+import { Game, Mode, Pos } from "./game.js"
 import { Player } from "./player.js"
 import { render, Sprite, SpriteSheet } from "./sprite.js"
 import { InputHandler } from "./input.js"
@@ -32,7 +32,8 @@ for (let i = 0; i < 10; i++) {
     this.#projectiles.push(projectile2)
 }
 */
-export class Battle {
+export class Battle extends SequenceCallback {
+    #hasFinished: boolean
     #dead: boolean
     #heart: PlayerHeart
     #enemy: Enemy
@@ -45,6 +46,7 @@ export class Battle {
 
     // TODO lägg till en array av projectiles som skjuts ut i olika stader av spelet
     constructor(game: Game, enemy: Enemy, rounds: Round[]) {
+        super()
         this.#heart = new PlayerHeart(game.getPlayer(), game.getInputHandler());
         this.#enemy = enemy;
         this.#game = game;
@@ -53,6 +55,7 @@ export class Battle {
         this.#currentRound = 0;
         this.#active = false;
         this.#dead = false;
+        this.#hasFinished = false;
     }
 
     getHeart() {
@@ -68,6 +71,7 @@ export class Battle {
     }
 
     nextRound() {
+
         if(this.#currentRound < this.#rounds.length) {
             let sequence = this.#rounds[this.#currentRound].animation
 
@@ -85,6 +89,15 @@ export class Battle {
             
             this.#projectiles = this.#projectiles.concat(this.#rounds[this.#currentRound].projectiles)
             this.#currentRound++
+        } else if(!this.#hasFinished) {
+            this.#hasFinished = true;
+            this.#game.setMode(Mode.OpenWorld);
+            this.#game.getPlayer().unfreezeMovment();
+            this.#game.getInputHandler().allowInteraction();
+            this.#game.getBattle()?.deactivate();
+            this.#game.getSequenceExecutor().setSequence(new Sequence([]));
+            this.#game.getAudioManager().pauseBackgroundMusic();
+            this.onFinish();
         }
     }
 

@@ -41,10 +41,12 @@ const assetLoader = new AssetLoader(
         new TextAsset("assets/test1.json"),
         new TextAsset("assets/teknik.json"),
         new TextAsset("assets/sodexo.json"),
+        new TextAsset("assets/cred.json"),
         new AudioAsset("assets/bg.mp3"),
         new AudioAsset("assets/beep.wav"),
         new AudioAsset("assets/rumble.wav"),
         new AudioAsset("assets/textblip.mp3"),
+        new AudioAsset("assets/DaftPunkalovania.mp3"),
         new AudioAsset("assets/clank1.wav"),
         new AudioAsset("assets/drippin_cave.mp3")
 
@@ -67,6 +69,7 @@ const assetLoader = new AssetLoader(
         menuScene.onLoad(game, menuScene);
 
         // --- Start dev code ---
+        /*
         game.getInputHandler().onClick(Keys.Debug3, () => {
             game.setMode(game.getMode() === Mode.OpenWorld ? Mode.Battle : Mode.OpenWorld);
             if(game.getMode() === Mode.Battle){
@@ -75,7 +78,7 @@ const assetLoader = new AssetLoader(
                 game.getBattle()?.deactivate();
             }
         }, true);
-
+        */
         game.getInputHandler().onClick(Keys.Debug2, async () => {
             if(dev){
                 let sceneName = prompt("Enter scene name");

@@ -3,7 +3,7 @@ import { InputHandler } from "./input.js";
 import { Player } from "./player.js";
 import { ObjectBehaviour, Scene, Tile, TileCoordinate, executeBehaviour, fadeOut } from "./scene.js";
 import { AssetLoader, AudioAsset } from "./assetloader.js";
-import { Sequence, SequenceExecutor, SequenceItem } from "./sequence.js";
+import { Sequence, SequenceExecutor, SequenceItem, WaitSequenceItem } from "./sequence.js";
 import * as Util from "./util.js";
 import { Battle, Enemy, HomingProjectile, LoopingHomingProjectile, Round, StraightProjectile } from "./battle.js";
 import Keys from "./keys.js";
@@ -53,6 +53,12 @@ export class Game {
         let projectiles4 = [];
         let projectiles5 = [];
         let projectiles6 = [];
+        let projectiles7 = [];
+        let projectiles8 = [];
+        let projectiles9 = [];
+        let projectiles10 = [];
+        let projectiles11 = [];
+        let projectiles12 = [];
 
         let antal = 10;
         for(let i = 0; i < antal; i++){
@@ -64,23 +70,40 @@ export class Game {
             projectiles4.push(new StraightProjectile(new Pos(100, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI));
             projectiles5.push(new StraightProjectile(new Pos(100/11*i, 100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI/2));
             projectiles6.push(new StraightProjectile(new Pos(100/11*i, 0), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 3*Math.PI/2));
+            projectiles7.push(new StraightProjectile(new Pos(0, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 0));
+            projectiles8.push(new StraightProjectile(new Pos(100, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI));
+            projectiles9.push(new StraightProjectile(new Pos(100/11*i, 100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI/2));
+            projectiles10.push(new StraightProjectile(new Pos(100/11*i, 0), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 3*Math.PI/2));
+            projectiles11.push(new LoopingHomingProjectile(new Pos(50+x*70, 50+y*70), 5*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75));
+            projectiles12.push(new StraightProjectile(new Pos(50+x*50, 50+y*50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.atan2(y, x)));
+
         }
         this.#battle = new Battle(this, new Enemy(100, new BigSprite(
             new Sprite("assets/faces.png", 26, 0, 0),
             new Sprite("assets/faces.png", 27, 0, 0),
             new Sprite("assets/faces.png", 26, 1, 0),
             new Sprite("assets/faces.png", 27, 1, 0)
-        )), [new Round(new Sequence([]), projectiles), new Round(new Sequence([
-            new SequenceItem(
-                new TextAnimationNoInteract("Du kommer bli mat för min köttfärssås hahahahhahaha", 1000*1, 1000*2),
-                (item, ctx) => {
-                    (item as TextAnimation).render(ctx, this);
-                }
-            )
-        ]),[new LoopingHomingProjectile(new Pos(50, 50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.25)]), new Round(new Sequence([]), projectiles2), new Round(new Sequence([]), projectiles3), new Round(new Sequence([]), projectiles4), new Round(new Sequence([]), projectiles5), new Round(new Sequence([]), projectiles6)]);
+        )), [new Round(new Sequence([
+            new SequenceItem(new TextAnimationNoInteract( "Du kommer bli mat för min köttfärssås hahahahhahaha", 1000, 1000), (item, ctx) => {
+                (item as TextAnimation).render(ctx, this);
+            })
+        ]), projectiles), new Round(new Sequence([
+            new SequenceItem(new TextAnimationNoInteract("Varför försöker du ens?", 1000*1, 1000*2), (item, ctx) => {
+                (item as TextAnimation).render(ctx, this);
+            })
+        ]),[new LoopingHomingProjectile(new Pos(50, 50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.25)]), new Round(new Sequence([]), projectiles2), new Round(new Sequence([]), projectiles3), new Round(new Sequence([]), projectiles4), new Round(new Sequence([]), projectiles5), new Round(new Sequence([]), projectiles6), new Round(new Sequence([]), projectiles7), new Round(new Sequence([]), projectiles8), new Round(new Sequence([]), projectiles9), new Round(new Sequence([]), projectiles10), new Round(new Sequence([]), projectiles11), new Round(new Sequence([]), projectiles12), new Round(new Sequence([
+            new SequenceItem(new TextAnimationNoInteract("Hur kunde du överleva min köttfärssås?", 1500, 1000*2), (item, ctx) => {
+                (item as TextAnimation).render(ctx, this);
+            }),
+            new SequenceItem(new TextAnimationNoInteract("Nej!!!!!!!!!!!!!!!!!", 1500, 1000*2), (item, ctx) => {
+                (item as TextAnimation).render(ctx, this);
+            }),
+        ]), [])]);
         
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
+
+            
             // check if the player is in a scripted object
             
             this.getCamera().setPosition(this.getPlayer().getPos());
@@ -543,11 +566,13 @@ export class GameState {
     hasTalkedToTeacherRoomMartin: boolean;
     hasSolvedIcePuzzle: boolean;
     hasReadExplosiveSign: boolean;
+    hasStartedBattle: boolean;
 
     constructor(){
         this.hasPlayedJohannesLektionCutScene = false;
         this.hasTalkedToTeacherRoomMartin = false;
         this.hasSolvedIcePuzzle = false;
         this.hasReadExplosiveSign = false;
+        this.hasStartedBattle = false;
     }
 }
