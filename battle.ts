@@ -252,7 +252,7 @@ export abstract class Projectile {
     width: number;
     damage: number
     
-    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24, damage: number = 50) {
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24, damage: number = 5) {
         this.pos = pos;
         this.lifeTime = lifeTime;
         this.sprite = sprite;
