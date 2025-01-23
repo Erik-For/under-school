@@ -46,6 +46,7 @@ const assetLoader = new AssetLoader(
         new AudioAsset("assets/rumble.wav"),
         new AudioAsset("assets/textblip.mp3"),
         new AudioAsset("assets/clank1.wav"),
+        new AudioAsset("assets/drippin_cave.mp3")
 
     ],
     async () => {
