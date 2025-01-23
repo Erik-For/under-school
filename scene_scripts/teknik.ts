@@ -33,7 +33,7 @@ const tom = {
     )
 }
 
-import { BigSprite, NPCTextAnimation, TextAnimation } from "../animate.js";
+import { BigSprite, NPCTextAnimation, TextAnimation, TextAnimationNoInteract } from "../animate.js";
 import { Game, Pos } from "../game.js";
 import { CollisionRule, fadeIn, fadeOut, ObjectBehaviour, Scene, SceneScript, ScriptedObject, Tile, TileCoordinate } from "../scene.js";
 import { CodeSequenceItem, Sequence, SequenceItem, WaitSequenceItem } from "../sequence.js";
@@ -179,6 +179,7 @@ export default class Script implements SceneScript {
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Fattar ni........... Kedjeregeln gäller för funktioner i funktioner", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "...... Jag tycker den är rolig i varje fall.", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Men jag tänker att ni ska räkna lite på egen hand på sidorna 78-79.", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new TextAnimationNoInteract("* Du borde prata med din lärare *", 1000, 3000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
                 new SequenceItem(new CodeSequenceItem(() => {
                     game.getCamera().setCameraOffsetSmooth(new Pos(0, 0), 1000);
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
