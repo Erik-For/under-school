@@ -528,9 +528,13 @@ function calculateNewPosition(currentPos: Pos, direction: string, range: number)
 export class GameState {
     hasPlayedJohannesLektionCutScene: boolean;
     hasTalkedToTeacherRoomMartin: boolean;
+    hasSolvedIcePuzzle: boolean;
+    hasReadExplosiveSign: boolean;
 
     constructor(){
         this.hasPlayedJohannesLektionCutScene = false;
         this.hasTalkedToTeacherRoomMartin = false;
+        this.hasSolvedIcePuzzle = false;
+        this.hasReadExplosiveSign = true;
     }
 }

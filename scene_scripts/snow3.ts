@@ -60,7 +60,6 @@ export default class Script implements SceneScript {
                         });
         }
 
-        game.getPlayer().setPos(new Pos(34, -30).multiply(16));
     };
 
     onExit(game: Game, currentScene: Scene) {
