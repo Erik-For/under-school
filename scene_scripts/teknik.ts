@@ -42,6 +42,24 @@ const alexander = {
     )
 }
 
+const jesper = {
+    bigsprite: new BigSprite (
+        new Sprite("assets/faces.png", 32, 0, 0),
+        new Sprite("assets/faces.png", 33, 0, 0),
+        new Sprite("assets/faces.png", 32, 1, 0),
+        new Sprite("assets/faces.png", 33, 1, 0),
+    )
+}
+
+const daniel = {
+    bigsprite: new BigSprite (
+        new Sprite("assets/faces.png", 36, 0, 0),
+        new Sprite("assets/faces.png", 37, 0, 0),
+        new Sprite("assets/faces.png", 36, 1, 0),
+        new Sprite("assets/faces.png", 37, 1, 0),
+    )
+}
+
 import { BigSprite, NPCTextAnimation, TextAnimation, TextAnimationNoInteract } from "../animate.js";
 import { Game, Pos } from "../game.js";
 import { CollisionRule, fadeIn, fadeOut, ObjectBehaviour, Scene, SceneScript, ScriptedObject, Tile, TileCoordinate } from "../scene.js";
@@ -78,27 +96,14 @@ export default class Script implements SceneScript {
             new ScriptedObject(new Pos(2, -14).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-1, -13).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-1, -14).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
-            new ScriptedObject(new Pos(-4, -13).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-1, -10).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-1, -11).multiply(16), ObjectBehaviour.Interactable, "other", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(2, -10).multiply(16), ObjectBehaviour.Interactable, "alexander", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(2, -11).multiply(16), ObjectBehaviour.Interactable, "alexander", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(-32, -9).multiply(16), ObjectBehaviour.Interactable, "jesper", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(-32, -22).multiply(16), ObjectBehaviour.Interactable, "daniel", new Sprite("assets/saker.png", 8, 0, 0)),
         );
 
-        currentScene.registerBehaviour("alexander", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
-            let sequence = new Sequence([
-                new SequenceItem(new CodeSequenceItem(() => {
-                    game.getPlayer().freezeMovment();
-                    game.getInputHandler().preventInteraction();
-                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
-                new SequenceItem(new NPCTextAnimation(alexander.bigsprite, "Hej, jag heter Alexander, skaka gärna hand med mig!", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                new SequenceItem(new CodeSequenceItem(() => {
-                    game.getPlayer().unfreezeMovment();
-                    game.getInputHandler().allowInteraction();
-                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
-            ]);
-            game.getSequenceExecutor().setSequence(sequence);
-        });
 
         currentScene.registerBehaviour("locked", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
             let sequence = new Sequence([
@@ -207,7 +212,7 @@ export default class Script implements SceneScript {
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "...... Jag tycker den är rolig i varje fall.", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Men jag tänker att ni ska räkna lite på egen hand på sidorna 78-79.", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 //HÄR PAUSAS MUSIKEN OBJS OBS OVBS!
-                new SequenceItem(new TextAnimationNoInteract("* Du borde prata med din lärare *", 1000, 3000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); game.getAudioManager().pauseBackgroundMusic();}),
+                new SequenceItem(new TextAnimationNoInteract("* Du borde nog prata med din lärare *", 1000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); game.getAudioManager().pauseBackgroundMusic();}),
                 // Hej!
                 new SequenceItem(new CodeSequenceItem(() => {
                     game.getCamera().setCameraOffsetSmooth(new Pos(0, 0), 1000);
@@ -224,6 +229,21 @@ export default class Script implements SceneScript {
         if(game.getGameState().hasTalkedToTeacherRoomMartin){
             removePeople(game, currentScene);
         }
+
+        currentScene.registerBehaviour("alexander", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new NPCTextAnimation(alexander.bigsprite, "Hej, jag heter Alexander, skaka gärna hand med mig!", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+        });
 
         currentScene.registerBehaviour("johannes", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
             if(!game.getGameState().hasTalkedToTeacherRoomMartin) {
@@ -291,6 +311,38 @@ export default class Script implements SceneScript {
             game.getSequenceExecutor().setSequence(sequence);	
         });
 
+        currentScene.registerBehaviour("jesper", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Hej, jag heter Jesper, jag är matte/fysik lärare.", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Alla är männskliga och gör fel ibland.", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Förutom mig.", 750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+        });
+
+        currentScene.registerBehaviour("daniel", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new NPCTextAnimation(daniel.bigsprite, "Hej, jag heter Daniel, jag är lärare i matte och fysik", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(daniel.bigsprite, "Jag gillar att åka skidor", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+        });
 
         currentScene.registerBehaviour("other", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
             if(game.getGameState().hasTalkedToTeacherRoomMartin) return;
@@ -317,8 +369,6 @@ export default class Script implements SceneScript {
 
 function removePeople(game: Game, currentScene: Scene) {
     let removePeoplePos = [
-        new Pos(-4, -13),
-        new Pos(-4, -14),
         new Pos(-1, -13),
         new Pos(-1, -14),
         new Pos(-1, -10),
