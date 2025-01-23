@@ -12,7 +12,6 @@ export default class Script implements SceneScript {
 
     onEnter(prevScene: Scene, game: Game, currentScene: Scene) {        
         // Reset buttons array
-        this.buttons = [];
     }
 
     onExit(game: Game, currentScene: Scene) {
@@ -38,7 +37,7 @@ export default class Script implements SceneScript {
         ctx.font = "20px underschool";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-
+        
         if (this.currentMenu === "main") {
             // Title
             ctx.font = "40px underschool";
@@ -46,7 +45,7 @@ export default class Script implements SceneScript {
             
             // Buttons
             ctx.font = "20px underschool";
-            const menuButtons = ["Start Game", "Credits"];
+            const menuButtons = ["Start Game"];
             menuButtons.forEach((text, index) => {
                 const y = centerY + (index * (this.buttonHeight + this.padding));
                 
@@ -69,6 +68,7 @@ export default class Script implements SceneScript {
                     height: this.buttonHeight,
                     text: text,
                     action: async () => {
+                        console.log(`Button ${text} clicked`);
                         if (text === "Start Game") {
                             let prev = game.getScene();
                             let introScene = await deserilizeScene(game.getAssetLoader().getTextAsset("assets/intro.json")!.data!);
