@@ -242,6 +242,10 @@ export class NPCTextAnimation extends SequenceCallback {
                 lines.push(line);
                 line = word + " ";
             }
+            // Play sound effect for each word
+            if (Date.now() - this.startTime < this.duration) {
+                game.getAudioManager().playSoundEffect(game.getAssetLoader().getAudioAsset("assets/textblip.mp3")!);
+            }
         }
         
         lines.push(line);
@@ -314,6 +318,10 @@ export class TextAnimation extends SequenceCallback {
             lines.push(line);
             line = word + " ";
         }
+        // Play sound effect for each word
+        if (Date.now() - this.startTime < this.duration) {
+            game.getAudioManager().playSoundEffect(game.getAssetLoader().getAudioAsset("assets/textblip.mp3")!);
+        }
     }
     
     lines.push(line);
@@ -372,6 +380,10 @@ export class TextAnimationNoInteract extends SequenceCallback {
             } else {
                 lines.push(line);
                 line = word + " ";
+            }
+            // Play sound effect for each word
+            if (Date.now() - this.startTime < this.duration) {
+                game.getAudioManager().playSoundEffect(game.getAssetLoader().getAudioAsset("assets/textblip.mp3")!);
             }
         }
         
