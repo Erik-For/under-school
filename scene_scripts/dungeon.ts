@@ -35,6 +35,9 @@ export default class Script implements SceneScript {
             
         }
 
+        game.getPlayer().unfreezeMovment();
+        game.getInputHandler().allowInteraction();
+
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(39, -2).multiply(16), ObjectBehaviour.Sign, "I labyrinten ska du gå, följ stenarna för att målet nå", new Sprite("assets/saker.png", 6, 0, 0)),
             new ScriptedObject(new Pos(-4, -5).multiply(16), ObjectBehaviour.Sign, "I grottan du är, vilket misär", new Sprite("assets/saker.png", 7, 0, 0)),

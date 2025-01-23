@@ -33,6 +33,7 @@ for (let i = 0; i < 10; i++) {
 }
 */
 export class Battle {
+    #dead: boolean
     #heart: PlayerHeart
     #enemy: Enemy
     #projectiles: Projectile[]
@@ -51,6 +52,7 @@ export class Battle {
         this.#rounds = rounds;
         this.#currentRound = 0;
         this.#active = false;
+        this.#dead = false;
     }
 
     getHeart() {
@@ -87,6 +89,12 @@ export class Battle {
     }
 
     tick() {
+        if(this.#dead) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
+            return;
+        }
         if (this.#active) {
             this.#projectiles.forEach(projectile => {
                 projectile.update(this);
@@ -94,8 +102,7 @@ export class Battle {
                     this.#heart.health -= projectile.damage
                     if(this.#heart.health <= 0) {
                         this.#heart.health = 0
-                        this.#active = false
-                        this.#heart.freezeMovment()
+                        this.#dead = true;
                     }
                     projectile.lifeTime = 0
                 }
@@ -108,6 +115,10 @@ export class Battle {
     }
 
     render(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader) {
+        if(this.#dead) {
+            renderDeathScreen(ctx, assetLoader);
+            return;
+        }
         const screen = this.#game.getScreen();
 
         const boxWidth = screen.width / 5;
@@ -187,7 +198,7 @@ export class PlayerHeart implements PosProvider {
     #frozen: boolean
 
     constructor(player: Player, inputHandler: InputHandler) {
-        this.#pos = new Pos(0, 0);
+        this.#pos = new Pos(50, 50);
         this.#size = 24;
         this.#player = player
         this.#frozen = false
@@ -241,7 +252,7 @@ export abstract class Projectile {
     width: number;
     damage: number
     
-    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24, damage: number = 10) {
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24, damage: number = 50) {
         this.pos = pos;
         this.lifeTime = lifeTime;
         this.sprite = sprite;
@@ -334,8 +345,9 @@ export class StraightProjectile extends Projectile {
     #initialTargetPos: Pos | undefined;
     #velocity: Pos;
     
-    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, height: number = 24, width: number = 24) {
+    constructor(pos: Pos, lifeTime: number, sprite: Sprite, speed: number, rotation: number, height: number = 24, width: number = 24) {
         super(pos, lifeTime, sprite, speed, height, width);
+        this.rotation = rotation;
         this.#velocity = new Pos(Math.cos(this.rotation) * speed, Math.sin(this.rotation) * speed);
     }
      
@@ -354,16 +366,24 @@ export class StraightProjectile extends Projectile {
 export class Enemy {
     #health: number
     #sprite: BigSprite
-    #spriteMouthOpen: BigSprite
+    //#spriteMouthOpen: BigSprite
     
     
-    constructor(health: number, sprite: BigSprite, mouthOpenSprite: BigSprite) {
+    constructor(health: number, sprite: BigSprite) {
         this.#health = health
         this.#sprite = sprite
-        this.#spriteMouthOpen = mouthOpenSprite;
+        //this.#spriteMouthOpen = mouthOpenSprite;
     }
 
     render(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader, enemyBoxTopLeftCornerX: number, enemyBoxTopLeftCornerY: number, enemyBoxWidth: number) {
         this.#sprite.render(ctx, assetLoader, enemyBoxTopLeftCornerX, enemyBoxTopLeftCornerY, enemyBoxWidth, enemyBoxWidth);
     }
+}
+
+function renderDeathScreen(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader) {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillStyle = "white";
+    ctx.font = "40px underschool";
+    ctx.fillText("You died", ctx.canvas.width / 2 - ctx.measureText("You died").width / 2, ctx.canvas.height / 2);
 }

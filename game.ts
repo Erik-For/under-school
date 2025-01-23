@@ -47,24 +47,37 @@ export class Game {
         this.#mode = Mode.OpenWorld;
 
         //TSTKOD FÖR BATTLE FIxa Notera Att en bild ska ha munnen öppen för att prata
+        let projectiles = [];
+        let projectiles2 = [];
+        let projectiles3 = [];
+        let projectiles4 = [];
+        let projectiles5 = [];
+        let projectiles6 = [];
+
+        let antal = 10;
+        for(let i = 0; i < antal; i++){
+            let x = Math.cos(2*Math.PI*i/antal);
+            let y = Math.sin(2*Math.PI*i/antal);
+            projectiles.push(new LoopingHomingProjectile(new Pos(50+x*70, 50+y*70), 5*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75));
+            projectiles2.push(new StraightProjectile(new Pos(50+x*50, 50+y*50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.atan2(y, x)));
+            projectiles3.push(new StraightProjectile(new Pos(0, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 0));
+            projectiles4.push(new StraightProjectile(new Pos(100, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI));
+            projectiles5.push(new StraightProjectile(new Pos(100/11*i, 100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI/2));
+            projectiles6.push(new StraightProjectile(new Pos(100/11*i, 0), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 3*Math.PI/2));
+        }
         this.#battle = new Battle(this, new Enemy(100, new BigSprite(
-            new Sprite("assets/faces.png", 8, 0, 0),
-            new Sprite("assets/faces.png", 9, 0, 0),
-            new Sprite("assets/faces.png", 8, 1, 0),
-            new Sprite("assets/faces.png", 9, 1, 0)
-        ), new BigSprite(
-            new Sprite("assets/faces.png", 10, 0, 0),
-            new Sprite("assets/faces.png", 11, 0, 0),
-            new Sprite("assets/faces.png", 10, 1, 0),
-            new Sprite("assets/faces.png", 11, 1, 0)
-        )), [new Round(new Sequence([]), [new LoopingHomingProjectile(new Pos(50, 50), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1)]), new Round(new Sequence([
+            new Sprite("assets/faces.png", 26, 0, 0),
+            new Sprite("assets/faces.png", 27, 0, 0),
+            new Sprite("assets/faces.png", 26, 1, 0),
+            new Sprite("assets/faces.png", 27, 1, 0)
+        )), [new Round(new Sequence([]), projectiles), new Round(new Sequence([
             new SequenceItem(
-                new TextAnimationNoInteract("Ajdå du överlevde", 1000*1, 1000*2),
+                new TextAnimationNoInteract("Du kommer bli mat för min köttfärssås hahahahhahaha", 1000*1, 1000*2),
                 (item, ctx) => {
                     (item as TextAnimation).render(ctx, this);
                 }
             )
-        ]),[new LoopingHomingProjectile(new Pos(50, 50), 10*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1)])]);
+        ]),[new LoopingHomingProjectile(new Pos(50, 50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.25)]), new Round(new Sequence([]), projectiles2), new Round(new Sequence([]), projectiles3), new Round(new Sequence([]), projectiles4), new Round(new Sequence([]), projectiles5), new Round(new Sequence([]), projectiles6)]);
         
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
@@ -533,8 +546,8 @@ export class GameState {
 
     constructor(){
         this.hasPlayedJohannesLektionCutScene = false;
-        this.hasTalkedToTeacherRoomMartin = true;
+        this.hasTalkedToTeacherRoomMartin = false;
         this.hasSolvedIcePuzzle = false;
-        this.hasReadExplosiveSign = true;
+        this.hasReadExplosiveSign = false;
     }
 }

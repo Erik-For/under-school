@@ -140,6 +140,11 @@ export default class Script implements SceneScript {
                     currentScene.getTile(new TileCoordinate(34, -6))!.getSprites().length = 0
                     currentScene.getTile(new TileCoordinate(34, -7))!.getSprites().length = 0
 
+                    currentScene.getTile(new TileCoordinate(35, -6))!.setCollisonRule(CollisionRule.None);
+                    currentScene.getTile(new TileCoordinate(35, -7))!.setCollisonRule(CollisionRule.None);
+                    currentScene.getTile(new TileCoordinate(34, -6))!.setCollisonRule(CollisionRule.None);
+                    currentScene.getTile(new TileCoordinate(34, -7))!.setCollisonRule(CollisionRule.None);
+
                     game.getPlayer().unfreezeMovment();
                     game.getInputHandler().allowInteraction();
                 }), (item, ctx) => {
