@@ -361,10 +361,15 @@ export default class Script implements SceneScript {
         });
     };
     onExit (game: Game, currentScene: Scene) {
+
     };
     render(game: Game, currentScene: Scene) {
 
     };
+
+    onInteraction(game: Game, currentScene: Scene, pos: Pos, data: string) {
+        
+    }
 }
 
 function removePeople(game: Game, currentScene: Scene) {
@@ -395,4 +400,5 @@ function removePeople(game: Game, currentScene: Scene) {
         });
         tile!.setCollisonRule(CollisionRule.None);
     });
+
 }

@@ -80,32 +80,32 @@ export class Game {
             let x = Math.cos(2*Math.PI*i/antal);
             let y = Math.sin(2*Math.PI*i/antal);
             projectiles.push(new LoopingHomingProjectile(new Pos(50+x*70, 50+y*70), 5*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75));
-            projectiles2.push(new StraightProjectile(new Pos(50+x*50, 50+y*50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.atan2(y, x)));
-            projectiles3.push(new StraightProjectile(new Pos(0, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 0));
-            projectiles4.push(new StraightProjectile(new Pos(100, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI));
-            projectiles5.push(new StraightProjectile(new Pos(100/11*i, 100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI/2));
-            projectiles6.push(new StraightProjectile(new Pos(100/11*i, 0), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 3*Math.PI/2));
-            projectiles7.push(new StraightProjectile(new Pos(0, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 0));
-            projectiles8.push(new StraightProjectile(new Pos(100, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI));
-            projectiles9.push(new StraightProjectile(new Pos(100/11*i, 100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI/2));
-            projectiles10.push(new StraightProjectile(new Pos(100/11*i, 0), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 3*Math.PI/2));
+            projectiles2.push(new StraightProjectile(new Pos(50+x*100, 50+y*100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.atan2(y, x)));
+            projectiles3.push(new StraightProjectile(new Pos(-50, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, 0));
+            projectiles4.push(new StraightProjectile(new Pos(150, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.PI));
+            projectiles5.push(new StraightProjectile(new Pos(100/11*i, 150), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.PI/2));
+            projectiles6.push(new StraightProjectile(new Pos(100/11*i, -50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, 3*Math.PI/2));
+            projectiles7.push(new StraightProjectile(new Pos(-50, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, 0));
+            projectiles8.push(new StraightProjectile(new Pos(150, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.PI));
+            projectiles9.push(new StraightProjectile(new Pos(100/11*i, 150), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.PI/2));
+            projectiles10.push(new StraightProjectile(new Pos(100/11*i, -50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 3*Math.PI/2));
             projectiles11.push(new LoopingHomingProjectile(new Pos(50+x*70, 50+y*70), 5*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75));
-            projectiles12.push(new StraightProjectile(new Pos(50+x*50, 50+y*50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.atan2(y, x)));
+            projectiles12.push(new StraightProjectile(new Pos(50+x*100, 50+y*100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.atan2(y, x)));
             projectiles13.push(new LoopingHomingProjectile(new Pos(50+x*70, 50+y*70), 5*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75));
-            projectiles14.push(new StraightProjectile(new Pos(50+x*50, 50+y*50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.atan2(y, x)));
-            projectiles15.push(new StraightProjectile(new Pos(0, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 0));
-            projectiles16.push(new StraightProjectile(new Pos(100, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI));
-            projectiles17.push(new StraightProjectile(new Pos(100/11*i, 100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI/2));
-            projectiles18.push(new StraightProjectile(new Pos(100/11*i, 0), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 3*Math.PI/2));
+            projectiles14.push(new StraightProjectile(new Pos(50+x*100, 50+y*100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.atan2(y, x)));
+            projectiles15.push(new StraightProjectile(new Pos(-50, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, 0));
+            projectiles16.push(new StraightProjectile(new Pos(150, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.PI));
+            projectiles17.push(new StraightProjectile(new Pos(100/11*i, 150), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.PI/2));
+            projectiles18.push(new StraightProjectile(new Pos(100/11*i, -50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 3*Math.PI/2));
             projectiles19.push(new LoopingHomingProjectile(new Pos(50+x*70, 50+y*70), 5*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75));
-            projectiles20.push(new StraightProjectile(new Pos(50+x*50, 50+y*50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.atan2(y, x)));
+            projectiles20.push(new StraightProjectile(new Pos(50+x*100, 50+y*100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.atan2(y, x)));
             projectiles21.push(new LoopingHomingProjectile(new Pos(50+x*70, 50+y*70), 5*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75));
-            projectiles22.push(new StraightProjectile(new Pos(50+x*50, 50+y*50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.atan2(y, x)));
-            projectiles23.push(new StraightProjectile(new Pos(0, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 0));
-            projectiles24.push(new StraightProjectile(new Pos(100, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.PI));
+            projectiles22.push(new StraightProjectile(new Pos(50+x*100, 50+y*100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.atan2(y, x)));
+            projectiles23.push(new StraightProjectile(new Pos(-50, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, 0));
+            projectiles24.push(new StraightProjectile(new Pos(150, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.PI));
             projectiles25.push(new LoopingHomingProjectile(new Pos(50+x*70, 50+y*70), 5*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 0.75));
-            projectiles26.push(new StraightProjectile(new Pos(50+x*50, 50+y*50), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, Math.atan2(y, x)));
-            projectiles27.push(new StraightProjectile(new Pos(0, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1, 0));
+            projectiles26.push(new StraightProjectile(new Pos(50+x*100, 50+y*100), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, Math.atan2(y, x)));
+            projectiles27.push(new StraightProjectile(new Pos(-50, 100/11 * i), 3*60, new Sprite("assets/rootSpike.png", 0, 0, 0), 1.5, 0));
         }
         this.#battle = new Battle(this, new Enemy(100, new BigSprite(
             new Sprite("assets/faces.png", 26, 0, 0),
@@ -200,6 +200,7 @@ export class Game {
                     break;
             }
             const playerTargetPos = Util.convertWorldPosToTileCoordinate(playerPos, this.getScreen());
+            this.getScene().callOnInteraction(this, this.#scene, playerTargetPos.toPos(1), "");
             let scriptedObject = this.#scene.getScriptedObjects().find((scriptedObject) => scriptedObject.pos.equals(playerTargetPos.toPos(screen.tileSize)))!;
             if((scriptedObject && (scriptedObject.type === ObjectBehaviour.Interactable) || scriptedObject.type === ObjectBehaviour.Sign) || scriptedObject.type === ObjectBehaviour.Button){
                 executeBehaviour(this, this.#scene, scriptedObject.pos, scriptedObject.type, scriptedObject.behaviourData);
@@ -604,6 +605,7 @@ export class GameState {
     hasSolvedIcePuzzle: boolean;
     hasReadExplosiveSign: boolean;
     hasStartedBattle: boolean;
+    hasTalkedToKim: boolean;
 
     constructor(){
         this.hasPlayedJohannesLektionCutScene = false;
@@ -611,5 +613,6 @@ export class GameState {
         this.hasSolvedIcePuzzle = false;
         this.hasReadExplosiveSign = false;
         this.hasStartedBattle = false;
+        this.hasTalkedToKim = true;
     }
 }

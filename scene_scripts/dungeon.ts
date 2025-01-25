@@ -104,4 +104,8 @@ export default class Script implements SceneScript {
     render(game: Game, currentScene: Scene) {
         
     };
+
+    onInteraction(game: Game, currentScene: Scene, pos: Pos, data: string) {
+        
+    }
 }

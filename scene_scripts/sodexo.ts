@@ -104,6 +104,7 @@ export default class Script implements SceneScript {
                 }),
                 new SequenceItem(new CodeSequenceItem(() => {
                     game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/DaftPunkalovania.mp3")!)
+                    game.getAudioManager().setVolume(0.5);
                 }), (item, ctx) => {
                     (item as CodeSequenceItem).run();
                 }),
@@ -123,5 +124,9 @@ export default class Script implements SceneScript {
     render(game: Game, currentScene: Scene) {
         
     };
+
+    onInteraction(game: Game, currentScene: Scene, pos: Pos, data: string) {
+        
+    }
 
 }

@@ -27,12 +27,13 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/faces.png", 16),
         new Sprites.SpriteSheet("assets/saker.png", 16),
         new Sprites.SpriteSheet("assets/heart.png", 16),
-        new Sprites.SpriteSheet("assets/proj1.png", 16),
         new Sprites.SpriteSheet("assets/rootSpike.png", 16),
         new Sprites.SpriteSheet("assets/ingang.png", 16),
         new Sprites.SpriteSheet("assets/dungeon.png", 16),
         new Sprites.SpriteSheet("assets/snowset.png", 16),
         new Sprites.SpriteSheet("assets/sodexo.png", 16),
+        new Sprites.SpriteSheet("assets/erik.png", 16),
+        new Sprites.SpriteSheet("assets/fire.png", 16),
         new TextAsset("assets/intro.json"),
         new TextAsset("assets/dungeon.json"),
         new TextAsset("assets/snow1.json"),
@@ -74,6 +75,7 @@ const assetLoader = new AssetLoader(
         const game = new Game(startScene, new Pos(-5, 2), screen, audioManager, particleManager, assetLoader);
         game.setScene(menuScene);
         menuScene.onLoad(game, menuScene);
+        game.getAudioManager().setVolume(0.3)
 
         // --- Start dev code ---
         /*
@@ -92,6 +94,7 @@ const assetLoader = new AssetLoader(
                 if(sceneName){
                     let scene = await deserilizeScene(assetLoader.getTextAsset("assets/" + sceneName + ".json")!.data!);
                     game.setScene(scene);
+                    game.getPlayer().setShouldRender(true);
                     scene.onLoad(game, scene);
                 }
             }
@@ -189,8 +192,8 @@ function render(game: Game): void {
         Sprites.render(ctx, assetLoader, sprite!, canvasPos.x, canvasPos.y, screen.tileSize * screen.renderScale, screen.tileSize * screen.renderScale);
     });
 
-    game.getPlayer().render(ctx, game);
     game.getScene().onRender(game);
+    game.getPlayer().render(ctx, game);
     game.getParticleManager().render(ctx, game);
 
     if(screen.fadeAlpha != 0){

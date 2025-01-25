@@ -1,4 +1,4 @@
-import { Game } from "../game.js";
+import { Game, Pos } from "../game.js";
 import Keys from "../keys.js";
 import { changeScene, Scene, SceneScript } from "../scene.js";
 
@@ -45,5 +45,7 @@ export default class Script implements SceneScript {
         if (game.getInputHandler().isKeyDown(Keys.Interact)) {
             window.location.reload();
         }
+    }
+    onInteraction(game: Game, currentScene: Scene, pos: Pos, data: string) {
     }
 }

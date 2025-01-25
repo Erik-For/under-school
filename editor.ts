@@ -20,6 +20,11 @@ let selectedCollisionRule: number = 1;
 // should render collision boxes
 let renderCollision: boolean = true;
 
+// Add a clipboard to store copied tile data
+let clipboard: { startCoord: TileCoordinate; tiles: { coord: TileCoordinate; tile: Tile }[] } | null = null;
+// Added state variables for preview functionality
+let isPreviewActive = false;
+let previewCoord: TileCoordinate | null = null;
 
 if(!ctx) {
     throw new Error('Canvas not found');   
@@ -37,6 +42,8 @@ const spriteSheetManager = new AssetLoader (
         new Sprites.SpriteSheet("assets/snowset.png", tileSize),
         new Sprites.SpriteSheet("assets/dungeon.png", tileSize),
         new Sprites.SpriteSheet("assets/sodexo.png", tileSize),
+        new Sprites.SpriteSheet("assets/erik.png", tileSize),
+        new Sprites.SpriteSheet("assets/fire.png", tileSize),
     ], async () => { 
         // callback when all assets are loaded
 
@@ -140,6 +147,72 @@ const spriteSheetManager = new AssetLoader (
             }
         });
 
+        // Copy selected section to clipboard
+        input.onClick('KeyY', () => {
+            if (selectSpriteModalActive) { return; }
+            if (!selection.active) {
+                // Start selection
+                selection.active = true;
+                selection.startX = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
+                selection.startY = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
+                return;
+            }
+
+            // End selection
+            selection.endX = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
+            selection.endY = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
+
+            // Get the minimum and maximum coordinates of the selection
+            const minX = Math.min(selection.startX, selection.endX);
+            const maxX = Math.max(selection.startX, selection.endX);
+            const minY = Math.min(selection.startY, selection.endY);
+            const maxY = Math.max(selection.startY, selection.endY);
+
+            const copiedTiles: { coord: TileCoordinate; tile: Tile }[] = [];
+
+            for (let x = minX; x <= maxX; x++) {
+                for (let y = minY; y <= maxY; y++) {
+                    const tile = scene.getTile(new TileCoordinate(x, y));
+                    if (tile) {
+                        // Deep clone the tile to avoid reference issues
+                        let sprites: Array<Sprites.Sprite> = [];
+                        for(let sprite of tile.getSprites()){
+                            sprites.push(new Sprites.Sprite(sprite.spriteSheetSrc, sprite.xOffset, sprite.yOffset, sprite.zindex));
+                        }
+
+                        const clonedTile = new Tile(tile.getPosition(), tile.getCollisonRule(), sprites);  
+                        copiedTiles.push({ coord: new TileCoordinate(x, y), tile: clonedTile });
+                    }
+                }
+            }
+
+            clipboard = { tiles: copiedTiles, startCoord: new TileCoordinate(minX, minY) };
+            selection.active = false;
+        });
+
+        // Paste copied section at mouse position
+        input.onClick('KeyZ', () => {
+            if (selectSpriteModalActive) { return; }
+            if (!clipboard || !isPreviewActive) {
+                return;
+            }
+
+            // Get the top-left coordinate of the selection
+            const pasteX = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
+            const pasteY = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
+
+            // Determine the offset based on the original selection's minimum coordinates
+            const originalMinX = Math.min(...clipboard.tiles.map(t => t.coord.x));
+            const originalMinY = Math.min(...clipboard.tiles.map(t => t.coord.y));
+
+            clipboard.tiles.forEach(({ coord, tile }) => {
+                const offsetX = coord.x - originalMinX;
+                const offsetY = coord.y - originalMinY;
+                const newCoord = new TileCoordinate(pasteX + offsetX, pasteY + offsetY);
+                scene.setTile(newCoord, tile.getCollisonRule(), [...tile.getSprites()]);
+            });
+
+        });
 
         // area selection with f, g, h, t
         const handleSelection = (mode : "remove" | "add" | "random" | "col") => {
@@ -238,6 +311,10 @@ const spriteSheetManager = new AssetLoader (
         });
 
 
+        input.onClick('KeyP', () => {
+            isPreviewActive = !isPreviewActive;            
+        });
+
         // some methods need this to work
         document.addEventListener('mousemove', (event) => {
             mouse.x = event.clientX;
@@ -261,6 +338,21 @@ const spriteSheetManager = new AssetLoader (
 
             if(selection.active){
                 renderSelection(selection, camera, ctx!, tileSize, renderScale, mouse);
+            }
+            
+            // Render the preview
+            if(isPreviewActive && !selection.active && clipboard != null){
+
+                let xStart = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
+                let yStart = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
+                let moveToCoord = new TileCoordinate(xStart, yStart);
+                let offset = moveToCoord.subtract(clipboard!.startCoord);
+                // ittarate over clipboard tiles and render them relative to XStart and YStart
+                ctx.globalAlpha = 0.5;
+                clipboard?.tiles.forEach(({ coord, tile }) => {
+                    Sprites.renderMany(ctx!, spriteSheetManager, tile.getSprites(),  (offset.x + coord.x) * tileSize * renderScale - camera.x + canvas.width / 2, (offset.y + coord.y) * tileSize * renderScale - camera.y + canvas.height / 2, tileSize * renderScale, tileSize * renderScale);
+                });
+                ctx.globalAlpha = 1;
             }
 
             ctx.fillStyle = "#FFFFFF";

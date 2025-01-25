@@ -10,7 +10,8 @@ export default class Script implements SceneScript {
     private buttonHeight: number = 40;
     private padding: number = 20;
 
-    onEnter(prevScene: Scene, game: Game, currentScene: Scene) {        
+    onEnter(prevScene: Scene, game: Game, currentScene: Scene) {   
+        game.getPlayer().setShouldRender(false);
         // Reset buttons array
     }
 
@@ -73,6 +74,7 @@ export default class Script implements SceneScript {
                             let prev = game.getScene();
                             let introScene = await deserilizeScene(game.getAssetLoader().getTextAsset("assets/intro.json")!.data!);
                             game.setScene(introScene);
+                            game.getPlayer().setShouldRender(true);
                             introScene.onLoad(game, prev);
                         } else if (text === "Credits") {
                             this.currentMenu = "credits";
@@ -108,5 +110,8 @@ export default class Script implements SceneScript {
                 }
             });
         }
+    }
+    onInteraction(game: Game, currentScene: Scene, pos: Pos, data: string) {
+        
     }
 } 

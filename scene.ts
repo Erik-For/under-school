@@ -21,6 +21,7 @@ export class Scene {
             name: "default",
             onEnter: (prevScene: Scene, game: Game, currentScene: Scene) => {},
             onExit: (game: Game, currentScene: Scene) => {},
+            onInteraction: (game: Game, currentScene: Scene, pos: Pos, data: string) => {},
             render: (game: Game, currentScene: Scene) => {},
         }
         this.#scriptedBehaviour = new Map();        
@@ -29,57 +30,57 @@ export class Scene {
     getScriptName(): string {
         return this.#sceneScript.name;
     }
-
+    
     /**
      * Sets a tile at the specified position with collision rule and sprites.
      * @param pos - The position of the tile.
      * @param collisonRule - The collision rule for the tile.
      * @param sprites - The array of sprites for the tile.
-     */
-    setTile(pos: TileCoordinate, collisonRule: number, sprites: Array<Sprites.Sprite>) {
-        if(!this.#mapData.has(pos.y)) {
-            this.#mapData.set(pos.y, new Map());
+    */
+   setTile(pos: TileCoordinate, collisonRule: number, sprites: Array<Sprites.Sprite>) {
+       if(!this.#mapData.has(pos.y)) {
+           this.#mapData.set(pos.y, new Map());
         }
         this.#mapData.get(pos.y)!.set(pos.x, new Tile(pos, collisonRule, sprites));
     }
-
+    
     setSceneScript(sceneScript: SceneScript){
         this.#sceneScript = sceneScript;
     }
-
+    
     /**
      * Gets the tile at the specified position.
      * @param pos - The position of the tile.
      * @returns The tile at the specified position, or undefined if not found.
-     */
-    getTile(pos: TileCoordinate) {
-        return this.#mapData.get(pos.y)?.get(pos.x);
+    */
+   getTile(pos: TileCoordinate) {
+       return this.#mapData.get(pos.y)?.get(pos.x);
     }
-
+    
     /**
      * Gets all the tiles in the scene.
      * @returns The map of tiles in the scene.
-     */
-    getTiles() {
-        return this.#mapData;
+    */
+   getTiles() {
+       return this.#mapData;
     }
-
+    
     /**
      * Removes the tile at the specified position.
      * @param pos - The position of the tile to remove.
-     */
-    removeTile(pos: TileCoordinate) {
-        this.#mapData.get(pos.y)?.delete(pos.x);
+    */
+   removeTile(pos: TileCoordinate) {
+       this.#mapData.get(pos.y)?.delete(pos.x);
     }
-
+    
     getScriptedObjects(): Array<ScriptedObject>{
         return this.#scriptedObjectData;
     }
-
+    
     addScriptedObject(scriptedObject: ScriptedObject){
         this.#scriptedObjectData.push(scriptedObject);
     }
-
+    
     addManyScriptedObjects(...scriptedObjects: ScriptedObject[]){
         this.#scriptedObjectData.push(...scriptedObjects);
     }
@@ -90,21 +91,24 @@ export class Scene {
             this.#scriptedObjectData.splice(index, 1);
         }
     }
-
+    
     removeScriptedObjectAtIndex(index: number) {
         this.#scriptedObjectData.splice(index, 1);
     }
-
+    
     onLoad(game: Game, prevScene: Scene) {
         const tileSize = game.getScreen().tileSize;
         prevScene.onExit(game, this);
         this.#sceneScript.onEnter(prevScene, game, this)
     }
-
+    
     onExit(game: Game, prevScene: Scene) {
         this.#sceneScript.onExit(game, prevScene);
     }
-
+    
+    callOnInteraction(game: Game, currentScene: Scene, pos: Pos, data: string) {
+        this.#sceneScript.onInteraction(game, currentScene, pos, data);
+    }
     onRender(game: Game) {
         this.#sceneScript.render(game, this);
     }
@@ -282,6 +286,7 @@ export interface SceneScript {
     name: string;
     onEnter: (prevScene: Scene ,game: Game, currentScene: Scene) => void;
     onExit: (game: Game, currentScene: Scene) => void;
+    onInteraction: (game: Game, currentScene: Scene, pos: Pos, data: string) => void;
     render: (game: Game, currentScene: Scene) => void;
 }
 

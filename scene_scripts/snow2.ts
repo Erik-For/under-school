@@ -173,4 +173,8 @@ export default class Script implements SceneScript {
             game.getParticleManager().addParticle(new Snow(position, 2000, game.getAssetLoader().getSpriteSheet("assets/snowset.png")!.getSprite(2, 3)));
         }
     };
+
+    onInteraction(game: Game, currentScene: Scene, pos: Pos, data: string) {
+        
+    }
 }

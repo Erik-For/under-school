@@ -14,6 +14,7 @@ export class Player {
     #movmentFrezze: boolean;
     #health: number;
     #canCollide: boolean;
+    #shouldRender: boolean;
 
     constructor(x: number, y: number, game: Game) {
         this.x = x;
@@ -24,6 +25,7 @@ export class Player {
         this.#movmentFrezze = false;
         this.#health = 100;
         this.#canCollide = true;
+        this.#shouldRender = true;
 
         initAnimations(this.#directionAnimation);
         this.#registerAnimationKeys(); // this handles animation logic, like walking and idleing animations
@@ -83,7 +85,18 @@ export class Player {
         return this.#canCollide;
     }
 
+    setShouldRender(shouldRender: boolean) {
+        this.#shouldRender = shouldRender;
+    }
+
+    getShouldRender() {
+        return this.#shouldRender;
+    }
+
     render(ctx: CanvasRenderingContext2D, game: Game) {                        
+        if(!this.#shouldRender) {
+            return;
+        }
         let animation = this.#movmentFrezze ? this.#directionAnimation.get("idle" + this.getDirection()) : this.#directionAnimation.get(this.#direction);
         let pos = Util.convertWorldPosToCanvasPos(this.getPos(), game.getCamera().getPosition(), game.getScreen());
         animation!.render(ctx, game.getAssetLoader(),
