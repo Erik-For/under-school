@@ -11,6 +11,7 @@ const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRendering
 
 let dev = false;
 const zoom = 1;
+let gamepads: Map<number, Gamepad> = new Map();
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'p') {
@@ -89,9 +90,28 @@ const assetLoader = new AssetLoader(
         }, true);
         */
 
-        window.addEventListener("gamepadconnected", (e) => {
-            alert("Gamepad connected");
-          });
+        window.addEventListener("gamepadconnected", (e: GamepadEvent) => {
+            console.log("Gamepad connected:", e.gamepad);
+            gamepads.set(e.gamepad.index, e.gamepad);
+        });
+        
+        window.addEventListener("gamepaddisconnected", (e: GamepadEvent) => {
+            console.log("Gamepad disconnected:", e.gamepad);
+            gamepads.delete(e.gamepad.index);
+        });
+
+        function scanGamepads() {
+            const detectedGamepads = navigator.getGamepads();
+            for (const gamepad of detectedGamepads) {
+                if (gamepad) {
+                    gamepads.set(gamepad.index, gamepad);
+                    console.log("Found gamepad:", gamepad);
+                }
+            }
+        }
+
+        scanGamepads();
+
         game.getInputHandler().onClick(Keys.Debug2, async () => {
             if(dev){
                 let sceneName = prompt("Enter scene name");
