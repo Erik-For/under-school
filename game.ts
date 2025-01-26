@@ -613,6 +613,6 @@ export class GameState {
         this.hasSolvedIcePuzzle = false;
         this.hasReadExplosiveSign = false;
         this.hasStartedBattle = false;
-        this.hasTalkedToKim = true;
+        this.hasTalkedToKim = false;
     }
 }
