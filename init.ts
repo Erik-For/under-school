@@ -88,6 +88,10 @@ const assetLoader = new AssetLoader(
             }
         }, true);
         */
+
+        window.addEventListener("gamepadconnected", (e) => {
+            alert("Gamepad connected");
+          });
         game.getInputHandler().onClick(Keys.Debug2, async () => {
             if(dev){
                 let sceneName = prompt("Enter scene name");
