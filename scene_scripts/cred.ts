@@ -15,6 +15,7 @@ export default class Script implements SceneScript {
     }
 
     render(game: Game, currentScene: Scene) {
+        game.getPlayer().setShouldRender(false);
         const ctx = game.getScreen().ctx;
         const centerX = game.getScreen().width / 2;
         const centerY = game.getScreen().height / 2;
