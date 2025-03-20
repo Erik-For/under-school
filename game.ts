@@ -8,7 +8,7 @@ import * as Util from "./util.js";
 import { Battle, Enemy, HomingProjectile, LoopingHomingProjectile, Round, StraightProjectile } from "./battle.js";
 import Keys from "./keys.js";
 import {BigSprite, TextAnimation, TextAnimationNoInteract} from "./animate.js";
-import {Sprite, SpriteSheet} from "./sprite.js";
+import {render, Sprite, SpriteSheet} from "./sprite.js";
 
 /**
  * Represents a game.
@@ -548,7 +548,8 @@ export class Snow extends Particle {
 
     render(ctx: CanvasRenderingContext2D, game: Game) {
         let canvasPos = Util.convertWorldPosToCanvasPos(this.pos, game.getCamera().getPosition(), game.getScreen());
-        Util.drawImageRot(ctx, this.image, canvasPos, 4, 4, this.#rot);
+        // Into rotera det är onödigt Util.drawImageRot(ctx, this.image, canvasPos, 4, 4, this.#rot);
+        ctx.drawImage(this.image, canvasPos.x, canvasPos.y, 4, 4);
     }
 }
 
