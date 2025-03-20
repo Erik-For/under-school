@@ -419,9 +419,9 @@ function populateSpritesheetModal(spriteSheetManager: AssetLoader) {
                 };
                 let c = document.createElement('canvas');
                 let cx: CanvasRenderingContext2D = c.getContext('2d')!;
-                cx.imageSmoothingEnabled = false;
                 c.width = width;
                 c.height = width;
+                cx.imageSmoothingEnabled = false;
                 cx?.drawImage(sprite, 0, 0, width, width);
                 a.appendChild(c);
                 rowDiv.appendChild(a);
