@@ -9,7 +9,7 @@
 - Up and down arrow keys to change collisionRule (only works if collision rendering is on)
 
 ## Selection keybinds
-- F, D, H , T to start selection
+- F, G, H , T to start selection
 - F again to delete selected area
 - G again to place selected tile in selected area
 - H prompts for a number 0-1 (chance for each tile) to fill selected area with
