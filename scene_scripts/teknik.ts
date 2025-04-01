@@ -318,8 +318,8 @@ export default class Script implements SceneScript {
                     game.getInputHandler().preventInteraction();
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                 new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Hej, jag heter Jesper, jag är matte/fysik lärare.", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Alla är männskliga, ty de gör fel................", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Förutom mig.", 750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Alla gör fel någon gång, ty de är mänskliga...", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Förutom jag.", 750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new CodeSequenceItem(() => {
                     game.getPlayer().unfreezeMovment();
                     game.getInputHandler().allowInteraction();
