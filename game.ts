@@ -552,6 +552,29 @@ export class Snow extends Particle {
         ctx.drawImage(this.image, canvasPos.x, canvasPos.y, 4, 4);
     }
 }
+
+export class BurstParticle extends Particle {
+    constructor(pos: Pos, image: ImageBitmap) {
+        super(pos, new Pos(0, 0), Math.random() * 30 + 30, image, false);
+
+        this.velocity = new Pos(Math.random() * 2 - 1, Math.random() * 2 - 1); // Random velocity
+        this.velocity.x *= 0.5; // Adjust the speed of the burst particles
+        this.velocity.y *= 0.5; // Adjust the speed of the burst particles
+    }
+
+    update(): void {
+        this.pos = this.pos.add(this.velocity);
+        this.lifeTime--;
+    }
+
+    render(ctx: CanvasRenderingContext2D, game: Game): void {
+        let canvasPos = Util.convertWorldPosToCanvasPos(this.pos, game.getCamera().getPosition(), game.getScreen());
+        ctx.drawImage(this.image, canvasPos.x, canvasPos.y, 4, 4); // Draw the burst particle
+    }
+
+
+}
+
 export class Star extends Particle {
     #rot: number;
     #fadeSpeed: number;

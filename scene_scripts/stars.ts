@@ -16,6 +16,7 @@ export default class Script implements SceneScript {
                 const fadeToBlack = fadeIn(game);
                 let newScene = await deserilizeScene(game.getAssetLoader().getTextAsset("assets/snow2.json")!.data!);
                 fadeToBlack.then(() => {
+                    game.getParticleManager().particles = [];
                     game.getPlayer().setShouldRender(true);
                     game.setScene(newScene);
                     newScene.onLoad(game, currentScene); 

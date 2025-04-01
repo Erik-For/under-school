@@ -25,16 +25,15 @@ export default class Script implements SceneScript {
             new ScriptedObject(new Pos(18, -7).multiply(16), ObjectBehaviour.Sign, "Trappor, förbjudet!", new Sprite("assets/saker.png", 7, 0, 10)),
             new ScriptedObject(new Pos(17, -8).multiply(16), ObjectBehaviour.Walkable, "ner", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(17, -9).multiply(16), ObjectBehaviour.Walkable, "ner", new Sprite("assets/dungeon.png", 0, 0, 10)),
-            new ScriptedObject(new Pos(5, -8).multiply(16), ObjectBehaviour.Interactable, "biblotek", new Sprite("assets/dungeon.png", 0, 0, 10)),
-            new ScriptedObject(new Pos(6, -8).multiply(16), ObjectBehaviour.Interactable, "biblotek", new Sprite("assets/dungeon.png", 0, 0, 10)),
-        );
+            new ScriptedObject(new Pos(5, -8).multiply(16), ObjectBehaviour.Sign, "Bibloteket är stängt, kom tillbaka senare", new Sprite("assets/dungeon.png", 0, 0, 10)),
+            new ScriptedObject(new Pos(6, -8).multiply(16), ObjectBehaviour.Sign, "Bibloteket är stängt, kom tillbaka senare", new Sprite("assets/dungeon.png", 0, 0, 10)),
+            new ScriptedObject(new Pos(12, -7).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
+            new ScriptedObject(new Pos(14, -7).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
+            new ScriptedObject(new Pos(12, 0).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
+            new ScriptedObject(new Pos(23, 0).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
+            new ScriptedObject(new Pos(24, 0).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
 
-        currentScene.registerBehaviour("biblotek", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
-            let sequence = new Sequence([
-                new SequenceItem(new TextAnimationNoInteract("Bibloteket är stängt, kom tillbaka senare!", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
-            ]);
-            game.getSequenceExecutor().setSequence(sequence);
-        });
+        );
 
         let hasWalkedDown = false;
         currentScene.registerBehaviour("ner", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
@@ -50,7 +49,7 @@ export default class Script implements SceneScript {
                     return fadeIn(game, 1000);
                 }), (item, ctx) => { (item as AsyncCodeSequenceItem).run(); }),
                 new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
-                new SequenceItem(new TextAnimationNoInteract("*Medans du går ner snubblar du och faller ner för ett brunnslock i golvet*", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
+                new SequenceItem(new TextAnimationNoInteract("*Medan du går ner för trapporna snubblar du och faller ner genom ett brunnslock i golvet*", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
                 new SequenceItem(new CodeSequenceItem(() => {
                     changeScene(game, "assets/dungeon.json");
                     fadeOut(game, 1000);
@@ -173,7 +172,7 @@ function goliCutScene(game: Game, currentScene: Scene) {
             }
         ),
         new SequenceItem(
-            new NPCTextAnimation(charecter, "Hej, jag heter Göran men du kan kalla mig GOLI..... använd dig av WASD för att röra dig och klicka på K för att interagera med objekt och dialog.", 8000, game.getInputHandler()),
+            new NPCTextAnimation(charecter, "Hej, jag heter Göran men du kan kalla mig GOLI..... Använd dig av WASD för att röra dig och klicka på K för att interagera med objekt och dialog.", 8000, game.getInputHandler()),
             (item, ctx) => {
                 (item as NPCTextAnimation).render(ctx, game);
             }
@@ -185,13 +184,13 @@ function goliCutScene(game: Game, currentScene: Scene) {
             }
         ),
         new SequenceItem(
-            new NPCTextAnimation(charecter, "Men i varje fall varmt välkommen till Åva gymmnasium där alla är välkomna. *mumlar för sig själv* Förutom tibble elever...", 5000, game.getInputHandler()),
+            new NPCTextAnimation(charecter, "Men i varje fall varmt välkommen till Åva gymmnasium där alla är välkomna! *mumlar för sig själv* 'Förutom Tibble elever...'", 5000, game.getInputHandler()),
             (item, ctx) => {
                 (item as NPCTextAnimation).render(ctx, game);
             }
         ),
         new SequenceItem(
-            new NPCTextAnimation(charecter, "Men jag ska inte störa dig mer, jag hörde att du var på väg till teknikhallen, den ligger till höger rakt fram, gå inte ner för trappan under några omständigheter.", 6500, game.getInputHandler()),
+            new NPCTextAnimation(charecter, "Jag ska inte störa dig något mer, jag har fått höra att du ska till teknikhallen, den ligger till höger rakt fram.... Gå inte ner för trappan under några omständigheter.", 6500, game.getInputHandler()),
             (item, ctx) => {
                 (item as NPCTextAnimation).render(ctx, game);
             }

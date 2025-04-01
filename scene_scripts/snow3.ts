@@ -45,10 +45,10 @@ export default class Script implements SceneScript {
                             game.getInputHandler().preventInteraction();
                         }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                         new SequenceItem(new NPCTextAnimation(kim.bigsprite, "FONClBrISCH, FONClBrISCH, på dig!", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                        new SequenceItem(new NPCTextAnimation(kim.bigsprite, "Jag heter Kim, jag var kemilärare på Åva innan de gjorde sig av med mig........ Nu håller jag hus här...", 5000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                        new SequenceItem(new NPCTextAnimation(kim.bigsprite, "Jag heter Kim och jobbade som kemilärare på Åva innan de gjorde sig av med mig........ Nu håller jag hus här...", 5000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new NPCTextAnimation(kim.bigsprite, "Du ser inte ut som om du hör hemma här.... Under skolan alltså....", 5000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new NPCTextAnimation(kim.bigsprite, "Jag nej, jag är ett med naturen nu mera...", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                    new SequenceItem(new NPCTextAnimation(kim.bigsprite, "Vet du vad, du som kommit så långt på väg till att bli den du vill... Gå tillbaka norr ut, så ska jag hjälpa dig på traven....", 5000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(kim.bigsprite, "Vet du vad? Du som kommit så långt som du är... på väg till att bli den du vill... Gå tillbaka norr ut, så ska jag hjälpa dig på traven....", 5500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new CodeSequenceItem(() => {
                         game.getGameState().hasTalkedToKim = true;
                         game.getPlayer().unfreezeMovment();
@@ -66,7 +66,8 @@ export default class Script implements SceneScript {
                             game.getPlayer().freezeMovment();
                             game.getInputHandler().preventInteraction();
                         }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
-                        new SequenceItem(new NPCTextAnimation(kim.bigsprite, "Jag är glad att du kom till mig, du kan gå upp på berget nu, det är vägen tillbaka till Åva", 5000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                        new SequenceItem(new NPCTextAnimation(kim.bigsprite, "Det glädjer mig att jag fick träffa dig här, du kan gå upp på berget nu, det är vägen tillbaka till Åva", 5000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                        new SequenceItem(new NPCTextAnimation(kim.bigsprite, "Men var försiktig.........................................................", 9500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                         new SequenceItem(new CodeSequenceItem(() => {
                             game.getPlayer().unfreezeMovment();
                             game.getInputHandler().allowInteraction();

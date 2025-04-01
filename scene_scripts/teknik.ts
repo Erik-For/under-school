@@ -141,7 +141,7 @@ export default class Script implements SceneScript {
                         bottom?.getSprites().push(new Sprite("assets/people.png", 3, 1, 2));
                     }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                     new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Hej, välkommen till teknikhallen, jag heter Martin och jag är din mentor.", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                    new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Jag har en skoldator för dig, om du har några problem med att logga in så kan du fråga Göran", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Jag har din skoldator här. Om du har några problem med att logga in så kan du fråga Göran.", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Klassen borde ha gått på lunch nu, gå ut ur teknikhallen där borde du hitta Tom och Jens, de kan hjälpa dig hitta till lunchen", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new NPCTextAnimation(martin.bigsprite, "Gå inte under några omständigheter ner för trappoorna utanför teknikhallen, det är förbjudet!", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new CodeSequenceItem(() => {
@@ -201,16 +201,16 @@ export default class Script implements SceneScript {
                     game.getPlayer().setPos(new Pos(4.5, -6.5).multiply(16));
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                 new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
-                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Hej allihopa, för er som är nya så heter jag Johannes.", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Hej allihopa! För er som är nya, så heter jag Johannes.", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Idag ska vi prata lite om kedjeregeln.", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "När jag var liten så fanns det ett populärt tv program som hette Pimp my ride på Mtv.", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "och i programet så finns det vissa catchphrases.", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "En av dessa är 'Yo dawg, I heard you like X, so we put a X in your car...' så här är min version:", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "När jag var liten så fanns det ett populärt tv program som hette Pimp my ride på MTV.", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Och i programet så finns det vissa catchphrases.", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "En av dessa var 'Yo dawg, I heard you like X, so we put a X in your car...' så här är min version... Är ni redo?", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Yo dawg, i heard you like functions", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "so i put a function in your function!", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Fattar ni........... Kedjeregeln gäller för funktioner i funktioner", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "...... Jag tycker den är rolig i varje fall.", 3500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Men jag tänker att ni ska räkna lite på egen hand på sidorna 78-79.", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Hur som helst... Idag tänker jag att ni ska räkna lite på egen hand på sidorna 78-79.", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 //HÄR PAUSAS MUSIKEN OBJS OBS OVBS!
                 new SequenceItem(new TextAnimationNoInteract("* Du borde nog prata med din lärare *", 1000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); game.getAudioManager().pauseBackgroundMusic();}),
                 // Hej!
@@ -252,8 +252,8 @@ export default class Script implements SceneScript {
                         game.getPlayer().freezeMovment();
                         game.getInputHandler().preventInteraction();
                     }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
-                    new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Hej, din mentor Martin har en skoldator för dig", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                    new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Martin är i lärarrummet, det hittar du genom att gå höger ur klassrummet sedan rakt fram en bit och lärarrummet ligger bakom dörren längst till höger", 5000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Hej, din mentor Martin har en skoldator till dig", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Martin är i lärarrummet, dit hittar du genom att gå höger ut ur klassrummet, sedan rakt fram en bit och så ligger lärarrummet bakom dörren längst till höger", 5000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new CodeSequenceItem(() => {
                         game.getPlayer().unfreezeMovment();
                         game.getInputHandler().allowInteraction();
@@ -267,7 +267,7 @@ export default class Script implements SceneScript {
                         game.getPlayer().freezeMovment();
                         game.getInputHandler().preventInteraction();
                     }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
-                    new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Resten av din klass gick på lunch", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(johannes.bigsprite, "Resten av din klass har gått på lunch", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                     new SequenceItem(new CodeSequenceItem(() => {
                         game.getPlayer().unfreezeMovment();
                         game.getInputHandler().allowInteraction();
@@ -318,7 +318,7 @@ export default class Script implements SceneScript {
                     game.getInputHandler().preventInteraction();
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                 new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Hej, jag heter Jesper, jag är matte/fysik lärare.", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Alla är männskliga och gör fel ibland.", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Alla är männskliga, ty de gör fel................", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(jesper.bigsprite, "Förutom mig.", 750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new CodeSequenceItem(() => {
                     game.getPlayer().unfreezeMovment();

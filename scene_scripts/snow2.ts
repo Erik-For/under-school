@@ -1,5 +1,5 @@
 import { BigSprite, NPCTextAnimation, TextAnimationNoInteract } from "../animate.js";
-import { Game, Particle, Snow, Pos } from "../game.js";
+import { Game, Particle, Snow, Pos, BurstParticle } from "../game.js";
 import { Player } from "../player.js";
 import { CollisionRule, isButtonPressed, ObjectBehaviour, Scene, SceneScript, ScriptedObject, setButtonPressed, TileCoordinate } from "../scene.js";
 import { CodeSequenceItem, Sequence, SequenceItem, WaitSequenceItem } from "../sequence.js";
@@ -23,7 +23,7 @@ export default class Script implements SceneScript {
     onEnter(prevScene: Scene, game: Game, currentScene: Scene){
         switch(prevScene.getScriptName()){
             default:
-                game.getPlayer().setPos(new Pos(8, -37).multiply(16));
+                game.getPlayer().setPos(new Pos(92, 27).multiply(16));
                 game.getPlayer().setDirection("right");
                 break;
             case "snow1.js":
@@ -50,9 +50,18 @@ export default class Script implements SceneScript {
         )
 
         currentScene.registerBehaviour("scope", (game: Game, currentScene: Scene, pos: Pos, data: String) => {
-            //set changescene object under player
-            currentScene.addScriptedObject(new ScriptedObject(new Pos(8, -40).multiply(16), ObjectBehaviour.ChangeScene, "assets/stars.json", new Sprite("assets/dungeon.png", 0, 0, 0)));
-            currentScene.addScriptedObject(new ScriptedObject(new Pos(7, -40).multiply(16), ObjectBehaviour.ChangeScene, "assets/stars.json", new Sprite("assets/dungeon.png", 0, 0, 0)));
+            let sequence = new Sequence([
+                new SequenceItem(new TextAnimationNoInteract("Du hukar dig ner och ser genom teleskopet upp mot natthimlen", 1000, 1500), (item, ctx) => {
+                    (item as TextAnimationNoInteract).render(ctx, game);
+                }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    currentScene.addScriptedObject(new ScriptedObject(new Pos(8, -40).multiply(16), ObjectBehaviour.ChangeScene, "assets/stars.json", new Sprite("assets/dungeon.png", 0, 0, 0)));
+                    currentScene.addScriptedObject(new ScriptedObject(new Pos(7, -40).multiply(16), ObjectBehaviour.ChangeScene, "assets/stars.json", new Sprite("assets/dungeon.png", 0, 0, 0)));        
+                }), (item, ctx) => {
+                    (item as CodeSequenceItem).run();
+                }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
         });
 
         currentScene.addManyScriptedObjects(...this.#buttons);
@@ -144,6 +153,18 @@ export default class Script implements SceneScript {
                     (item as TextAnimationNoInteract).render(ctx, game);
                 }),
                 new SequenceItem(new CodeSequenceItem(() => {
+                    //remove the sign it is not a tile, its a scripted object
+                    currentScene.getScriptedObjects().forEach((obj) => {
+                        if(obj.pos.equals(new Pos(92, 25).multiply(16))) {
+                            currentScene.removeScriptedObject(obj);
+                        }
+                    });
+                    currentScene.getTile(new TileCoordinate(92, 25))!.setCollisonRule(CollisionRule.None);
+                    //spawn a bunch of sign particles
+                    for (let i = 0; i < 100; i++) {
+                        const signParticle = new BurstParticle(new Pos(92.5, 25).multiply(16), game.getAssetLoader().getSpriteSheet("assets/saker.png")!.getSprite(6, 0));
+                        game.getParticleManager().addParticle(signParticle);
+                    }
                     game.getCamera().cameraShake(500, 2, game);
                 }), (item, ctx) => {
                     (item as CodeSequenceItem).run();
