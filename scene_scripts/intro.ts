@@ -32,7 +32,8 @@ export default class Script implements SceneScript {
             new ScriptedObject(new Pos(12, 0).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(23, 0).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(24, 0).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
-
+            new ScriptedObject(new Pos(12, -23).multiply(16), ObjectBehaviour.Sign, "GOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLI", new Sprite("assets/people.png", 0, 1, 0)),
+            new ScriptedObject(new Pos(12, -24).multiply(16), ObjectBehaviour.Sign, "GOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLI", new Sprite("assets/people.png", 0, 0, 0)),
         );
 
         let hasWalkedDown = false;
