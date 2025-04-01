@@ -44,6 +44,7 @@ const assetLoader = new AssetLoader(
         new TextAsset("assets/teknik.json"),
         new TextAsset("assets/sodexo.json"),
         new TextAsset("assets/cred.json"),
+        new TextAsset("assets/stars.json"),
         new AudioAsset("assets/bg.mp3"),
         new AudioAsset("assets/beep.wav"),
         new AudioAsset("assets/rumble.wav"),

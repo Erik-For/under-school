@@ -9,7 +9,10 @@ export default class Script implements SceneScript {
     name: string = "snow1.js";
     async onEnter(prevScene: Scene, game: Game, currentScene: Scene){
         switch(prevScene.getScriptName()){
-            //default:
+            default:
+                game.getPlayer().setPos(new Pos(-1, -4).multiply(16)); // byt ut kordinaterna
+                game.getPlayer().setDirection("down");
+                break;
             case "dungeon.js":
                 game.getPlayer().setPos(new Pos(-1, -4).multiply(16)); // byt ut kordinaterna
                 game.getPlayer().setDirection("down");

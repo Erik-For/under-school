@@ -158,7 +158,7 @@ export class BigSprite {
      */
     render(ctx: CanvasRenderingContext2D, assetLoader: AssetLoader, x: number, y: number, width: number, height: number) {
         render(ctx, assetLoader, this.topLeft, Math.round(x), Math.round(y), Math.round(width / 2), Math.round(height / 2));
-        render(ctx, assetLoader, this.topRight, Math.round(x + width / 2), Math.floor(y), Math.round(width / 2), Math.round(height / 2));
+        render(ctx, assetLoader, this.topRight, Math.round(x + width / 2), Math.round(y), Math.round(width / 2), Math.round(height / 2));
         render(ctx, assetLoader, this.bottomLeft, Math.round(x), Math.round(y + height / 2), Math.round(width / 2), Math.round(height / 2));
         render(ctx, assetLoader, this.bottomRight, Math.round(x + width / 2), Math.round(y + height / 2), Math.round(width / 2), Math.round(height / 2));
     }

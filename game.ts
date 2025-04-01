@@ -552,6 +552,40 @@ export class Snow extends Particle {
         ctx.drawImage(this.image, canvasPos.x, canvasPos.y, 4, 4);
     }
 }
+export class Star extends Particle {
+    #rot: number;
+    #fadeSpeed: number;
+    #fadeOut: boolean;
+    #fade: number;
+
+    constructor(pos: Pos, lifeTime: number, image: ImageBitmap) {
+        super(pos, new Pos(0, 0), lifeTime, image, false); // No velocity
+        this.#rot = Math.random() * Math.PI * 2;
+        this.#fadeSpeed = Math.random() * 0.05 + 0.05; // Random fade speed
+        this.#fadeOut = false;
+        this.#fade = 1;
+    }
+
+    update(): void {
+        if(this.#fadeOut) {
+            this.#fade -= this.#fadeSpeed;
+            if(this.#fade <= 0) {
+                this.lifeTime = 0; // Remove the particle when it is fully faded out
+            }
+        } else {
+            this.#fade += this.#fadeSpeed;
+            if(this.#fade >= 1) {
+                this.#fadeOut = true; // Start fading out after reaching full brightness
+            }
+        }
+    }
+
+    render(ctx: CanvasRenderingContext2D, game: Game): void {
+        ctx.globalAlpha = this.#fade; // Set the alpha for fading effect
+        Util.drawImageRot(ctx, this.image, this.pos, 4, 4, this.#rot);
+        ctx.globalAlpha = 1; // Reset alpha to 1 for other drawings
+    }
+}
 
 export class ParticleManager{
     particles: Particle[];
