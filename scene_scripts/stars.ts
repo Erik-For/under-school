@@ -24,6 +24,7 @@ export default class Script implements SceneScript {
                     fade.then(() => {
                         game.getPlayer().allowCollisions();
                         game.getPlayer().unfreezeMovment();
+                        game.getInputHandler().allowInteraction();
                     });
                 });
             })();
@@ -31,7 +32,6 @@ export default class Script implements SceneScript {
     }
 
     onExit(game: Game, currentScene: Scene) {
-        // No cleanup needed
     }
 
     render(game: Game, currentScene: Scene) {

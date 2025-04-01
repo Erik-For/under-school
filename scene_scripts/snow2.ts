@@ -1,4 +1,4 @@
-import { BigSprite, NPCTextAnimation, TextAnimationNoInteract } from "../animate.js";
+import { BigSprite, NPCTextAnimation, TextAnimation, TextAnimationNoInteract } from "../animate.js";
 import { Game, Particle, Snow, Pos, BurstParticle } from "../game.js";
 import { Player } from "../player.js";
 import { CollisionRule, isButtonPressed, ObjectBehaviour, Scene, SceneScript, ScriptedObject, setButtonPressed, TileCoordinate } from "../scene.js";
@@ -51,8 +51,14 @@ export default class Script implements SceneScript {
 
         currentScene.registerBehaviour("scope", (game: Game, currentScene: Scene, pos: Pos, data: String) => {
             let sequence = new Sequence([
-                new SequenceItem(new TextAnimationNoInteract("Du hukar dig ner och ser genom teleskopet upp mot natthimlen", 1000, 1500), (item, ctx) => {
-                    (item as TextAnimationNoInteract).render(ctx, game);
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => {
+                    (item as CodeSequenceItem).run();
+                }),
+                new SequenceItem(new TextAnimation("Du hukar dig ner och ser genom teleskopet upp mot natthimlen", 1000, game.getInputHandler()), (item, ctx) => {
+                    (item as TextAnimation).render(ctx, game);
                 }),
                 new SequenceItem(new CodeSequenceItem(() => {
                     currentScene.addScriptedObject(new ScriptedObject(new Pos(8, -40).multiply(16), ObjectBehaviour.ChangeScene, "assets/stars.json", new Sprite("assets/dungeon.png", 0, 0, 0)));
