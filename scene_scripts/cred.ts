@@ -26,7 +26,7 @@ export default class Script implements SceneScript {
         ctx.textAlign = "center";
 
         // Draw title
-        ctx.fillText("Credits", centerX, centerY - this.padding * 3);
+        ctx.fillText("UNDERSCHOOL", centerX, centerY - this.padding * 3);
 
         // Draw victory text
         ctx.font = "30px underschool";
@@ -34,13 +34,13 @@ export default class Script implements SceneScript {
         ctx.fillText("Jens den hungrige!", centerX, centerY);
 
         // Draw credits text
-        ctx.fillText("Made by", centerX, centerY + this.padding * 2);
+        ctx.fillText("Skapat av", centerX, centerY + this.padding * 2);
         ctx.fillText("Ruben och Erik", centerX, centerY + this.padding * 3);
-        ctx.fillText("from TE22A", centerX, centerY + this.padding * 4);
+        ctx.fillText("från TE22A", centerX, centerY + this.padding * 4);
 
         // Draw return text
         ctx.font = "20px underschool";
-        ctx.fillText("Press K to return", centerX, centerY + this.padding * 6);
+        ctx.fillText("Tryck på K för att gå tillbaka till startmenyn", centerX, centerY + this.padding * 6);
 
         // Handle return to main menu
         if (game.getInputHandler().isKeyDown(Keys.Interact)) {
