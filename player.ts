@@ -114,44 +114,47 @@ export class Player {
      * @private
      */
     #registerMovmentKeys() {
-        let inputHandler = this.#game.getInputHandler();
+        const inputHandler = this.#game.getInputHandler();
         
-        let movmentSpeed = 1;
+        const getMultiplier = () => {
+            return this.#game.getTimeSinceLastTick() / (1000/60);
+        }
+
+        const movmentSpeed = 1.2;
         inputHandler.onHold(Keys.MoveUp, () => {
-            if (this.#canMove(this.x, this.y - movmentSpeed)) {
-                if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight)){
-                    this.y -= movmentSpeed / Math.sqrt(2);
-                } else {
-                    this.y -= movmentSpeed;
-                }
+            let mutlipliedSpeed = movmentSpeed * getMultiplier();
+            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight)){
+                mutlipliedSpeed /= Math.sqrt(2);
+            }
+            if (this.#canMove(this.x, this.y - mutlipliedSpeed)) {
+                this.y -= mutlipliedSpeed;
             }
         });
         inputHandler.onHold(Keys.MoveDown, () => {
-            if (this.#canMove(this.x, this.y + movmentSpeed)) {
-                if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight)){
-                    this.y += movmentSpeed / Math.sqrt(2);
-                } else {
-                    this.y += movmentSpeed;
-                }
+            let mutlipliedSpeed = movmentSpeed * getMultiplier();
+            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight)){
+                mutlipliedSpeed /= Math.sqrt(2);
+            }
+            if (this.#canMove(this.x, this.y + mutlipliedSpeed)) {
+                this.y += mutlipliedSpeed;
             }
         });
         inputHandler.onHold(Keys.MoveLeft, () => {
-            if (this.#canMove(this.x - movmentSpeed, this.y)) {
-                if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown)){
-                    this.x -= movmentSpeed / Math.sqrt(2);
-                } else {
-                    this.x -= movmentSpeed;
-                }
+            let mutlipliedSpeed = movmentSpeed * getMultiplier();
+            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown)){
+                mutlipliedSpeed /= Math.sqrt(2);
+            }
+            if (this.#canMove(this.x - mutlipliedSpeed, this.y)) {
+                this.x -= mutlipliedSpeed;
             }
         });
         inputHandler.onHold(Keys.MoveRight, () => {
-            if (this.#canMove(this.x + movmentSpeed, this.y)) {
-                if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown)){
-                    this.x += movmentSpeed / Math.sqrt(2);
-                } else {
-                    this.x += movmentSpeed;
-                }
-                
+            let mutlipliedSpeed = movmentSpeed * getMultiplier();
+            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown)){
+                mutlipliedSpeed /= Math.sqrt(2);
+            }
+            if (this.#canMove(this.x + mutlipliedSpeed, this.y)) {
+                this.x += mutlipliedSpeed;
             }
         });
     }

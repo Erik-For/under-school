@@ -26,6 +26,7 @@ export class Game {
     #sequenceExecutor: SequenceExecutor;
     #mode: Mode;
     #battle: Battle | undefined;
+    #lastTickTime: number = 0;
     
     /**
      * Creates a new instance of the Game class.
@@ -137,6 +138,7 @@ export class Game {
             }),
         ]), [])]);
         
+        this.#lastTickTime = Date.now();
         setInterval(() => { // Game ticks
             this.#inputHandler.update();
 
@@ -179,7 +181,10 @@ export class Game {
             }
             this.#battle?.tick();
             this.#particleManager.update();
+            this.#lastTickTime = Date.now();
         }, Math.round(1000 / 60));
+
+
         this.#inputHandler.onClick(Keys.Interact, () => {
             // calculate tile in front of player ( 8 pixels in front of player)
             const playerPos = this.getPlayer().getPos();
@@ -320,6 +325,10 @@ export class Game {
 
     newBattle(enemy: Enemy, rounds: Round[]) {
         this.#battle = new Battle(this, enemy, rounds);
+    }
+
+    getTimeSinceLastTick(): number {
+        return Date.now() - this.#lastTickTime;
     }
 }
 
@@ -633,6 +642,7 @@ export class ParticleManager{
             particle.render(ctx, game);
         });
     }
+
 }
 
 function calculateNewPosition(currentPos: Pos, direction: string, range: number): Pos {
