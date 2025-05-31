@@ -28,13 +28,20 @@ export default class Script implements SceneScript {
             new ScriptedObject(new Pos(5, -8).multiply(16), ObjectBehaviour.Sign, "Bibloteket är stängt, kom tillbaka senare", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(6, -8).multiply(16), ObjectBehaviour.Sign, "Bibloteket är stängt, kom tillbaka senare", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(12, -7).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
-            new ScriptedObject(new Pos(14, -7).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(12, 0).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(23, 0).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(24, 0).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)),
             new ScriptedObject(new Pos(12, -23).multiply(16), ObjectBehaviour.Sign, "GOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLI", new Sprite("assets/people.png", 0, 1, 0)),
             new ScriptedObject(new Pos(12, -24).multiply(16), ObjectBehaviour.Sign, "GOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLIGOLI", new Sprite("assets/people.png", 0, 0, 0)),
         );
+
+        if(!game.getGameState().hasRecievedKey) {
+            currentScene.addScriptedObject(new ScriptedObject(new Pos(14, -7).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)));
+        }
+        else{
+            //gör dörren upplåsbar
+            currentScene.addScriptedObject(new ScriptedObject(new Pos(14, -7).multiply(16), ObjectBehaviour.Interactable, "Dörren ska gå att låsa upp (inte fixat än)", new Sprite("assets/dungeon.png", 0, 0, 10)));
+        }
 
         let hasWalkedDown = false;
         currentScene.registerBehaviour("ner", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
@@ -52,8 +59,8 @@ export default class Script implements SceneScript {
                 new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
                 new SequenceItem(new TextAnimationNoInteract("*Medan du går ner för trapporna snubblar du och faller ner genom ett brunnslock i golvet*", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
                 new SequenceItem(new CodeSequenceItem(() => {
-                    changeScene(game, "assets/dungeon.json");
                     fadeOut(game, 1000);
+                    changeScene(game, "assets/dungeon.json");
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
             ]);
             game.getSequenceExecutor().setSequence(sequence);
@@ -120,8 +127,8 @@ export default class Script implements SceneScript {
         }
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(-2, -7).multiply(16), ObjectBehaviour.Sign, "GOLI WAS HERE!!!!!!!!!!!!!!", new Sprite("assets/saker.png", 6, 0, 0)),
-            new ScriptedObject(new Pos(27, -3).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/teknik.png", 0, 0, 0)),
-            new ScriptedObject(new Pos(27, -4).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/teknik.png", 0, 0, 0))
+            new ScriptedObject(new Pos(27, -3).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/ingang.png", 0, 0, 0)),
+            new ScriptedObject(new Pos(27, -4).multiply(16), ObjectBehaviour.ChangeScene, "assets/teknik.json", new Sprite("assets/ingang.png", 0, 0, 0))
         );
 
         await fadeOut(game, 5000);

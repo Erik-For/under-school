@@ -60,6 +60,15 @@ const daniel = {
     )
 }
 
+const goli = {
+    bigsprite: new BigSprite (
+        new Sprite("assets/faces.png", 10, 0, 0),
+        new Sprite("assets/faces.png", 11, 0, 0),
+        new Sprite("assets/faces.png", 10, 1, 0),
+        new Sprite("assets/faces.png", 11, 1, 0),
+    )
+}
+
 import { BigSprite, NPCTextAnimation, TextAnimation, TextAnimationNoInteract } from "../animate.js";
 import { Game, Pos } from "../game.js";
 import { CollisionRule, fadeIn, fadeOut, ObjectBehaviour, Scene, SceneScript, ScriptedObject, Tile, TileCoordinate } from "../scene.js";
@@ -72,9 +81,16 @@ export default class Script implements SceneScript {
         
         switch(prevScene.getScriptName()){
             default: 
+                game.getPlayer().setPos(new Pos(-18.5, -21.5).multiply(16)); //tag bort default när test är klar
+                game.getPlayer().setDirection("up");
+                break;
             case "intro.js":
                 if(!game.getGameState().hasPlayedJohannesLektionCutScene) break;
                 game.getPlayer().setPos(new Pos(5, 4).multiply(16));
+                game.getPlayer().setDirection("up");
+                break;
+            case "minigame.js":
+                game.getPlayer().setPos(new Pos(-18.5, -21.5).multiply(16));
                 game.getPlayer().setDirection("up");
                 break;
             
@@ -82,10 +98,20 @@ export default class Script implements SceneScript {
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(4, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/intro.json", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(5, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/intro.json", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(3, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/intro.json", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(6, 5).multiply(16), ObjectBehaviour.ChangeScene, "assets/intro.json", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-9, -24).multiply(16), ObjectBehaviour.Interactable, "locked", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-12, -24).multiply(16), ObjectBehaviour.Interactable, "locked", new Sprite("assets/saker.png", 8, 0, 0)),
             new ScriptedObject(new Pos(-6, -24).multiply(16), ObjectBehaviour.Interactable, "teacher", new Sprite("assets/saker.png", 8, 0, 0)),
+            new ScriptedObject(new Pos(-19, -24).multiply(16), ObjectBehaviour.Interactable, "arcade", new Sprite("assets/teknik.png", 9, 4, 0)),
+            new ScriptedObject(new Pos(-19, -23).multiply(16), ObjectBehaviour.Interactable, "arcade", new Sprite("assets/teknik.png", 9, 5, 0)),
         );
+
+        if(!game.getGameState().hasRecievedKey){currentScene.addManyScriptedObjects(
+            new ScriptedObject(new Pos(-20, -24).multiply(16), ObjectBehaviour.Interactable, "goli2", new Sprite("assets/people.png", 0, 0, 0)),
+            new ScriptedObject(new Pos(-20, -23).multiply(16), ObjectBehaviour.Interactable, "goli2", new Sprite("assets/people.png", 0, 1, 0)),
+        );
+        }
 
         currentScene.addManyScriptedObjects(
             new ScriptedObject(new Pos(7, -10).multiply(16), ObjectBehaviour.Interactable, "johannes", new Sprite("assets/saker.png", 8, 0, 0)),
@@ -230,6 +256,48 @@ export default class Script implements SceneScript {
             removePeople(game, currentScene);
         }
 
+        if(game.getGameState().hasWonMinigame && prevScene.getScriptName() === "minigame.js" && !game.getGameState().hasRecievedKey) {
+            game.getPlayer().freezeMovment();
+            game.getPlayer().setDirection("up");
+            game.getInputHandler().preventInteraction();
+            game.getPlayer().setPos(new Pos(-19.5, -21.5).multiply(16));
+            await fadeOut(game, 4000);
+
+            let sequence = new Sequence([
+                new SequenceItem(new WaitSequenceItem(10), (item, ctx) => { (item as WaitSequenceItem).run(); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getPlayer().setDirection("up");
+                    game.getInputHandler().preventInteraction();
+                    game.getPlayer().setPos(new Pos(-19.5, -21.5).multiply(16));
+                    game.getGameState().hasRecievedKey = true;
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new WaitSequenceItem(500), (item, ctx) => { (item as WaitSequenceItem).run(); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Snyggt jobbat! Jag har aldrig sett någon klara spelet förut...", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new TextAnimationNoInteract("* GOLI ger dig en nyckel *", 1000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); game.getAudioManager().pauseBackgroundMusic();}),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Se om du kan lista ut vart vilken dörr nyckeln leder till... Jag hittade den utanför biblioteket...", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Lycka till...", 1000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "GOLI OUT!", 1000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+
+
+                new SequenceItem(new CodeSequenceItem(() => {
+                    fadeIn(game, 2500);
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                    currentScene.getScriptedObjects().filter(obj => obj.behaviourData === "goli2").forEach(obj => {
+                        currentScene.removeScriptedObject(obj);
+                    });
+                    currentScene.getTile(new TileCoordinate(-20, -23))!.setCollisonRule(CollisionRule.None);
+                    fadeOut(game, 2500);
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+        
+            game.getSequenceExecutor().setSequence(sequence);
+        }
+
         currentScene.registerBehaviour("alexander", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
             let sequence = new Sequence([
                 new SequenceItem(new CodeSequenceItem(() => {
@@ -241,6 +309,66 @@ export default class Script implements SceneScript {
                     game.getPlayer().unfreezeMovment();
                     game.getInputHandler().allowInteraction();
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+        });
+
+        currentScene.registerBehaviour("goli2", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            if(!game.getGameState().hasPlayedMinigame)
+            {
+                            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Yo dawg! Goli in the house!", 750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Provspela gärna det här spelet som två av våra elever på teknikprogrammet har skapat i kursen programmering 1", 4000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Du kan spela det på arkadmaskinen här brevid", 1000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+
+            }
+            else{
+                            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Imponerande spel, eller hur?", 750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Du kan alltid försöka igen, komma lite längre...", 1250, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Det kanske finns ett slut på spelet...", 1000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+
+            }
+        });
+
+        currentScene.registerBehaviour("arcade", (game: Game, currentScene: Scene, pos: Pos, data: String) => {
+            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => {
+                    (item as CodeSequenceItem).run();
+                }),
+                new SequenceItem(new TextAnimation("Du slår på maskinen och startar spelet (*whaaaat?? ett spel i ett spel?? hur crazy är inte det - Ruben 29/05-2025 21:50*) ", 4000, game.getInputHandler()), (item, ctx) => {
+                    (item as TextAnimation).render(ctx, game);
+                }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    currentScene.addScriptedObject(new ScriptedObject(new Pos(-19, -22).multiply(16), ObjectBehaviour.ChangeScene, "assets/minigame.json", new Sprite("assets/dungeon.png", 0, 0, 0)));
+                }), (item, ctx) => {
+                    (item as CodeSequenceItem).run();
+                }),
             ]);
             game.getSequenceExecutor().setSequence(sequence);
         });

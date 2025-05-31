@@ -35,6 +35,7 @@ const assetLoader = new AssetLoader(
         new Sprites.SpriteSheet("assets/sodexo.png", 16),
         new Sprites.SpriteSheet("assets/erik.png", 16),
         new Sprites.SpriteSheet("assets/fire.png", 16),
+        new Sprites.SpriteSheet("assets/cars.png", 16),
         new TextAsset("assets/intro.json"),
         new TextAsset("assets/dungeon.json"),
         new TextAsset("assets/snow1.json"),
@@ -45,6 +46,7 @@ const assetLoader = new AssetLoader(
         new TextAsset("assets/sodexo.json"),
         new TextAsset("assets/cred.json"),
         new TextAsset("assets/stars.json"),
+        new TextAsset("assets/minigame.json"),
         new AudioAsset("assets/bg.mp3"),
         new AudioAsset("assets/beep.wav"),
         new AudioAsset("assets/rumble.wav"),
@@ -57,9 +59,7 @@ const assetLoader = new AssetLoader(
         new AudioAsset("assets/Underschool.wav"),
         new AudioAsset("assets/slappin_bass.wav"),
         new AudioAsset("assets/Intro.wav"),
-
-
-
+        new AudioAsset("assets/binaryburnout.mp3"),
     ],
     async () => {
         // remove loading screen
@@ -233,9 +233,19 @@ function renderDevOverlay(game: Game) {
 
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "lighter 20px Arial";
-    ctx.fillText(`Standing on tile: ${playerTilePos.x}, ${playerTilePos.y}`, 10, 30);
-    ctx.fillText(`Mouse on tile: ${mouseTilePos.x}, ${mouseTilePos.y}`, 10, 60);
-    ctx.fillText(`Scene: ${game.getScene().getScriptName()}`, 10, 90);
+    ctx.fillText("Dev Mode :)", 10, 20);
+    ctx.fillText(`Standing on tile: ${playerTilePos.x}, ${playerTilePos.y}`, 10, 50);
+    ctx.fillText(`Mouse on tile: ${mouseTilePos.x}, ${mouseTilePos.y}`, 10, 80);
+    ctx.fillText(`Scene: ${game.getScene().getScriptName()}`, 10, 110);
+
+    ctx.fillText(`Availible Scenes (press o and type in the name of the scene. No asset nor .js):`, 10, 150);
+    let i = 0;
+    game.getAssetLoader().getTextAssets().forEach((asset, key) => {
+        if (key.endsWith(".json")) {
+            ctx.fillText(`- ${key}`, 10, 180 + i * 20);
+            i++;
+        }
+    });
 }
 
 function renderDevPlayerHitbox(game: Game) {

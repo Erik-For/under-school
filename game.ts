@@ -669,6 +669,11 @@ function calculateNewPosition(currentPos: Pos, direction: string, range: number)
 
 export class GameState {
     hasPlayedJohannesLektionCutScene: boolean;
+    //minigame related
+    hasPlayedMinigame: boolean;
+    hasWonMinigame: boolean;
+    hasRecievedKey: boolean;
+    //
     hasTalkedToTeacherRoomMartin: boolean;
     hasSolvedIcePuzzle: boolean;
     hasReadExplosiveSign: boolean;
@@ -676,7 +681,12 @@ export class GameState {
     hasTalkedToKim: boolean;
 
     constructor(){
-        this.hasPlayedJohannesLektionCutScene = false;
+        this.hasPlayedJohannesLektionCutScene = true; // ändra tillbaka till false innan push
+        //minigame related
+        this.hasPlayedMinigame = false;
+        this.hasWonMinigame = true;
+        this.hasRecievedKey = false;
+        //
         this.hasTalkedToTeacherRoomMartin = false;
         this.hasSolvedIcePuzzle = false;
         this.hasReadExplosiveSign = false;

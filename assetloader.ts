@@ -125,6 +125,16 @@ export class AssetLoader {
         }
     }
 
+    getTextAssets(): Map<string, TextAsset> {
+        let textAssets = new Map<string, TextAsset>();
+        this.assets.forEach((asset) => {
+            if(asset instanceof TextAsset) {
+                textAssets.set(asset.src, asset);
+            }
+        });
+        return textAssets;
+    }
+
     getAudioAsset(src: string): AudioAsset | undefined {
         if(this.assets.get(src) instanceof AudioAsset) {
             return this.assets.get(src) as AudioAsset;
