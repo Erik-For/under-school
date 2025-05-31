@@ -47,6 +47,7 @@ const assetLoader = new AssetLoader(
         new TextAsset("assets/cred.json"),
         new TextAsset("assets/stars.json"),
         new TextAsset("assets/minigame.json"),
+        new TextAsset("assets/supersecretroom.json"),
         new AudioAsset("assets/bg.mp3"),
         new AudioAsset("assets/beep.wav"),
         new AudioAsset("assets/rumble.wav"),
@@ -60,6 +61,7 @@ const assetLoader = new AssetLoader(
         new AudioAsset("assets/slappin_bass.wav"),
         new AudioAsset("assets/Intro.wav"),
         new AudioAsset("assets/binaryburnout.mp3"),
+        new AudioAsset("assets/crash.wav"),
     ],
     async () => {
         // remove loading screen

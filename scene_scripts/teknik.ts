@@ -256,7 +256,7 @@ export default class Script implements SceneScript {
             removePeople(game, currentScene);
         }
 
-        if(game.getGameState().hasWonMinigame && prevScene.getScriptName() === "minigame.js" && !game.getGameState().hasRecievedKey) {
+        if(game.getGameState().hasWonMinigame && game.getGameState().hasReachedHighScoreThreshold && prevScene.getScriptName() === "minigame.js" && !game.getGameState().hasRecievedKey) {
             game.getPlayer().freezeMovment();
             game.getPlayer().setDirection("up");
             game.getInputHandler().preventInteraction();
@@ -273,7 +273,7 @@ export default class Script implements SceneScript {
                     game.getGameState().hasRecievedKey = true;
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                 new SequenceItem(new WaitSequenceItem(500), (item, ctx) => { (item as WaitSequenceItem).run(); }),
-                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Snyggt jobbat! Jag har aldrig sett någon klara spelet förut...", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Snyggt jobbat! Jag har aldrig sett någon få ett sådant högt highscore förut", 3750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new TextAnimationNoInteract("* GOLI ger dig en nyckel *", 1000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); game.getAudioManager().pauseBackgroundMusic();}),
                 new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Se om du kan lista ut vart vilken dörr nyckeln leder till... Jag hittade den utanför biblioteket...", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Lycka till...", 1000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
@@ -333,15 +333,34 @@ export default class Script implements SceneScript {
             game.getSequenceExecutor().setSequence(sequence);
 
             }
-            else{
+            else if(game.getGameState().hasPlayedMinigame && !game.getGameState().hasWonMinigame) {
                             let sequence = new Sequence([
                 new SequenceItem(new CodeSequenceItem(() => {
                     game.getPlayer().freezeMovment();
                     game.getInputHandler().preventInteraction();
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
-                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Imponerande spel, eller hur?", 750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Du kan alltid försöka igen, komma lite längre...", 1250, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Imponerande spel, eller hur? Det har alltså två av våra elever skapat...", 2250, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Men du, försök gärna igen.... du kan alltid försöka igen, komma lite längre...", 2650, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                 new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Det kanske finns ett slut på spelet...", 1000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().unfreezeMovment();
+                    game.getInputHandler().allowInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+
+            }
+            else {
+                            let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Snyggt att du klarade spelet...", 1000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Jag har dock sett ett par högre highscores...", 1250, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Jag tror inte jag har sett någon få fler poäng än 2500...", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Se om du kan slå det. I så fall har jag någonting åt dig...", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
 
                 new SequenceItem(new CodeSequenceItem(() => {
                     game.getPlayer().unfreezeMovment();
@@ -361,7 +380,7 @@ export default class Script implements SceneScript {
                 }), (item, ctx) => {
                     (item as CodeSequenceItem).run();
                 }),
-                new SequenceItem(new TextAnimation("Du slår på maskinen och startar spelet (*whaaaat?? ett spel i ett spel?? hur crazy är inte det - Ruben 29/05-2025 21:50*) ", 4000, game.getInputHandler()), (item, ctx) => {
+                new SequenceItem(new TextAnimation("Du slår på maskinen och startar spelet (*whaaaat?? ett spel i ett spel?? hur crazy är inte det... Tryck på ESC eller L för att avsluta spelet tidigt) ", 4000, game.getInputHandler()), (item, ctx) => {
                     (item as TextAnimation).render(ctx, game);
                 }),
                 new SequenceItem(new CodeSequenceItem(() => {

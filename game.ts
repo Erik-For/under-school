@@ -672,7 +672,9 @@ export class GameState {
     //minigame related
     hasPlayedMinigame: boolean;
     hasWonMinigame: boolean;
+    hasReachedHighScoreThreshold: boolean;
     hasRecievedKey: boolean;
+    hasTalkedToRuben: boolean;
     //
     hasTalkedToTeacherRoomMartin: boolean;
     hasSolvedIcePuzzle: boolean;
@@ -681,11 +683,13 @@ export class GameState {
     hasTalkedToKim: boolean;
 
     constructor(){
-        this.hasPlayedJohannesLektionCutScene = true; // ändra tillbaka till false innan push
+        this.hasPlayedJohannesLektionCutScene = false; // ändra tillbaka till false innan push
         //minigame related
         this.hasPlayedMinigame = false;
-        this.hasWonMinigame = true;
+        this.hasWonMinigame = false;
+        this.hasReachedHighScoreThreshold = false;
         this.hasRecievedKey = false;
+        this.hasTalkedToRuben = false;
         //
         this.hasTalkedToTeacherRoomMartin = false;
         this.hasSolvedIcePuzzle = false;

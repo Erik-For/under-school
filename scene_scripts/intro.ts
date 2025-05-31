@@ -16,6 +16,10 @@ export default class Script implements SceneScript {
             case "teknik.js":
                 game.getPlayer().setPos(new Pos(26.5, -3).multiply(16));
                 break;
+            case "supersecretroom.js":
+                game.getPlayer().setPos(new Pos(14.5, -5.5).multiply(16));
+                game.getPlayer().setDirection("up");
+                break;
             default:
                 game.getPlayer().setPos(new Pos(14, -3));
                 break;
@@ -39,8 +43,30 @@ export default class Script implements SceneScript {
             currentScene.addScriptedObject(new ScriptedObject(new Pos(14, -7).multiply(16), ObjectBehaviour.Sign, "Dörren är låst", new Sprite("assets/dungeon.png", 0, 0, 10)));
         }
         else{
-            //gör dörren upplåsbar
-            currentScene.addScriptedObject(new ScriptedObject(new Pos(14, -7).multiply(16), ObjectBehaviour.Interactable, "Dörren ska gå att låsa upp (inte fixat än)", new Sprite("assets/dungeon.png", 0, 0, 10)));
+            if(!game.getGameState().hasTalkedToRuben) {
+                currentScene.addScriptedObject(new ScriptedObject(new Pos(14, -7).multiply(16), ObjectBehaviour.Interactable, "golidoor", new Sprite("assets/dungeon.png", 0, 0, 10)));
+            currentScene.registerBehaviour("golidoor", async (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+                let sequence = new Sequence([
+                new SequenceItem(new CodeSequenceItem(() => {
+                    game.getPlayer().freezeMovment();
+                    game.getInputHandler().preventInteraction();
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                new SequenceItem(new TextAnimation("Du sätter nyckeln som GOLI gav dig i dörrens lås...", 2500, game.getInputHandler()), (item, ctx) => { (item as TextAnimation).render(ctx, game); }),
+                new SequenceItem(new TextAnimation("Låset klickar till och dörren öppnas", 1250, game.getInputHandler()), (item, ctx) => { (item as TextAnimation).render(ctx, game); }),
+                new SequenceItem(new CodeSequenceItem(() => {
+                    fadeIn(game, 1000);
+                    changeScene(game, "assets/supersecretroom.json");
+                    fadeOut(game, 1000);
+                }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+            ]);
+            game.getSequenceExecutor().setSequence(sequence);
+            });
+            }
+            else{
+                            currentScene.addScriptedObject(new ScriptedObject(new Pos(14, -7).multiply(16), ObjectBehaviour.Sign, "Nyckeln passar inte längre...", new Sprite("assets/dungeon.png", 0, 0, 10)));
+
+            }
+            
         }
 
         let hasWalkedDown = false;
@@ -59,8 +85,8 @@ export default class Script implements SceneScript {
                 new SequenceItem(new WaitSequenceItem(1000), (item, ctx) => { (item as WaitSequenceItem).run(); }),
                 new SequenceItem(new TextAnimationNoInteract("*Medan du går ner för trapporna snubblar du och faller ner genom ett brunnslock i golvet*", 2000, 2000), (item, ctx) => { (item as TextAnimationNoInteract).render(ctx, game); }),
                 new SequenceItem(new CodeSequenceItem(() => {
-                    fadeOut(game, 1000);
                     changeScene(game, "assets/dungeon.json");
+                    fadeOut(game, 1000);
                 }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
             ]);
             game.getSequenceExecutor().setSequence(sequence);
