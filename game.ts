@@ -684,7 +684,7 @@ export class GameState {
     hasTalkedToKim: boolean;
 
     constructor(){
-        this.hasPlayedJohannesLektionCutScene = false; // ändra tillbaka till false innan push
+        this.hasPlayedJohannesLektionCutScene = false;
         //minigame related
         this.hasPlayedMinigame = false;
         this.hasWonMinigame = false;

@@ -297,14 +297,18 @@ export default class Script implements SceneScript {
         ctx.fillText("uunnvhvhba", 10 * this.scaleX, screen.height - 80 * this.scaleY);
         
         if(!this.isCrashed && this.canMove) {
-            this.roadSpeed = Math.min(this.roadSpeed + 1, 2250);
+            // Fixed increment per second instead of per frame
+            const roadSpeedIncrement = 120 * cappedDeltaTime;
+            this.roadSpeed = Math.min(this.roadSpeed + roadSpeedIncrement, 2250);
         }
 
         if(this.roadSpeed === 2250) {
-            this.score += cappedDeltaTime * 50;
+            // Normalize score increment to target 50 points per second
+            this.score += 50 * cappedDeltaTime;
         }
         else if(this.roadSpeed > 1000) {
-            this.score  += cappedDeltaTime * 15;
+            // Normalize score increment to target 15 points per second
+            this.score += 15 * cappedDeltaTime;
         }
         
         if(this.canMove) {
@@ -333,11 +337,12 @@ export default class Script implements SceneScript {
                 dy = dy / length;
             }
 
-            this.playerPos.x += dx * baseSpeed * cappedDeltaTime;
-            this.playerPos.y += dy * baseSpeed * cappedDeltaTime;
+            this.playerPos.x += dx * baseSpeed * (cappedDeltaTime * 60) / 60;
+            this.playerPos.y += dy * baseSpeed * (cappedDeltaTime * 60) / 60;
         }
 
-        this.mDriven += this.roadSpeed * cappedDeltaTime / 1000 * 60;
+        // Normalize distance calculation to a 60fps equivalent
+        this.mDriven += (this.roadSpeed * cappedDeltaTime / 1000) * 60;
         this.LapCount = Math.floor(this.mDriven / 2000) + 1;
 
         // Check if game should end and start exit animation
