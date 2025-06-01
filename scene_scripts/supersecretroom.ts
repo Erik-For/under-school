@@ -16,10 +16,10 @@ const ruben = {
 export default class Script implements SceneScript {
     name: string = "supersecretroom.js";
     #buttons: ScriptedObject[] = [
+        new ScriptedObject(new Pos(-8, -5).multiply(16), ObjectBehaviour.Button, "btn", new Sprite("assets/dungeon.png", 0, 1, 0)),
+        new ScriptedObject(new Pos(7, -5).multiply(16), ObjectBehaviour.Button, "btn", new Sprite("assets/dungeon.png", 0, 1, 0)),
         new ScriptedObject(new Pos(-8, 3).multiply(16), ObjectBehaviour.Button, "btn", new Sprite("assets/dungeon.png", 0, 1, 0)),
         new ScriptedObject(new Pos(7, 3).multiply(16), ObjectBehaviour.Button, "btn", new Sprite("assets/dungeon.png", 0, 1, 0)),
-        new ScriptedObject(new Pos(7, -5).multiply(16), ObjectBehaviour.Button, "btn", new Sprite("assets/dungeon.png", 0, 1, 0)),
-        new ScriptedObject(new Pos(-8, -5).multiply(16), ObjectBehaviour.Button, "btn", new Sprite("assets/dungeon.png", 0, 1, 0)),
     ]
     #pranks: number = 0;
     #canInteract: boolean = false;
@@ -57,9 +57,10 @@ export default class Script implements SceneScript {
                                         }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
                                         new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Hejsan! Jag heter Ruben...", 750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                                         new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Kul att du tog dig igenom mitt lilla racing-spel... Jag är imponerad", 2750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                                        new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Själv behövde jag spela det 7 eller 8 gånger innan jag klarade det...", 2250, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                                        new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Jag hoppas att det var lite svårt att klara...", 1550, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                                        new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Det tog en hel del justering för att det skulle bli lagom svårt...", 2250, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                                         new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Hur som helst... Nu har du klarat spelets enda 'sidequest'. Grattis!", 2250, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                                        new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Innan du får återgå till att själva spelet har jag ett sista pussel som du ska få lösa", 3250, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                                        new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Innan du får återgå till att själva spelet måste du låsa upp dörren...", 3250, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                                         new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Dra i spaken längst upp till vänster och lengst ner till höger för att låsa upp dörren", 3000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                                         new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Kom tillbaka till mig om du har några frågor. Lycka till.", 1750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
 
@@ -137,7 +138,8 @@ export default class Script implements SceneScript {
                         new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Hahahaha, get pranked...", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                         new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "De där spakarna är inte inkopplade...", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
                         new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Låt mig öppna dörren åt dig...", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
-                        new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Auf wiedersehen!", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                        new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Glöm inte att du inte, under några omständigheter får gå ned för trappan ;)", 2000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                        new SequenceItem(new NPCTextAnimation(ruben.bigsprite, "Hejdå!", 500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
 
                         new SequenceItem(new CodeSequenceItem(() => {
                             game.getPlayer().unfreezeMovment();
@@ -183,7 +185,7 @@ export default class Script implements SceneScript {
             }
             else if(this.#pranks === 3 || (this.#pranks === 2 && this.#canInteract))
             {
-                                                let sequence = new Sequence([
+                        let sequence = new Sequence([
                         new SequenceItem(new CodeSequenceItem(() => {
                             game.getPlayer().freezeMovment();
                             game.getInputHandler().preventInteraction();
@@ -201,10 +203,27 @@ export default class Script implements SceneScript {
         });
 
         currentScene.registerBehaviour("btn", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
+            let ans = "";
+            this.#buttons.forEach(button => {
+                if(isButtonPressed(currentScene, button.pos.divide(16).floor().toTileCoordinate())) {
+                    ans += "1"
+                } else {
+                    ans += "0"
+                }
+            })
+            console.log(ans);
             if(this.#canInteract)
             {
-                this.#pranks++;
-                this.#canInteract = false;
+                if(this.#pranks === 0 && ans === "0110") {
+                    game.getCamera().cameraShake(500, 2, game);
+                    this.#pranks++;
+                    this.#canInteract = false;
+                }
+                else if(this.#pranks === 1 && ans === "1001") {
+                    game.getCamera().cameraShake(500, 2, game);
+                    this.#pranks++;
+                    this.#canInteract = false;
+                }
             } 
         });
 

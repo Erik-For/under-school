@@ -72,6 +72,7 @@ export default class Script implements SceneScript {
     isExiting: boolean = false;
     exitAnimationTimer: number = 0;
     exitAnimationDuration: number = 3; // seconds for the animation
+    canForceExit: boolean = false;
     
     virtualToScreenX(x: number): number {
         return x * this.scaleX;
@@ -108,6 +109,7 @@ export default class Script implements SceneScript {
             game.getAudioManager().playBackgroundMusic(game.getAssetLoader().getAudioAsset("assets/binaryburnout.mp3")!);
             setTimeout(() => {
                 this.canMove = true;
+                this.canForceExit = true;
             }, 2000);
         });
 
@@ -130,9 +132,9 @@ export default class Script implements SceneScript {
 
     //all minigame logik ligger i render... (lol?) kanske inte är det bästa - Rubor 29 maj 2025 23:40
     render(game: Game, currentScene: Scene) {
-        if(game.getInputHandler().isKeyDown("Escape") || game.getInputHandler().isKeyDown(Keys.SkipText)) {
+        if((game.getInputHandler().isKeyDown("Escape") || game.getInputHandler().isKeyDown(Keys.SkipText)) && this.canForceExit) {
+            this.canForceExit = false;
             this.exit(game, currentScene);
-            return;
         }
 
         let screen = game.getScreen();
@@ -176,7 +178,7 @@ export default class Script implements SceneScript {
         //Här sätts lanes och y pos för bilar !!!!!!!!!!!!!!!!!! OBS!!!!!!!!!!!!
         if (this.spawnTimer >= this.spawnInterval && this.cars.length < this.maxCars && !this.isExiting) {
             this.spawnTimer = 0;
-            this.spawnInterval = this.roadSpeed === 2250 ? 0.25 : 0.55;
+            this.spawnInterval = this.roadSpeed === 2250 ? 0.15 : 0.40;
             if (this.carPool.length > 0) {
                 const newCar = this.carPool.pop()!;
                 //set lane and speed

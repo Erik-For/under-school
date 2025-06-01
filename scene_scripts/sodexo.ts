@@ -67,6 +67,8 @@ export default class Script implements SceneScript {
             ...ScriptedObject.constructFamily(24, (i) => new ScriptedObject(new Pos(24-i,16).multiply(16), ObjectBehaviour.ConveyorBelt, "l", new Sprite("assets/saker.png", 3, 0, 0))),
             ...ScriptedObject.constructFamily(12, (i) => new ScriptedObject(new Pos(0, 16 - i).multiply(16), ObjectBehaviour.ConveyorBelt, "u", new Sprite("assets/saker.png", 0, 0, 0))),
             new ScriptedObject(new Pos(0, 4).multiply(16), ObjectBehaviour.Walkable, "battle", new Sprite("assets/dungeon.png", 0, 0, 0)),
+            new ScriptedObject(new Pos(-1, 5).multiply(16), ObjectBehaviour.Walkable, "battle", new Sprite("assets/dungeon.png", 0, 0, 0)),
+            new ScriptedObject(new Pos(1, 5).multiply(16), ObjectBehaviour.Walkable, "battle", new Sprite("assets/dungeon.png", 0, 0, 0)),
             new ScriptedObject(new Pos(8, -8).multiply(16), ObjectBehaviour.ChangeScene, "assets/cred.json", new Sprite("assets/dungeon.png", 0, 0, 0)),
         );
 

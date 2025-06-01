@@ -674,6 +674,7 @@ export class GameState {
     hasWonMinigame: boolean;
     hasReachedHighScoreThreshold: boolean;
     hasRecievedKey: boolean;
+    goliCutScene1: boolean;
     hasTalkedToRuben: boolean;
     //
     hasTalkedToTeacherRoomMartin: boolean;
@@ -689,6 +690,7 @@ export class GameState {
         this.hasWonMinigame = false;
         this.hasReachedHighScoreThreshold = false;
         this.hasRecievedKey = false;
+        this.goliCutScene1 =  false;
         this.hasTalkedToRuben = false;
         //
         this.hasTalkedToTeacherRoomMartin = false;

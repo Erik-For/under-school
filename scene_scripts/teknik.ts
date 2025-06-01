@@ -256,8 +256,9 @@ export default class Script implements SceneScript {
             removePeople(game, currentScene);
         }
 
-        if(game.getGameState().hasWonMinigame && game.getGameState().hasReachedHighScoreThreshold && prevScene.getScriptName() === "minigame.js" && !game.getGameState().hasRecievedKey) {
-            game.getPlayer().freezeMovment();
+        if(game.getGameState().hasWonMinigame && prevScene.getScriptName() === "minigame.js" && !game.getGameState().hasRecievedKey) {
+            if(game.getGameState().hasReachedHighScoreThreshold){
+                game.getPlayer().freezeMovment();
             game.getPlayer().setDirection("up");
             game.getInputHandler().preventInteraction();
             game.getPlayer().setPos(new Pos(-19.5, -21.5).multiply(16));
@@ -296,6 +297,38 @@ export default class Script implements SceneScript {
             ]);
         
             game.getSequenceExecutor().setSequence(sequence);
+            }else if(!game.getGameState().goliCutScene1){
+                game.getGameState().goliCutScene1 = true;
+                game.getPlayer().freezeMovment();
+                game.getPlayer().setDirection("up");
+                game.getInputHandler().preventInteraction();
+                game.getPlayer().setPos(new Pos(-19.5, -21.5).multiply(16));
+                await fadeOut(game, 4000);
+
+                let sequence = new Sequence([
+                    new SequenceItem(new WaitSequenceItem(10), (item, ctx) => { (item as WaitSequenceItem).run(); }),
+                    new SequenceItem(new CodeSequenceItem(() => {
+                        game.getPlayer().freezeMovment();
+                        game.getPlayer().setDirection("up");
+                        game.getInputHandler().preventInteraction();
+                        game.getPlayer().setPos(new Pos(-19.5, -21.5).multiply(16));
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                    new SequenceItem(new WaitSequenceItem(500), (item, ctx) => { (item as WaitSequenceItem).run(); }),
+                    new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Bra jobbat! Du klarade spelet...", 1000, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Jag tror du kan nå ett högre highscore om du försöker igen...", 2500, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Jag har aldrig sett någon få högre än 2500 poäng...", 1750, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+                    new SequenceItem(new NPCTextAnimation(goli.bigsprite, "Se om du kan slå 2500 poäng, så ska du få något...", 1350, game.getInputHandler()), (item, ctx) => { (item as NPCTextAnimation).render(ctx, game); }),
+
+                    new SequenceItem(new CodeSequenceItem(() => {
+                        game.getPlayer().unfreezeMovment();
+                        game.getInputHandler().allowInteraction();
+                        currentScene.getTile(new TileCoordinate(-20, -23))!.setCollisonRule(CollisionRule.None);
+                    }), (item, ctx) => { (item as CodeSequenceItem).run(); }),
+                ]);
+            
+                game.getSequenceExecutor().setSequence(sequence);
+            }
+            
         }
 
         currentScene.registerBehaviour("alexander", (game: Game, currentScene: Scene, pos: Pos, data: string) => {
