@@ -1,6 +1,19 @@
 import { Game, Mode, Pos } from "../game.js";
+import Keys, { setKey } from "../keys.js";
 import { deserilizeScene, ObjectBehaviour, Scene, SceneScript, ScriptedObject, TileCoordinate } from "../scene.js";
 import { Sprite } from "../sprite.js";
+
+interface MenuButton {
+    text: string | (() => string); // Allow text to be a function for dynamic text
+    action?: () => void | Promise<void>; // Make action optional
+    clickable?: boolean; // Add explicit clickable flag
+}
+
+interface Menu {
+    title?: string;
+    titleSize?: string;
+    buttons: MenuButton[];
+}
 
 export default class Script implements SceneScript {
     name: string = "mainmenu.js";
@@ -9,22 +22,209 @@ export default class Script implements SceneScript {
     private buttonWidth: number = 200;
     private buttonHeight: number = 40;
     private padding: number = 20;
+    private selectedKey:  undefined | string = undefined;
+    
+    private menus: Record<string, Menu> = {
+        main: {
+            title: "Underschool",
+            titleSize: "40px underschool",
+            buttons: [
+                {
+                    text: "Start Game",
+                    action: async () => {
+                        let prev = this.game!.getScene();
+                        let introScene = await deserilizeScene(this.game!.getAssetLoader().getTextAsset("assets/intro.json")!.data!);
+                        this.game!.setScene(introScene);
+                        this.game!.getPlayer().setShouldRender(true);
+                        introScene.onLoad(this.game!, prev);
+                    },
+                    clickable: true
+                },
+                {
+                    text: "Credits",
+                    action: () => this.switchToMenu("credits"),
+                    clickable: true
+                },
+                {
+                    text: "Controls",
+                    action: () => this.switchToMenu("controls"),
+                    clickable: true
+                },
+            ]
+        },
+        credits: {
+            title: "Credits",
+            buttons: [
+                {
+                    text: "Ruben Steen and Erik Forsum from TE22A",
+                    clickable: true // Not clickable
+                },
+                {
+                    text: () => "Back",
+                    action: () => this.switchToMenu("main"),
+                    clickable: true
+                }
+            ]
+        },
+        controls: {
+            title: "Controls",
+            // Buttons so user can set controls by clicking
+            buttons: [
+                {
+                    text: () => "Walk up: " + Keys.MoveUp.replace("Key", ""),
+                    clickable: true,
+                    action: () => {
+                        this.selectedKey = "MoveUp";
+                        // Listen for key press to change control (not via prompt)
+                        
+                    }
+                },
+                {
+                    text: () => "Walk down: " + Keys.MoveDown.replace("Key", ""),
+                    clickable: true,
+                    action: () => {
+                        this.selectedKey = "MoveDown";
+                    }
+                },
+                {
+                    text: () => "Walk left: " + Keys.MoveLeft.replace("Key", ""),
+                    clickable: true,
+                    action: () => {
+                        this.selectedKey = "MoveLeft";
+                    }
+                },
+                {
+                    text: () => "Walk right: " + Keys.MoveRight.replace("Key", ""),
+                    clickable: true,
+                    action: () => {
+                        this.selectedKey = "MoveRight";
+                    }
+                },
+                {
+                    text: () => "Interact: " + Keys.Interact.replace("Key", ""),
+                    clickable: true,
+                    action: () => {
+                        this.selectedKey = "Interact";
+                    }
+                },
+                {
+                    text: () => "Skip Text: " + Keys.SkipText.replace("Key", ""),
+                    clickable: true,
+                    action: () => {
+                        this.selectedKey = "SkipText";
+                    }
+                },
+                {
+                    text: "Back",
+                    action: () => this.switchToMenu("main"),
+                    clickable: true
+                }
+            ]
+        }
+    };
+
+    private game?: Game;
 
     onEnter(prevScene: Scene, game: Game, currentScene: Scene) {   
+        this.game = game;
         game.getPlayer().setShouldRender(false);
-        // Reset buttons array
+        this.currentMenu = "main";
+        document.addEventListener("keydown", (event) => {
+            if (this.selectedKey) {
+                setKey(this.selectedKey as keyof typeof Keys, event.code);
+                this.selectedKey = undefined; // Reset after setting
+            } 
+        });
     }
 
     onExit(game: Game, currentScene: Scene) {
-        // Clean up if needed
+        this.game = undefined;
+    }
+
+    private switchToMenu(menuName: string) {
+        this.currentMenu = menuName;
+        this.buttons = [];
+    }
+
+    private renderMenu(menu: Menu, ctx: CanvasRenderingContext2D, centerX: number, centerY: number) {
+        let yOffset = centerY - 100;
+
+        // Render title if it exists
+        if (menu.title) {
+            ctx.font = menu.titleSize || "20px underschool";
+            ctx.fillText(menu.title, centerX, yOffset);
+            yOffset += 80;
+        }
+
+        // Reset font for buttons
+        ctx.font = "20px underschool";
+
+        // Render buttons
+        menu.buttons.forEach((button, index) => {
+            const y = yOffset + (index * (this.buttonHeight + this.padding));
+            
+            // Check if button should be clickable
+            const isClickable = button.clickable !== false && button.action;
+            
+            // check if button.text is a function
+
+            const buttonText = typeof button.text === 'function' ? button.text() : button.text;
+            
+            // Only draw button background and add to clickable buttons if it's clickable
+            if (isClickable) {
+                ctx.strokeStyle = "#FFFFFF";
+                ctx.strokeRect(
+                    centerX - this.buttonWidth/2,
+                    y - this.buttonHeight/2,
+                    this.buttonWidth,
+                    this.buttonHeight
+                );
+                
+                const buttonData = {
+                    x: centerX - this.buttonWidth/2,
+                    y: y - this.buttonHeight/2,
+                    width: this.buttonWidth,
+                    height: this.buttonHeight,
+                    text: buttonText,
+                    action: button.action
+                };
+                
+                this.buttons.push(buttonData);
+            }
+            
+            // Button text
+            ctx.fillText(buttonText, centerX, y);
+        });
+
+        // render big box to tell user to click to change controls with alot of padding
+        if (this.selectedKey) {
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(centerX - 250, centerY + 100, 500, 100);
+            ctx.fillStyle = "#000000";
+            ctx.textAlign = "center";
+            ctx.fillText(`Click a key to set ${this.selectedKey}`, centerX, centerY + 150);
+        }
     }
 
     render(game: Game, currentScene: Scene) {
+        
+        // Handle button clicks
+        const mousePos = game.getInputHandler().getMousePos();
+        const isMouseClicked = game.getInputHandler().isMouseClicked();
+        
         this.buttons.forEach(button => {
-            if(game.getInputHandler().isMouseClicked() && game.getInputHandler().getMousePos().x > button.x && game.getInputHandler().getMousePos().x < button.x + button.width && game.getInputHandler().getMousePos().y > button.y && game.getInputHandler().getMousePos().y < button.y + button.height){                
+            
+            if(isMouseClicked && 
+               mousePos.x > button.x && 
+               mousePos.x < button.x + button.width && 
+               mousePos.y > button.y && 
+               mousePos.y < button.y + button.height) {
                 button.action();
             }
         });
+
+        // Clear buttons for this frame
+        this.buttons = [];
 
         const ctx = game.getScreen().ctx;
         const centerX = game.getScreen().width / 2;
@@ -34,84 +234,29 @@ export default class Script implements SceneScript {
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, game.getScreen().width, game.getScreen().height);
         
+        // Set text styling
         ctx.fillStyle = "#FFFFFF";
-        ctx.font = "20px underschool";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         
-        if (this.currentMenu === "main") {
-            // Title
-            ctx.font = "40px underschool";
-            ctx.fillText("Underschool", centerX, centerY - 100);
-            
-            // Buttons
-            ctx.font = "20px underschool";
-            const menuButtons = ["Start Game"];
-            menuButtons.forEach((text, index) => {
-                const y = centerY + (index * (this.buttonHeight + this.padding));
-                
-                // Button background
-                ctx.strokeStyle = "#FFFFFF";
-                ctx.strokeRect(
-                    centerX - this.buttonWidth/2,
-                    y - this.buttonHeight/2,
-                    this.buttonWidth,
-                    this.buttonHeight
-                );
-                
-                // Button text
-                ctx.fillText(text, centerX, y);
-                
-                this.buttons.push({
-                    x: centerX - this.buttonWidth/2,
-                    y: y - this.buttonHeight/2,
-                    width: this.buttonWidth,
-                    height: this.buttonHeight,
-                    text: text,
-                    action: async () => {
-                        console.log(`Button ${text} clicked`);
-                        if (text === "Start Game") {
-                            let prev = game.getScene();
-                            let introScene = await deserilizeScene(game.getAssetLoader().getTextAsset("assets/intro.json")!.data!);
-                            game.setScene(introScene);
-                            game.getPlayer().setShouldRender(true);
-                            introScene.onLoad(game, prev);
-                        } else if (text === "Credits") {
-                            this.currentMenu = "credits";
-                            this.buttons = [];
-                        }
-                    }
-                });
-            });
-        } else if (this.currentMenu === "credits") {
-            ctx.fillText("Credits", centerX, centerY);
-            ctx.fillText("Ruben and Erik", centerX, centerY + 50);
-            
-            // Back button
-            const y = centerY + 2*(this.buttonHeight + this.padding);
-            ctx.strokeStyle = "#FFFFFF";
-            ctx.strokeRect(
-                centerX - this.buttonWidth/2,
-                y - this.buttonHeight/2,
-                this.buttonWidth,
-                this.buttonHeight
-            );
-            
-            ctx.fillText("back", centerX, y);
-            this.buttons.push({
-                x: centerX - this.buttonWidth/2,
-                y: y - this.buttonHeight/2,
-                width: this.buttonWidth,
-                height: this.buttonHeight,
-                text: "back",
-                action: () => {
-                    this.currentMenu = "main";
-                    this.buttons = [];
-                }
-            });
+        // Render current menu
+        const currentMenuData = this.menus[this.currentMenu];
+        if (currentMenuData) {
+            this.renderMenu(currentMenuData, ctx, centerX, centerY);
         }
     }
+
     onInteraction(game: Game, currentScene: Scene, pos: Pos, data: string) {
         
     }
-} 
+
+    // Helper method to add new menus dynamically
+    addMenu(name: string, menu: Menu) {
+        this.menus[name] = menu;
+    }
+
+    // Helper method to get current menu
+    getCurrentMenu(): string {
+        return this.currentMenu;
+    }
+}
