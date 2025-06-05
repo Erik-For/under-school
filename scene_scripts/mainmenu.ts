@@ -30,7 +30,7 @@ export default class Script implements SceneScript {
             titleSize: "40px underschool",
             buttons: [
                 {
-                    text: "Start Game",
+                    text: "Starta Spel",
                     action: async () => {
                         let prev = this.game!.getScene();
                         let introScene = await deserilizeScene(this.game!.getAssetLoader().getTextAsset("assets/intro.json")!.data!);
@@ -46,32 +46,36 @@ export default class Script implements SceneScript {
                     clickable: true
                 },
                 {
-                    text: "Controls",
+                    text: "Kontroller",
                     action: () => this.switchToMenu("controls"),
                     clickable: true
                 },
             ]
         },
         credits: {
-            title: "Credits",
+            title: "Underschool",
             buttons: [
                 {
-                    text: "Ruben Steen and Erik Forsum from TE22A",
-                    clickable: true // Not clickable
+                    text: "Skapat av",
+                    clickable: false // Not clickable
                 },
                 {
-                    text: () => "Back",
+                    text: "Ruben Steen and Erik Forsum från TE22A",
+                    clickable: false // Not clickable
+                },
+                {
+                    text: () => "Tillbaka",
                     action: () => this.switchToMenu("main"),
                     clickable: true
                 }
             ]
         },
         controls: {
-            title: "Controls",
+            title: "Kontroller",
             // Buttons so user can set controls by clicking
             buttons: [
                 {
-                    text: () => "Walk up: " + Keys.MoveUp.replace("Key", ""),
+                    text: () => "Gå uppåt: " + Keys.MoveUp.replace("Key", ""),
                     clickable: true,
                     action: () => {
                         this.selectedKey = "MoveUp";
@@ -80,42 +84,45 @@ export default class Script implements SceneScript {
                     }
                 },
                 {
-                    text: () => "Walk down: " + Keys.MoveDown.replace("Key", ""),
+                    text: () => "Gå nedåt: " + Keys.MoveDown.replace("Key", ""),
                     clickable: true,
                     action: () => {
                         this.selectedKey = "MoveDown";
                     }
                 },
                 {
-                    text: () => "Walk left: " + Keys.MoveLeft.replace("Key", ""),
+                    text: () => "Gå vänster: " + Keys.MoveLeft.replace("Key", ""),
                     clickable: true,
                     action: () => {
                         this.selectedKey = "MoveLeft";
                     }
                 },
                 {
-                    text: () => "Walk right: " + Keys.MoveRight.replace("Key", ""),
+                    text: () => "Gå höger: " + Keys.MoveRight.replace("Key", ""),
                     clickable: true,
                     action: () => {
                         this.selectedKey = "MoveRight";
                     }
                 },
                 {
-                    text: () => "Interact: " + Keys.Interact.replace("Key", ""),
+                    text: () => "Interagera: " + Keys.Interact.replace("Key", ""),
                     clickable: true,
                     action: () => {
                         this.selectedKey = "Interact";
                     }
                 },
                 {
-                    text: () => "Skip Text: " + Keys.SkipText.replace("Key", ""),
+                    text: () => "Skippa text: " + Keys.SkipText.replace("Key", ""),
                     clickable: true,
                     action: () => {
                         this.selectedKey = "SkipText";
                     }
                 },
                 {
-                    text: "Back",
+                    text: ""
+                },
+                {
+                    text: "Tillbaka",
                     action: () => this.switchToMenu("main"),
                     clickable: true
                 }
