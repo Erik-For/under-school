@@ -175,16 +175,16 @@ render(ctx: CanvasRenderingContext2D, spriteSheetLoader: AssetLoader, sprite: Sp
 >onRelease is called when a key is released
 >onHold is called every tick (Ticks are seperate from frames to ensure that the game runs at a consistent speed and not dependent on the framerate)
 ```ts
-// Keys.MoveUp = "KeyW"
+// Action.MoveUp = "KeyW"
 
 let input: Input = new Input();
-input.onKey(Keys.MoveUp, () => {
+input.onKey(Action.MoveUp, () => {
     console.log("w is pressed");
 });
-input.onRelease(Keys.MoveUp, () => {
+input.onRelease(Action.MoveUp, () => {
     console.log("w is released");
 });
-input.onHold(Keys.MoveUp, () => {
+input.onHold(Action.MoveUp, () => {
     console.log("w is held");
 });
 ```
@@ -195,7 +195,7 @@ console.log(input.getMousePos());
 console.log(input.isKeyDown("keyW"));
 // isKeyDown is useful when checking if for example
 // the shift key is pressed when another key event is ran
-input.onKey(Keys.MoveUp, () => {
+input.onKey(Action.MoveUp, () => {
     if(input.isKeyDown("ShiftLeft")) {
         console.log("shift + w is pressed");
     }

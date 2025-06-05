@@ -4,7 +4,7 @@ import { Screen } from "./screen.js";
 import { render, Sprite } from "./sprite.js";
 import { AssetLoader } from "./assetloader.js";
 import { SequenceCallback } from "./sequence.js";
-import Keys from "./keys.js";
+import { Action } from "./keys.js";
 
 /**
  * Represents a cyclic animation that loops through a series of frames.
@@ -206,12 +206,12 @@ export class NPCTextAnimation extends SequenceCallback {
         }
 
         // This is a horrible way to do this, but it works for now
-        this.inputHandler.onClick(Keys.Interact, () => {
+        this.inputHandler.onClick(Action.Interact, () => {
             if(Date.now() - this.startTime > this.duration) {
                 this.onFinish();
             }
         }, true);
-        this.inputHandler.onClick(Keys.SkipText, () => {
+        this.inputHandler.onClick(Action.SkipText, () => {
             this.startTime = Date.now() - this.duration;
         }, true);
 
@@ -287,12 +287,12 @@ export class TextAnimation extends SequenceCallback {
     }
 
     // This is a horrible way to do this, but it works for now
-    this.inputHandler.onClick(Keys.Interact, () => {
+    this.inputHandler.onClick(Action.Interact, () => {
         if(Date.now() - this.startTime > this.duration) {
             this.onFinish();
         }
     }, true);
-    this.inputHandler.onClick(Keys.SkipText, () => {
+    this.inputHandler.onClick(Action.SkipText, () => {
         this.startTime = Date.now() - this.duration;
     }, true);
 

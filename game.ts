@@ -6,9 +6,9 @@ import { AssetLoader, AudioAsset } from "./assetloader.js";
 import { Sequence, SequenceExecutor, SequenceItem, WaitSequenceItem } from "./sequence.js";
 import * as Util from "./util.js";
 import { Battle, Enemy, HomingProjectile, LoopingHomingProjectile, Round, StraightProjectile } from "./battle.js";
-import Keys from "./keys.js";
 import {BigSprite, TextAnimation, TextAnimationNoInteract} from "./animate.js";
 import {render, Sprite, SpriteSheet} from "./sprite.js";
+import { Action } from "./keys.js";
 
 /**
  * Represents a game.
@@ -185,7 +185,7 @@ export class Game {
         }, Math.round(1000 / 60));
 
 
-        this.#inputHandler.onClick(Keys.Interact, () => {
+        this.#inputHandler.onClick(Action.Interact, () => {
             // calculate tile in front of player ( 8 pixels in front of player)
             const playerPos = this.getPlayer().getPos();
             const playerDirection = this.getPlayer().getDirection();

@@ -1,6 +1,6 @@
 import { AssetLoader } from "../assetloader.js";
 import { Game, Pos } from "../game.js";
-import Keys from "../keys.js";
+import Keys, { Action } from "../keys.js";
 import { changeScene, Scene, SceneScript, deserilizeScene, fadeIn, fadeOut } from "../scene.js";
 
 class car {
@@ -132,7 +132,7 @@ export default class Script implements SceneScript {
 
     //all minigame logik ligger i render... (lol?) kanske inte är det bästa - Rubor 29 maj 2025 23:40
     render(game: Game, currentScene: Scene) {
-        if((game.getInputHandler().isKeyDown("Escape") || game.getInputHandler().isKeyDown(Keys.SkipText)) && this.canForceExit) {
+        if((game.getInputHandler().isKeyDown(Action.Escape) || game.getInputHandler().isKeyDown(Action.SkipText)) && this.canForceExit) {
             this.canForceExit = false;
             this.exit(game, currentScene);
         }
@@ -315,19 +315,19 @@ export default class Script implements SceneScript {
             let dx = 0;
             let dy = 0;
 
-            if(game.getInputHandler().isKeyDown(Keys.MoveDown)) {
+            if(game.getInputHandler().isKeyDown(Action.MoveDown)) {
                 dy += 1;
             }
 
-            if(game.getInputHandler().isKeyDown(Keys.MoveUp)) {
+            if(game.getInputHandler().isKeyDown(Action.MoveUp)) {
                 dy -= 1;
             }
 
-            if(game.getInputHandler().isKeyDown(Keys.MoveLeft)) {
+            if(game.getInputHandler().isKeyDown(Action.MoveLeft)) {
                 dx -= 1;
             }
 
-            if(game.getInputHandler().isKeyDown(Keys.MoveRight)) {
+            if(game.getInputHandler().isKeyDown(Action.MoveRight)) {
                 dx += 1;
             }
 

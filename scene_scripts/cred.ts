@@ -1,5 +1,5 @@
 import { Game, Pos } from "../game.js";
-import Keys from "../keys.js";
+import Keys, { Action } from "../keys.js";
 import { changeScene, Scene, SceneScript } from "../scene.js";
 
 export default class Script implements SceneScript {
@@ -43,7 +43,7 @@ export default class Script implements SceneScript {
         ctx.fillText("Tryck på K för att gå tillbaka till startmenyn", centerX, centerY + this.padding * 6);
 
         // Handle return to main menu
-        if (game.getInputHandler().isKeyDown(Keys.Interact)) {
+        if (game.getInputHandler().isKeyDown(Action.Interact)) {
             window.location.reload();
         }
     }

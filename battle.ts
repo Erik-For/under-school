@@ -3,7 +3,7 @@ import { Game, Mode, Pos } from "./game.js"
 import { Player } from "./player.js"
 import { render, Sprite, SpriteSheet } from "./sprite.js"
 import { InputHandler } from "./input.js"
-import Keys from "./keys.js"
+import Keys, { Action } from "./keys.js"
 import { AssetLoader } from "./assetloader.js"
 import { Screen } from "./screen.js"
 import { drawImageRot, drawSpriteRot } from "./util.js"
@@ -221,17 +221,17 @@ export class PlayerHeart implements PosProvider {
 
         const movmentSpeed = 1;
 
-        inputHandler.onHold(Keys.MoveUp, () => {
-            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x, this.#pos.y - movmentSpeed))) this.#pos.y -= inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight) ? movmentSpeed/Math.sqrt(2) : movmentSpeed 
+        inputHandler.onHold(Action.MoveUp, () => {
+            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x, this.#pos.y - movmentSpeed))) this.#pos.y -= inputHandler.isKeyDown(Action.MoveLeft) || inputHandler.isKeyDown(Action.MoveRight) ? movmentSpeed/Math.sqrt(2) : movmentSpeed 
         });
-        inputHandler.onHold(Keys.MoveDown, () => {
-            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x, this.#pos.y + movmentSpeed))) this.#pos.y += inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight) ? movmentSpeed/Math.sqrt(2) : movmentSpeed
+        inputHandler.onHold(Action.MoveDown, () => {
+            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x, this.#pos.y + movmentSpeed))) this.#pos.y += inputHandler.isKeyDown(Action.MoveLeft) || inputHandler.isKeyDown(Action.MoveRight) ? movmentSpeed/Math.sqrt(2) : movmentSpeed
         });
-        inputHandler.onHold(Keys.MoveLeft, () => {
-            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x - movmentSpeed, this.#pos.y))) this.#pos.x -= inputHandler.isKeyDown(Keys.MoveDown) || inputHandler.isKeyDown(Keys.MoveUp) ? movmentSpeed/Math.sqrt(2) : movmentSpeed
+        inputHandler.onHold(Action.MoveLeft, () => {
+            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x - movmentSpeed, this.#pos.y))) this.#pos.x -= inputHandler.isKeyDown(Action.MoveDown) || inputHandler.isKeyDown(Action.MoveUp) ? movmentSpeed/Math.sqrt(2) : movmentSpeed
         });
-        inputHandler.onHold(Keys.MoveRight, () => {
-            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x + movmentSpeed, this.#pos.y))) this.#pos.x += inputHandler.isKeyDown(Keys.MoveDown) || inputHandler.isKeyDown(Keys.MoveUp) ? movmentSpeed/Math.sqrt(2) : movmentSpeed
+        inputHandler.onHold(Action.MoveRight, () => {
+            if (!this.#frozen && this.#canMove(new Pos(this.#pos.x + movmentSpeed, this.#pos.y))) this.#pos.x += inputHandler.isKeyDown(Action.MoveDown) || inputHandler.isKeyDown(Action.MoveUp) ? movmentSpeed/Math.sqrt(2) : movmentSpeed
         });
     }
 

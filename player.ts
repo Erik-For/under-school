@@ -3,7 +3,7 @@ import * as Util from "./util.js";
 import { PlayerAnimation, CyclicAnimation } from "./animate.js";
 import { Sprite } from "./sprite.js";
 import { Game } from "./game.js";
-import Keys from "./keys.js";
+import { Action } from "./keys.js";
 
 export class Player {
     x: number;
@@ -121,36 +121,36 @@ export class Player {
         }
 
         const movmentSpeed = 1.2;
-        inputHandler.onHold(Keys.MoveUp, () => {
+        inputHandler.onHold(Action.MoveUp, () => {
             let mutlipliedSpeed = movmentSpeed * getMultiplier();
-            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight)){
+            if(inputHandler.isKeyDown(Action.MoveLeft) || inputHandler.isKeyDown(Action.MoveRight)){
                 mutlipliedSpeed /= Math.sqrt(2);
             }
             if (this.#canMove(this.x, this.y - mutlipliedSpeed)) {
                 this.y -= mutlipliedSpeed;
             }
         });
-        inputHandler.onHold(Keys.MoveDown, () => {
+        inputHandler.onHold(Action.MoveDown, () => {
             let mutlipliedSpeed = movmentSpeed * getMultiplier();
-            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight)){
+            if(inputHandler.isKeyDown(Action.MoveLeft) || inputHandler.isKeyDown(Action.MoveRight)){
                 mutlipliedSpeed /= Math.sqrt(2);
             }
             if (this.#canMove(this.x, this.y + mutlipliedSpeed)) {
                 this.y += mutlipliedSpeed;
             }
         });
-        inputHandler.onHold(Keys.MoveLeft, () => {
+        inputHandler.onHold(Action.MoveLeft, () => {
             let mutlipliedSpeed = movmentSpeed * getMultiplier();
-            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown)){
+            if(inputHandler.isKeyDown(Action.MoveUp) || inputHandler.isKeyDown(Action.MoveDown)){
                 mutlipliedSpeed /= Math.sqrt(2);
             }
             if (this.#canMove(this.x - mutlipliedSpeed, this.y)) {
                 this.x -= mutlipliedSpeed;
             }
         });
-        inputHandler.onHold(Keys.MoveRight, () => {
+        inputHandler.onHold(Action.MoveRight, () => {
             let mutlipliedSpeed = movmentSpeed * getMultiplier();
-            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown)){
+            if(inputHandler.isKeyDown(Action.MoveUp) || inputHandler.isKeyDown(Action.MoveDown)){
                 mutlipliedSpeed /= Math.sqrt(2);
             }
             if (this.#canMove(this.x + mutlipliedSpeed, this.y)) {
@@ -212,42 +212,42 @@ export class Player {
     #registerAnimationKeys() {
         let inputHandler = this.#game.getInputHandler()
         function isOtherKeyHeld(){
-            return inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown) || inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight);
+            return inputHandler.isKeyDown(Action.MoveUp) || inputHandler.isKeyDown(Action.MoveDown) || inputHandler.isKeyDown(Action.MoveLeft) || inputHandler.isKeyDown(Action.MoveRight);
         }
 
         // animation keys
-        inputHandler.onHold(Keys.MoveUp, () => {       
-            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight) || this.#movmentFrezze){ return; }
+        inputHandler.onHold(Action.MoveUp, () => {       
+            if(inputHandler.isKeyDown(Action.MoveLeft) || inputHandler.isKeyDown(Action.MoveRight) || this.#movmentFrezze){ return; }
             this.#direction = "walkup";
         });
-        inputHandler.onRelease(Keys.MoveUp, () => {
+        inputHandler.onRelease(Action.MoveUp, () => {
             if(isOtherKeyHeld() || this.#movmentFrezze){ return; }
             this.#direction = "idleup";
         });
     
-        inputHandler.onHold(Keys.MoveDown, () => {
-            if(inputHandler.isKeyDown(Keys.MoveLeft) || inputHandler.isKeyDown(Keys.MoveRight) || this.#movmentFrezze){ return; }
+        inputHandler.onHold(Action.MoveDown, () => {
+            if(inputHandler.isKeyDown(Action.MoveLeft) || inputHandler.isKeyDown(Action.MoveRight) || this.#movmentFrezze){ return; }
             this.#direction = "walkdown";
         });
-        inputHandler.onRelease(Keys.MoveDown, () => {
+        inputHandler.onRelease(Action.MoveDown, () => {
             if(isOtherKeyHeld() || this.#movmentFrezze){ return; }
             this.#direction = "idledown";
         });
     
-        inputHandler.onHold(Keys.MoveLeft, () => {
-            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown) || this.#movmentFrezze){ return; }
+        inputHandler.onHold(Action.MoveLeft, () => {
+            if(inputHandler.isKeyDown(Action.MoveUp) || inputHandler.isKeyDown(Action.MoveDown) || this.#movmentFrezze){ return; }
             this.#direction = "walkleft";
         });
-        inputHandler.onRelease(Keys.MoveLeft, () => {
+        inputHandler.onRelease(Action.MoveLeft, () => {
             if(isOtherKeyHeld() || this.#movmentFrezze){ return; }
             this.#direction = "idleleft";
         });
     
-        inputHandler.onHold(Keys.MoveRight, () => {
-            if(inputHandler.isKeyDown(Keys.MoveUp) || inputHandler.isKeyDown(Keys.MoveDown) || this.#movmentFrezze){ return; }
+        inputHandler.onHold(Action.MoveRight, () => {
+            if(inputHandler.isKeyDown(Action.MoveUp) || inputHandler.isKeyDown(Action.MoveDown) || this.#movmentFrezze){ return; }
             this.#direction = "walkright";
         });
-        inputHandler.onRelease(Keys.MoveRight, () => {
+        inputHandler.onRelease(Action.MoveRight, () => {
             if(isOtherKeyHeld() || this.#movmentFrezze){ return; }
             this.#direction = "idleright";
         });

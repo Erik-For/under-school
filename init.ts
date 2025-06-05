@@ -4,7 +4,7 @@ import * as Util from './util.js';
 import { Screen } from './screen.js';
 import { TextAsset, AudioAsset, AssetLoader} from './assetloader.js';
 import { Pos, Game, AudioManager, ParticleManager, Mode } from './game.js';
-import Keys from './keys.js';
+import Keys, { Action } from './keys.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -115,7 +115,7 @@ const assetLoader = new AssetLoader(
 
         scanGamepads();
 
-        game.getInputHandler().onClick(Keys.Debug2, async () => {
+        game.getInputHandler().onClick(Action.Debug2, async () => {
             if(dev){
                 let sceneName = prompt("Enter scene name");
                 if(sceneName){

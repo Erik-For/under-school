@@ -2,6 +2,7 @@ import * as Sprites from './sprite.js';
 import { deserilizeScene, Scene, serilizeScene, Tile, TileCoordinate } from './scene.js';
 import { InputHandler } from './input.js';
 import { AssetLoader } from './assetloader.js';
+import { Action } from './keys.js';
 
 const canvas: HTMLCanvasElement = document.getElementById('game') as HTMLCanvasElement;
 canvas.width = window.innerWidth;
@@ -74,19 +75,19 @@ const spriteSheetManager = new AssetLoader (
         });
         
         //movement
-        input.onHold('KeyW', () => {
+        input.onHold(Action.MoveLeft, () => {
             if(selectSpriteModalActive){ return; }
             camera.y -= (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
-        input.onHold('KeyS', () => {
+        input.onHold(Action.MoveDown, () => {
             if(selectSpriteModalActive){ return; }
             camera.y += (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
-        input.onHold('KeyA', () => {
+        input.onHold(Action.MoveUp, () => {
             if(selectSpriteModalActive){ return; }
             camera.x -= (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
-        input.onHold('KeyD', () => {
+        input.onHold(Action.MoveRight, () => {
             if(selectSpriteModalActive){ return; }
             camera.x += (1.5*renderScale)/(( window.outerWidth - 10 ) / window.innerWidth);
         });
@@ -98,17 +99,17 @@ const spriteSheetManager = new AssetLoader (
             if(!renderCollision){ return; }
             selectedCollisionRule = rule;
         }
-        input.onClick('ArrowUp', () => setCollisionRule(selectedCollisionRule + 1));
-        input.onClick('ArrowDown', () => setCollisionRule(selectedCollisionRule - 1));
+        input.onClick(Action.EditorUpArrow, () => setCollisionRule(selectedCollisionRule + 1));
+        input.onClick(Action.EditorDownArrow, () => setCollisionRule(selectedCollisionRule - 1));
 
         // toggle render collision
-        input.onClick('KeyE', () => {
+        input.onClick(Action.EditorE, () => {
             if(selectSpriteModalActive){ return; }
             renderCollision = !renderCollision;
         });
 
         // set collision rule on tile from selectedCollisionRule
-        input.onClick('KeyR', () => {
+        input.onClick(Action.EditorR, () => {
             if(selectSpriteModalActive){ return; }
             if(!renderCollision) { return; }
             let x = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
@@ -121,7 +122,7 @@ const spriteSheetManager = new AssetLoader (
         });
 
         // copy scene to clipboard as json string
-        input.onClick('KeyC', () => {
+        input.onClick(Action.EditorC, () => {
             if(selectSpriteModalActive){ return; }
             if(confirm("Do you want to copy the current scene? as a JSON string")){
                 let serilizedScene = serilizeScene(scene);
@@ -131,7 +132,7 @@ const spriteSheetManager = new AssetLoader (
         });
 
         // load scene from clipboard json string
-        input.onClick('KeyV', () => {
+        input.onClick(Action.EditorV, () => {
             if(selectSpriteModalActive){ return; }
             if(confirm("Do you want to paste to the current scene? from a JSON string")){
                 navigator.clipboard.readText().then(async (text) => {
@@ -141,7 +142,7 @@ const spriteSheetManager = new AssetLoader (
         });
 
         // clear scene
-        input.onClick('KeyX', () => {
+        input.onClick(Action.EditorX, () => {
             if(selectSpriteModalActive){ return; }
             if(confirm("Do you want to clear the current scene?")){
                 scene = new Scene();
@@ -149,7 +150,7 @@ const spriteSheetManager = new AssetLoader (
         });
 
         // Copy selected section to clipboard
-        input.onClick('KeyY', () => {
+        input.onClick(Action.EditorY, () => {
             if (selectSpriteModalActive) { return; }
             if (!selection.active) {
                 // Start selection
@@ -192,7 +193,7 @@ const spriteSheetManager = new AssetLoader (
         });
 
         // Paste copied section at mouse position
-        input.onClick('KeyZ', () => {
+        input.onClick(Action.EditorZ, () => {
             if (selectSpriteModalActive) { return; }
             if (!clipboard || !isPreviewActive) {
                 return;
@@ -259,10 +260,10 @@ const spriteSheetManager = new AssetLoader (
             }
         }
         // bind the selection functions to keys
-        input.onClick('KeyF', () => handleSelection("remove"));
-        input.onClick('KeyG', () => handleSelection("add"));
-        input.onClick('KeyH', () => handleSelection("random"));
-        input.onClick('KeyT', () => handleSelection("col"));
+        input.onClick(Action.EditorF, () => handleSelection("remove"));
+        input.onClick(Action.EditorG, () => handleSelection("add"));
+        input.onClick(Action.EditorH, () => handleSelection("random"));
+        input.onClick(Action.EditorT, () => handleSelection("col"));
 
         // place 
         canvas.addEventListener('click', (event) => {
@@ -271,7 +272,7 @@ const spriteSheetManager = new AssetLoader (
             let y = Math.floor(((camera.y - canvas.height / 2) + event.clientY) / (tileSize * renderScale));
             // when holding shift add a sprite to the top of the tile
             // if not holding shift create/replace tile
-            if(input.isKeyDown("ShiftLeft")){
+            if(input.isKeyDown(Action.EditorShiftLeft)){
                 let tile = scene.getTile(new TileCoordinate(x, y));
                 if(tile != null ){
                     let zindex = tile.getSprites().sort((a,b) => a.zindex - b.zindex)[0].zindex // get the zindex of the top sprite
@@ -289,7 +290,7 @@ const spriteSheetManager = new AssetLoader (
             let y = Math.floor(((camera.y - canvas.height / 2) + event.clientY) / (tileSize * renderScale));
             // when holding shift remove the top sprite from the tile
             // if not holding shift delete the tile
-            if(input.isKeyDown("ShiftLeft")){
+            if(input.isKeyDown(Action.EditorShiftLeft)){
                 let tile = scene.getTile(new TileCoordinate(x, y));
                 if(tile != null ){
                     if(tile.getSprites().length == 1){
@@ -304,7 +305,7 @@ const spriteSheetManager = new AssetLoader (
         })
 
 
-        input.onClick('KeyK', () => {
+        input.onClick(Action.Interact, () => {
             let x = Math.floor(((camera.x - canvas.width / 2) + mouse.x) / (tileSize * renderScale));
             let y = Math.floor(((camera.y - canvas.height / 2) + mouse.y) / (tileSize * renderScale));
             
@@ -312,7 +313,7 @@ const spriteSheetManager = new AssetLoader (
         });
 
 
-        input.onClick('KeyP', () => {
+        input.onClick(Action.Debug, () => {
             isPreviewActive = !isPreviewActive;            
         });
 
