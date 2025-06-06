@@ -294,7 +294,6 @@ export default class Script implements SceneScript {
         this.drawScanlines(ctx, screen.width, screen.height);
         ctx.font = `${fontSizeSmall}px underschool`;
         ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
-        ctx.fillText("uunnvhvhba", 10 * this.scaleX, screen.height - 80 * this.scaleY);
         
         if(!this.isCrashed && this.canMove) {
             // Fixed increment per second instead of per frame
