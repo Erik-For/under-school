@@ -43,6 +43,13 @@ jobs:
         run: npx tsc
       - name: Build TypeDoc
         run: npx typedoc *.ts --name Underschool --exclude editor.ts --exclude init.ts --readme DOCS.md --out ./build/docs/
+      - name: Copy game.html to index.html
+        run: cp ./build/game.html ./build/index.html
+      - name: Create downloadable zip
+        run: |
+          cd ./build
+          zip -r public.zip .
+          cd ..
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
