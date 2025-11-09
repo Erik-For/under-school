@@ -1,5 +1,6 @@
-[Game demo](https://underschool.vibevault.se/game.html)
-[Editor demo](https://underschool.vibevault.se/editor.html)
+
+[Game demo](https://avateknik.se/oppet-hus/under-school/index.html)
+[Editor demo](https://avateknik.se/oppet-hus/under-school/editor.html)
 
 # Bästa spelet någonsin gjort förmodligen
 
