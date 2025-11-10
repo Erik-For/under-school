@@ -1,11 +1,7 @@
-
-[Game demo](https://avateknik.se/oppet-hus/under-school/index.html)
-[Editor demo](https://avateknik.se/oppet-hus/under-school/editor.html)
+[Game](https://erik-for.github.io/under-school/index.html)
+[Editor](https://erik-for.github.io/under-school/editor.html)
 
 # Bästa spelet någonsin gjort förmodligen
-
-[Docs](https://underschool.vibevault.se/docs/)
-[Editor docs](https://github.com/Erik-For/under-school-testing/blob/master/EDITOR.md)
 
 ## Setup and Building (you need node and npm)
 ### Run the following commands to setup
